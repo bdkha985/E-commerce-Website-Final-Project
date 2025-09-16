@@ -1,0 +1,204 @@
+/* Banner */
+.banner {
+  height: calc(100vh - 140px);
+}
+.banner .carousel,
+.banner .carousel-inner,
+.banner .carousel-item,
+.banner img {
+  height: 100%;
+}
+.banner img {
+  object-fit: cover;
+}
+
+.banner .carousel-caption {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  text-align: center;
+  padding-bottom: 40px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+}
+
+.banner-title {
+  font-size: clamp(2.4rem, 5vw, 5rem);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.banner-subtitle {
+  font-size: 1.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-banner {
+  background-color: var(--primary-color);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 500;
+}
+.btn-banner:hover {
+  opacity: 0.9;
+}
+/* Section title */
+.section-title {
+  margin: 60px 0 30px;
+  font-size: 2.8rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-color);
+  position: relative;
+}
+.section-title::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: var(--primary-color);
+  margin: 12px auto 0;
+  border-radius: 2px;
+}
+
+/* Grid chung */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+/* Card sản phẩm & blog */
+.card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #eee;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+}
+.card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+.card h3 {
+  margin: 16px;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+.card .price {
+  margin: 0 16px 16px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+.card p {
+  margin: 0 16px 16px;
+  color: #555;
+}
+
+/* Card nâng cấp hiệu ứng ảnh */
+.card {
+  position: relative;
+  overflow: hidden;
+}
+
+.card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  transition: transform .5s ease, filter .5s ease;
+  display: block;
+}
+
+.card:hover img {
+  transform: scale(1.06);
+  filter: saturate(1.05) contrast(1.02);
+}
+
+.card::before {
+  content: attr(data-badge);
+  position: absolute; top: 10px; left: 10px;
+  background: var(--primary-color);
+  color: #fff; font-weight: 700;
+  font-size: 1.2rem; padding: 4px 8px; border-radius: 999px;
+  opacity: .95;
+}
+
+/* Contact form */
+.contact-form {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.contact-form input,
+.contact-form textarea {
+  padding: 14px 16px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1.4rem;
+  transition: border-color 0.3s;
+}
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,84,97,0.1);
+}
+.contact-form button {
+  background: var(--primary-color);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 14px;
+  transition: background 0.3s;
+}
+.contact-form button:hover {
+  background: #00414b;
+}
+
+/* About us */
+.member-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.member-card img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 12px;
+  border: 3px solid var(--primary-color);
+}
+.member-card h3 {
+  margin: 8px 0 4px;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+.member-card p {
+  color: #666;
+  font-size: 1.4rem;
+}
+.member-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}

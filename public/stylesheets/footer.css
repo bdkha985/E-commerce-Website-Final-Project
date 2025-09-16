@@ -1,0 +1,91 @@
+/* Footer */
+.footer {
+  margin-top: 60px;
+  background: #fff;
+  border-top: 1px solid var(--border, #e5e7eb);
+}
+
+.footer__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 2fr;
+  gap: 28px;
+  padding: 28px 0;
+}
+
+.footer__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+}
+.footer__logo img {
+  width: 28px; height: 28px; display: block;
+}
+.footer__desc { margin-top: 10px; color: #64748b; }
+
+.footer__links h4,
+.footer__news h4 {
+  font-size: 1.6rem;
+  margin: 6px 0 12px;
+  font-weight: 700;
+}
+.footer__links a {
+  display: block;
+  color: #334155;
+  margin: 8px 0;
+}
+.footer__links a:hover { text-decoration: underline; }
+
+.news-form {
+  display: flex; gap: 8px; margin: 10px 0 12px;
+}
+.news-form input {
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 1.4rem;
+}
+.btn--news {
+  background: var(--primary-color);
+  color: #fff;
+  border-radius: 10px;
+  padding: 12px 16px;
+  border: none;
+  font-weight: 600;
+}
+.btn--news:hover { opacity: .9; }
+
+.footer__socials { display: flex; gap: 10px; margin-top: 8px; }
+.footer__socials a {
+  width: 36px; height: 36px; display: inline-flex;
+  align-items: center; justify-content: center;
+  border: 1px solid #cbd5e1; border-radius: 50%;
+  color: #0f172a;
+}
+.footer__socials a:hover {
+  background: var(--primary-color); color: #fff; border-color: var(--primary-color);
+}
+
+/* Bottom bar */
+.footer__bottom {
+  border-top: 1px solid var(--border, #e5e7eb);
+  background: #fff;
+}
+.footer__bottom-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0;
+}
+.footer__bottom-links { display: flex; gap: 10px; color: #64748b; }
+.footer__bottom-links a { color: inherit; }
+.footer__bottom-links a:hover { text-decoration: underline; }
+
+/* Responsive */
+@media (max-width: 992px) {
+  .footer__grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .footer__grid { grid-template-columns: 1fr; }
+  .news-form { flex-direction: column; }
+  .footer__bottom-inner { flex-direction: column; gap: 8px; text-align: center; }
+}
