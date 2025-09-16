@@ -1,4 +1,7 @@
 /* Footer */
+footer {
+  background: var(--background-color);
+}
 .footer {
   margin-top: 60px;
   background: #fff;
