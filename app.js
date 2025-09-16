@@ -2,7 +2,7 @@ require('dotenv').config();
 
 var createError = require('http-errors');
 var express = require('express');
- var cookieParser = require('cookie-parser');
+var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const configViewEngine = require('./config/viewEngine');
 const webRoutes = require('./routes/web');
@@ -28,6 +28,7 @@ app.use(cookieParser());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/', require('./routes/web'));
 
 app.listen(port, hostname, () => {
   console.log(`Example app listening on port ${port}`)
