@@ -1,0 +1,32 @@
+<section class="auth container">
+  <div class="auth-card">
+    <h1 class="auth-title">Create Account</h1>
+    <p class="auth-sub">Đăng ký để mua sắm dễ dàng</p>
+
+    <form action="/signup" method="post" class="auth-form">
+      <div class="mb-3">
+        <label class="form-label">Full name</label>
+        <input name="fullName" type="text" class="form-control" placeholder="Nguyễn Văn A" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input name="email" type="email" class="form-control" placeholder="you@example.com" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input name="password" type="password" class="form-control" placeholder="Tối thiểu 6 ký tự" required minlength="6">
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">Confirm password</label>
+        <input name="confirmPassword" type="password" class="form-control" placeholder="Nhập lại mật khẩu" required minlength="6">
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+    </form>
+
+    <p class="auth-alt">Đã có tài khoản? <a href="/signin">Sign in</a></p>
+  </div>
+</section>

@@ -1,6 +1,6 @@
 const { get } = require("../routes");
 
-const getHomePage = (req, res) => {
+const test = (req, res) => {
     res.render('index.ejs');
 }
 
@@ -9,6 +9,6 @@ function render(res, viewPath, locals = {}) {
 }
 
 module.exports = {
-    getHomePage,
+    test,
     render
 }

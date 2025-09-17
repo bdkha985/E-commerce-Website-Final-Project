@@ -19,7 +19,19 @@ const hostname = process.env.HOST_NAME || 'localhost';
 configViewEngine(app);
 
 //khai bao routes
+app.use((req, res, next) => {
+  // Demo: thay bằng session/DB sau
+  if (!res.locals.cartItems) {
+    res.locals.cartItems = [
+      { slug:'mid-century-modern-tshirt', name:'Mid Century Modern T-Shirt', qty:1, price:110000, image:'https://picsum.photos/seed/p1a/80/80' },
+      { slug:'corporate-office-shoes',    name:'Corporate Office Shoes',    qty:1, price:399000, image:'https://picsum.photos/seed/p2a/80/80' },
+    ];
+  }
+  res.locals.cartCount = res.locals.cartItems.length;
+  next();
+});
 app.use('/', webRoutes);
+
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -28,7 +40,7 @@ app.use(cookieParser());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/', require('./routes/web'));
+// app.use('/', require('./routes/web'));
 
 app.listen(port, hostname, () => {
   console.log(`Example app listening on port ${port}`)
