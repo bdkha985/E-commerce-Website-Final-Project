@@ -1,10 +1,11 @@
 /* Footer */
+
 footer {
   background: var(--background-color);
 }
+
 .footer {
   margin-top: 60px;
-  background: #fff;
   border-top: 1px solid var(--border, #e5e7eb);
 }
 
@@ -73,7 +74,6 @@ footer {
 /* Bottom bar */
 .footer__bottom {
   border-top: 1px solid var(--border, #e5e7eb);
-  background: #fff;
 }
 .footer__bottom-inner {
   display: flex; align-items: center; justify-content: space-between;

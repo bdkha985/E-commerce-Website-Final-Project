@@ -15,6 +15,11 @@
     <link rel="stylesheet" href="/stylesheets/body.css">
     <link rel="stylesheet" href="/stylesheets/products.css">
     <link rel="stylesheet" href="/stylesheets/products-detail.css">
+    <link rel="stylesheet" href="/stylesheets/auth.css">
+    <link rel="stylesheet" href="/stylesheets/blog.css">
+    <link rel="stylesheet" href="/stylesheets/contact.css">
+    <link rel="stylesheet" href="/stylesheets/about.css">
+    <link rel="stylesheet" href="/stylesheets/cart.css">
     <link rel="stylesheet" href="/stylesheets/footer.css">
     <title>K Shopping</title>
 
@@ -26,6 +31,12 @@
 
 </head>
 <body>
+
+      <!-- Page Loader -->
+    <div id="app-loader" aria-hidden="true">
+        <div class="spinner"></div>
+        <p>Đang tải…</p>
+    </div>
     <!-- Header chung -->
     <%- include('../partials/header') %>
 
@@ -39,5 +50,6 @@
 
     <!-- JS tĩnh (nếu có) -->
     <script src="/javascripts/main.js"></script>
+    <script src="/javascripts/loader.js"></script>
 </body>
 </html>
