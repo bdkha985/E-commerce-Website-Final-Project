@@ -1,12 +1,13 @@
 require('dotenv').config();
+require('express-async-errors');     // để throw trong async không cần try/catch ở mỗi controller
 
 var createError = require('http-errors');
-var express = require('express');
+const express = require('express');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const configViewEngine = require('./config/viewEngine');
 const webRoutes = require('./routes/web');
-const connection = require('./config/database')
+const { connectDB } = require('./config/database');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -15,10 +16,7 @@ const app = express();
 const port = process.env.PORT || 8888;
 const hostname = process.env.HOST_NAME || 'localhost';
 
-// config view engine
-configViewEngine(app);
-
-//khai bao routes
+// FAKE DATA
 app.use((req, res, next) => {
   // Demo: thay bằng session/DB sau
   if (!res.locals.cartItems) {
@@ -30,21 +28,41 @@ app.use((req, res, next) => {
   res.locals.cartCount = res.locals.cartItems.length;
   next();
 });
-app.use('/', webRoutes);
 
-
+//web routes
 app.use(logger('dev'));
+
+// parse body
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// config view engine
+configViewEngine(app);
+
+//routes
+app.use('/', webRoutes);
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-// app.use('/', require('./routes/web'));
 
-app.listen(port, hostname, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+connectDB(process.env.MONGODB_URI)
+  .then(() => {
+    app.listen(port, hostname, () => {
+      console.log(`✅ Server running at http://${hostname}:${port}`);
+    });
+  })
+  .catch(err => {
+    console.error('❌ Failed to connect to MongoDB:', err.message);
+    process.exit(1);
+  });
+
+  const Test = require('./models/test.model');
+
+app.get('/test-insert', async (req, res) => {
+  const doc = await Test.create({ name: 'Hello DB' });
+  res.json(doc);
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
