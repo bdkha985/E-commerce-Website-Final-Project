@@ -33,18 +33,17 @@ router.get('/blog', (req, res) =>
   render(res, 'pages/blog', { title: 'Blog' })
 );
 
-//Contact us
+// Contact us
 router.get('/contact', (req, res) =>
   render(res, 'pages/contact', { title: 'Contact Us' })
 );
 
-//About us
+// About us
 router.get('/about', (req, res) =>
   render(res, 'pages/about', { title: 'About Us' })
 );
 
-//Cart
-
+// Cart
 router.get('/cart', (req, res) =>
   render(res, 'pages/cart', { title: 'Cart' })
 );
