@@ -57,12 +57,7 @@ connectDB(process.env.MONGODB_URI)
     process.exit(1);
   });
 
-  const Test = require('./models/test.model');
-
-app.get('/test-insert', async (req, res) => {
-  const doc = await Test.create({ name: 'Hello DB' });
-  res.json(doc);
-});
+app.use('/', require('./routes/auth.api'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
