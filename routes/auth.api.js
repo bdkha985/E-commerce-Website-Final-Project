@@ -2,6 +2,7 @@
 const express = require('express');
 const { body } = require('express-validator');
 const { signup } = require('../controllers/authController');
+const { signin } = require('../controllers/authController');
 
 const router = express.Router();
 
@@ -18,5 +19,10 @@ router.post(
   ],
   signup
 );
+
+router.post('/signin', [
+  body('email').isEmail().withMessage('Email không hợp lệ'),
+  body('password').isLength({ min: 6 }).withMessage('Mật khẩu >= 6 ký tự')
+], signin);
 
 module.exports = router;

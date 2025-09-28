@@ -1,26 +1,38 @@
-// services/user.service.js
-const bcrypt = require('bcrypt');
 const User = require('../models/user.model');
+const bcrypt = require('bcrypt');
 
 async function createUserLocal({ email, password, fullName }) {
-  // chuẩn hoá email
-  email = String(email).toLowerCase().trim();
-
-  // đã tồn tại?
-  const existed = await User.findOne({ email });
-  if (existed) {
-    const err = new Error('Email already in use');
-    err.status = 409;
-    throw err;
-  }
+  const existing = await User.findOne({ email: email.toLowerCase() });
+  if (existing) throw new Error('Email đã được sử dụng');
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = await User.create({
-    email, passwordHash, fullName, roles: ['customer']
+
+  const user = new User({
+    email: email.toLowerCase(),
+    passwordHash,
+    fullName,
+    roles: ['customer'],
+    createdAt: new Date(),
+    updatedAt: new Date()
   });
 
-  // Không trả passwordHash ra ngoài
-  return { id: user._id, email: user.email, fullName: user.fullName, roles: user.roles };
+  return await user.save();
 }
 
-module.exports = { createUserLocal };
+async function findUserByEmail(email) {
+  return await User.findOne({ email: String(email).toLowerCase().trim() });
+}
+
+async function validatePassword(user, password) {
+  if (!user?.passwordHash) return false;
+  try {
+    return await bcrypt.compare(password, user.passwordHash);
+  } catch {
+    return false;
+  }
+}
+
+module.exports = { 
+  createUserLocal, 
+  findUserByEmail,
+  validatePassword };

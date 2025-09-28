@@ -58,8 +58,14 @@
     </div>
   </div><!-- /cart-hover -->
 
-  <a href="/signin" class="btn action-link">Sign in</a>
-</div>
+  <% if (currentUser) { %>
+    <span class="me-3">Xin chào, <strong><%= currentUser.fullName %></strong></span>
+    <a href="/logout">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+    </a>
+  <% } else { %>
+    <a href="/signin" class="btn action-link">Sign in</a>
+  <% } %></div>
     </nav>
   </div>
 </header>
