@@ -8,12 +8,16 @@
     "seed:users": "node seeders/seed-users.js"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "connect-flash": "^0.1.1",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dotenv": "^17.2.2",
     "ejs": "3.1.10",
     "express": "4.16.4",
     "express-async-errors": "^3.1.1",
+    "express-session": "^1.18.2",
+    "express-validator": "^7.2.1",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "mongoose": "^8.18.1",

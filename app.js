@@ -1,6 +1,8 @@
 require('dotenv').config();
-require('express-async-errors');     // để throw trong async không cần try/catch ở mỗi controller
+require('express-async-errors');
 
+const flash = require('connect-flash');
+const session = require('express-session');
 var createError = require('http-errors');
 const express = require('express');
 var cookieParser = require('cookie-parser');
@@ -37,6 +39,30 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// Check
+app.use(session({
+  secret: 'kshop-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 1000*60*60 } // 1h
+}));
+
+app.use(flash());
+app.use((req, res, next) => {
+  // đưa user đang đăng nhập ra view
+  if (req.session && req.session.fullName) {
+    res.locals.currentUser = {
+      fullName: req.session.fullName,
+      role: req.session.role
+    };
+  } else res.locals.currentUser = null;
+
+  // đưa flash ra view (nếu dùng toast)
+  res.locals.flashSuccess = req.flash('success');
+  res.locals.flashError   = req.flash('error');
+  next();
+});
+
 // config view engine
 configViewEngine(app);
 
@@ -57,12 +83,8 @@ connectDB(process.env.MONGODB_URI)
     process.exit(1);
   });
 
-  const Test = require('./models/test.model');
-
-app.get('/test-insert', async (req, res) => {
-  const doc = await Test.create({ name: 'Hello DB' });
-  res.json(doc);
-});
+// app.use('/', require('./routes/auth.api'));
+app.use('/', require('./routes/auth.api'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

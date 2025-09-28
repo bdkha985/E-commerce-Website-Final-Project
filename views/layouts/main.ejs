@@ -32,6 +32,26 @@
 </head>
 <body>
 
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:1080">
+  <% if (flashSuccess && flashSuccess.length) { %>
+    <div id="toastSuccess" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body"><%= flashSuccess[0] %></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  <% } %>
+  <% if (flashError && flashError.length) { %>
+    <div id="toastError" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body"><%= flashError[0] %></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  <% } %>
+</div>
+
+
       <!-- Page Loader -->
     <div id="app-loader" aria-hidden="true">
         <div class="spinner"></div>
@@ -49,7 +69,15 @@
     <%- include('../partials/footer') %>
 
     <!-- JS tĩnh (nếu có) -->
-    <script src="/javascripts/main.js"></script>
     <script src="/javascripts/loader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        const s = document.getElementById('toastSuccess');
+        const e = document.getElementById('toastError');
+        if (s) new bootstrap.Toast(s, { delay: 3000 }).show();
+        if (e) new bootstrap.Toast(e, { delay: 4000 }).show();
+        });
+        </script>
 </body>
 </html>

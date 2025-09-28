@@ -1,62 +1,38 @@
-// services/user.service.js
-const bcrypt = require('bcrypt');
 const User = require('../models/user.model');
+const bcrypt = require('bcrypt');
 
-async function createUserLocal({ email, password, fullName, roles = ['customer'] }) {
-  const passwordHash = password ? await bcrypt.hash(password, 10) : null;
-  const user = await User.create({
-    email,
+async function createUserLocal({ email, password, fullName }) {
+  const existing = await User.findOne({ email: email.toLowerCase() });
+  if (existing) throw new Error('Email đã được sử dụng');
+
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  const user = new User({
+    email: email.toLowerCase(),
     passwordHash,
     fullName,
-    roles,
-    loyaltyPoints: { balance: 0, lastUpdatedAt: new Date() }
-  });
-  return user.toObject();
-}
-
-async function createUserOAuth({ email, fullName, provider, providerId }) {
-  const oauthField = provider === 'google' ? { googleId: providerId } : { facebookId: providerId };
-  const user = await User.create({
-    email,
-    passwordHash: null,
-    fullName,
     roles: ['customer'],
-    oauth: oauthField,
-    loyaltyPoints: { balance: 0, lastUpdatedAt: new Date() }
+    createdAt: new Date(),
+    updatedAt: new Date()
   });
-  return user.toObject();
+
+  return await user.save();
 }
 
-async function findByEmail(email) {
-  return User.findOne({ email: email.toLowerCase() }).lean();
+async function findUserByEmail(email) {
+  return await User.findOne({ email: String(email).toLowerCase().trim() });
 }
 
-async function addAddress(userId, address, setDefault = false) {
-  const user = await User.findById(userId);
-  if (!user) return null;
-
-  const addr = { ...address, isDefault: !!setDefault };
-  if (setDefault) {
-    user.addresses = user.addresses.map(a => ({ ...a.toObject?.() ?? a, isDefault: false }));
+async function validatePassword(user, password) {
+  if (!user?.passwordHash) return false;
+  try {
+    return await bcrypt.compare(password, user.passwordHash);
+  } catch {
+    return false;
   }
-  user.addresses.push(addr);
-  await user.save();
-  return user.toObject();
 }
 
-async function updateLoyalty(userId, delta) {
-  const user = await User.findById(userId);
-  if (!user) return null;
-  user.loyaltyPoints.balance = Math.max(0, (user.loyaltyPoints.balance || 0) + delta);
-  user.loyaltyPoints.lastUpdatedAt = new Date();
-  await user.save();
-  return user.toObject();
-}
-
-module.exports = {
-  createUserLocal,
-  createUserOAuth,
-  findByEmail,
-  addAddress,
-  updateLoyalty
-};
+module.exports = { 
+  createUserLocal, 
+  findUserByEmail,
+  validatePassword };
