@@ -1,40 +1,54 @@
 <section class="cart-page container">
-  <h1 class="section-title">Giỏ Hàng</h1>
+    <h1 class="section-title">Giỏ Hàng</h1>
 
-  <div class="cart-layout">
-    <div class="cart-table">
-      <div class="cart-row cart-head">
-        <div>Sản phẩm</div><div class="t-center">Số lượng</div><div class="t-right">Tổng tiền</div><div class="t-center">Xóa</div>
-      </div>
-
-      <% (cartItems || []).forEach(it => { %>
-        <div class="cart-row">
-          <div class="cart-prod">
-            <img src="<%= it.image %>" alt="">
-            <div>
-              <a class="name" href="/products/<%= it.slug %>"><%= it.name %></a>
-              <div class="price"><%= (it.price).toLocaleString('vi-VN') %>đ</div>
+    <div class="cart-layout">
+        <div class="cart-table">
+            <div class="cart-row cart-head">
+                <div>Sản phẩm</div>
+                <div class="t-center">Số lượng</div>
+                <div class="t-right">Tổng tiền</div>
+                <div class="t-center">Xóa</div>
             </div>
-          </div>
-          <div class="t-center qty"> <span class="qty-box">&lt; 1 &gt;</span> </div>
-          <div class="t-right"><%= (it.price * it.qty).toLocaleString('vi-VN') %>đ</div>
-          <div class="t-center"><i class="fa-regular fa-trash-can"></i></div>
+
+            <% (cartItems || []).forEach(it => { %>
+            <div class="cart-row">
+                <div class="cart-prod">
+                    <img src="<%= it.image %>" alt="" />
+                    <div>
+                        <a class="name" href="/products/<%= it.slug %>"
+                            ><%= it.name %></a
+                        >
+                        <div class="price">
+                            <%= (it.price).toLocaleString('vi-VN') %>đ
+                        </div>
+                    </div>
+                </div>
+                <div class="t-center qty">
+                    <span class="qty-box">&lt; 1 &gt;</span>
+                </div>
+                <div class="t-right">
+                    <%= (it.price * it.qty).toLocaleString('vi-VN') %>đ
+                </div>
+                <div class="t-center">
+                    <i class="fa-regular fa-trash-can"></i>
+                </div>
+            </div>
+            <% }) %>
         </div>
-      <% }) %>
+
+        <aside class="cart-summary">
+            <div class="sum-row">
+                <span>Tổng tiền</span>
+                <strong>
+                    <%= (cartItems || []).reduce((s,i)=> s + i.price*i.qty,
+                    0).toLocaleString('vi-VN') %>đ
+                </strong>
+            </div>
+            <a class="btn btn-checkout" href="/checkout">THANH TOÁN</a>
+        </aside>
     </div>
 
-    <aside class="cart-summary">
-      <div class="sum-row">
-        <span>Tổng tiền</span>
-        <strong>
-          <%= (cartItems || []).reduce((s,i)=> s + i.price*i.qty, 0).toLocaleString('vi-VN') %>đ
-        </strong>
-      </div>
-      <a class="btn btn-checkout" href="/checkout">THANH TOÁN</a>
-    </aside>
-  </div>
-
-  <div class="cart-actions">
-    <a href="/products" class="btn btn-continue">TIẾP TỤC MUA SẮM</a>
-  </div>
+    <div class="cart-actions">
+        <a href="/products" class="btn btn-continue">TIẾP TỤC MUA SẮM</a>
+    </div>
 </section>

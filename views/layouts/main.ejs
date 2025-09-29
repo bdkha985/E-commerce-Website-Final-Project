@@ -1,82 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-    
-    <!-- CSS LINK -->
-    <link rel="stylesheet" href="/stylesheets/reset.css">
-    <link rel="stylesheet" href="/stylesheets/header.css">
-    <link rel="stylesheet" href="/stylesheets/body.css">
-    <link rel="stylesheet" href="/stylesheets/products.css">
-    <link rel="stylesheet" href="/stylesheets/products-detail.css">
-    <link rel="stylesheet" href="/stylesheets/auth.css">
-    <link rel="stylesheet" href="/stylesheets/blog.css">
-    <link rel="stylesheet" href="/stylesheets/contact.css">
-    <link rel="stylesheet" href="/stylesheets/about.css">
-    <link rel="stylesheet" href="/stylesheets/cart.css">
-    <link rel="stylesheet" href="/stylesheets/footer.css">
-    <title>K Shopping</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+            crossorigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap&subset=vietnamese"
+            rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
 
-    <!-- FAVICON -->
-    <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-touch-icon">
-    <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-32x32">
-    <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+        <!-- CSS LINK -->
+        <link rel="stylesheet" href="/stylesheets/reset.css" />
+        <link rel="stylesheet" href="/stylesheets/header.css" />
+        <link rel="stylesheet" href="/stylesheets/body.css" />
+        <link rel="stylesheet" href="/stylesheets/account.css" />
+        <link rel="stylesheet" href="/stylesheets/products.css" />
+        <link rel="stylesheet" href="/stylesheets/products-detail.css" />
+        <link rel="stylesheet" href="/stylesheets/auth.css" />
+        <link rel="stylesheet" href="/stylesheets/blog.css" />
+        <link rel="stylesheet" href="/stylesheets/contact.css" />
+        <link rel="stylesheet" href="/stylesheets/about.css" />
+        <link rel="stylesheet" href="/stylesheets/cart.css" />
+        <link rel="stylesheet" href="/stylesheets/footer.css" />
+        <title>K Shopping</title>
 
-</head>
-<body>
+        <!-- FAVICON -->
+        <link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href="./images/favicon/apple-touch-icon" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="./images/favicon/favicon-32x32" />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="./images/favicon/favicon-16x16.png" />
+        <link rel="manifest" href="./images/favicon/site.webmanifest" />
+    </head>
+    <body>
+        <div
+            class="toast-container position-fixed top-0 end-0 p-3"
+            style="z-index: 1080">
+            <% if (flashSuccess && flashSuccess.length) { %>
+            <div
+                id="toastSuccess"
+                class="toast align-items-center text-bg-success border-0"
+                role="alert"
+                aria-live="assertive"
+                aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body"><%= flashSuccess[0] %></div>
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+            <% } %> <% if (flashError && flashError.length) { %>
+            <div
+                id="toastError"
+                class="toast align-items-center text-bg-danger border-0"
+                role="alert"
+                aria-live="assertive"
+                aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body"><%= flashError[0] %></div>
+                    <button
+                        type="button"
+                        class="btn-close btn-close-white me-2 m-auto"
+                        data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+            <% } %>
+        </div>
 
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:1080">
-  <% if (flashSuccess && flashSuccess.length) { %>
-    <div id="toastSuccess" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body"><%= flashSuccess[0] %></div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-      </div>
-    </div>
-  <% } %>
-  <% if (flashError && flashError.length) { %>
-    <div id="toastError" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body"><%= flashError[0] %></div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-      </div>
-    </div>
-  <% } %>
-</div>
+        <!-- Page Loader -->
+        <div id="app-loader" aria-hidden="true">
+            <div class="spinner"></div>
+            <p>Đang tải…</p>
+        </div>
+        <!-- Header chung -->
+        <%- include('../partials/header') %>
 
-      <!-- Page Loader -->
-    <div id="app-loader" aria-hidden="true">
-        <div class="spinner"></div>
-        <p>Đang tải…</p>
-    </div>
-    <!-- Header chung -->
-    <%- include('../partials/header') %>
+        <!-- Nội dung riêng của từng trang -->
+        <main><%- include('../' + body) %></main>
 
-    <!-- Nội dung riêng của từng trang -->
-    <main>
-    <%- include('../' + body) %>
-    </main>
+        <!-- Footer chung -->
+        <%- include('../partials/footer') %>
 
-    <!-- Footer chung -->
-    <%- include('../partials/footer') %>
-
-    <!-- JS tĩnh (nếu có) -->
-    <script src="/javascripts/loader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- JS tĩnh (nếu có) -->
+        <script src="/javascripts/loader.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-        document.addEventListener('DOMContentLoaded', () => {
-        const s = document.getElementById('toastSuccess');
-        const e = document.getElementById('toastError');
-        if (s) new bootstrap.Toast(s, { delay: 3000 }).show();
-        if (e) new bootstrap.Toast(e, { delay: 4000 }).show();
-        });
+            document.addEventListener("DOMContentLoaded", () => {
+                const s = document.getElementById("toastSuccess");
+                const e = document.getElementById("toastError");
+                if (s) new bootstrap.Toast(s, { delay: 3000 }).show();
+                if (e) new bootstrap.Toast(e, { delay: 4000 }).show();
+            });
         </script>
-</body>
+    </body>
 </html>

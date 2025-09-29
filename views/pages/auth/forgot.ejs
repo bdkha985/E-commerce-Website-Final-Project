@@ -1,17 +1,24 @@
 <section class="auth container">
-  <div class="auth-card">
-    <h1 class="auth-title">Forgot Password</h1>
-    <p class="auth-sub">Nhập email để nhận liên kết đặt lại mật khẩu</p>
+    <div class="auth-card">
+        <h1 class="auth-title">Forgot Password</h1>
+        <p class="auth-sub">Nhập email để nhận liên kết đặt lại mật khẩu</p>
 
-    <form action="/forgot" method="post" class="auth-form">
-      <div class="mb-4">
-        <label class="form-label">Email</label>
-        <input name="email" type="email" class="form-control" placeholder="you@example.com" required>
-      </div>
+        <form action="/forgot" method="post" class="auth-form">
+            <div class="mb-4">
+                <label class="form-label">Email</label>
+                <input
+                    name="email"
+                    type="email"
+                    class="form-control"
+                    placeholder="you@example.com"
+                    required />
+            </div>
 
-      <button type="submit" class="btn btn-primary w-100">Gửi liên kết</button>
-    </form>
+            <button type="submit" class="btn btn-primary w-100">
+                Gửi liên kết
+            </button>
+        </form>
 
-    <p class="auth-alt"><a href="/signin">Quay lại Sign in</a></p>
-  </div>
+        <p class="auth-alt"><a href="/signin">Quay lại Sign in</a></p>
+    </div>
 </section>

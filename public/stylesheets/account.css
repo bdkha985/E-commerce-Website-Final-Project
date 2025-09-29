@@ -1,0 +1,252 @@
+/* =========== Account Page – Fresh UI =========== */
+
+.account.container {
+    padding-top: 32px;
+    padding-bottom: 48px;
+}
+
+/* Layout */
+.account .account-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 28px;
+}
+
+@media (max-width: 992px) {
+    .account .account-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Sidebar */
+.account-aside {
+    background: #fff;
+    border: 1px solid #eef2f7;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+}
+
+.account-user {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed #e5e7eb;
+}
+
+.account-user .avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #0ea5e9;
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 1.8rem;
+}
+
+.account-user .name {
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-size: 1.8rem;
+    color: #111827;
+}
+.account-user .email {
+    font-size: 1.35rem;
+    color: #6b7280;
+}
+
+/* Sidebar menu */
+.account-menu {
+    display: grid;
+    gap: 8px;
+}
+
+.account-menu button {
+    width: 100%;
+    border: 1px solid #eef2f7;
+    background: #f8fafc;
+    padding: 12px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #0f172a;
+    transition: all 0.18s ease;
+}
+
+.account-menu button:hover {
+    background: #eef2ff;
+    border-color: #e5e7eb;
+}
+
+.account-menu button.active {
+    background: #e0e7ff;
+    border-color: #c7d2fe;
+    color: #111827;
+}
+
+/* Main content card */
+.account-content {
+    background: #fff;
+    border: 1px solid #eef2f7;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+}
+
+.tab-panel h3 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 16px;
+}
+
+/* Form controls: to, rõ, dễ click */
+.account .form-label {
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+    font-size: 1.5rem;
+}
+.account .form-control {
+    padding: 14px 14px;
+    font-size: 1.6rem; /* value to hơn */
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.account .form-control:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2);
+}
+
+/* Buttons: gọn hơn, nhìn “định hình” hơn */
+.account .btn {
+    --btn-radius: 10px;
+    --btn-pad-y: 10px;
+    --btn-pad-x: 14px;
+    --btn-fs: 1.5rem;
+    border-radius: var(--btn-radius) !important;
+    padding: var(--btn-pad-y) var(--btn-pad-x) !important;
+    font-size: var(--btn-fs) !important;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.account .btn.btn-primary {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+}
+.account .btn.btn-primary:hover {
+    background: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+}
+
+.account .btn.btn-outline-dark {
+    border-color: #0f172a !important;
+    color: #0f172a !important;
+    background: transparent !important;
+}
+.account .btn.btn-outline-dark:hover {
+    background: #0f172a !important;
+    color: #fff !important;
+}
+
+/* Alerts */
+.account .alert {
+    border-radius: 12px;
+    font-size: 1.5rem;
+    padding: 12px 14px;
+}
+
+/* Address list */
+.addr-list {
+    margin-top: 12px;
+    display: grid;
+    gap: 12px;
+}
+
+.addr-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px;
+    background: #fafafa;
+}
+.addr-item .meta {
+    color: #64748b;
+    font-size: 1.45rem;
+    margin-top: 4px;
+}
+.addr-item .actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+/* Dùng badge mặc định của BS nhưng tăng kích thước nhẹ */
+.addr-item .badge {
+    font-size: 1.2rem;
+    padding: 6px 8px;
+    border-radius: 999px;
+}
+
+/* Utilities */
+.d-none {
+    display: none !important;
+}
+
+#modalAddAddress .form-label {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+#modalAddAddress .form-control {
+    font-size: 1.5rem;
+    padding: 12px 14px;
+    border-radius: 10px;
+}
+
+/* Modal form input */
+#modalAddress .form-label {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+#modalAddress .form-control {
+    font-size: 1.5rem;
+    padding: 12px 14px;
+    border-radius: 10px;
+}
+
+/* Confirm modal */
+#modalConfirmDelete .modal-body {
+    font-size: 1.5rem;
+}
+
+/* Address item */
+.addr-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px;
+    background: #fafafa;
+}
+.addr-item .meta {
+    color: #64748b;
+    font-size: 1.45rem;
+    margin-top: 4px;
+}
+.addr-item .actions {
+    display: flex;
+    gap: 8px;
+    margin-left: 10px;
+}
+.addr-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 12px;
+}

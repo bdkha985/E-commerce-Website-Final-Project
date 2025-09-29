@@ -1,71 +1,88 @@
 <!-- Header -->
 <header class="fixed-header">
-  <div class="container">
-    <nav class="navbar">
-      <!-- Logo -->
-      <a href="/homepage" class="navbar__logo">
-        <img class="logo" src="/images/K.svg" alt="K Shopping" />
-        <span>K Shopping</span>
-      </a>
+    <div class="container">
+        <nav class="navbar">
+            <!-- Logo -->
+            <a href="/homepage" class="navbar__logo">
+                <img class="logo" src="/images/K.svg" alt="K Shopping" />
+                <span>K Shopping</span>
+            </a>
 
-      <!-- Navigation -->
-      <ul id="pc-nav">
-        <li><a href="/homepage">Home</a></li>
-        <li><a href="/products">Products</a></li>
-        <li><a href="/blog">Blog</a></li>
-        <li><a href="/contact">Contact us</a></li>
-        <li><a href="/about">About us</a></li>
-      </ul>
+            <!-- Navigation -->
+            <ul id="pc-nav">
+                <li><a href="/homepage">Home</a></li>
+                <li><a href="/products">Products</a></li>
+                <li><a href="/blog">Blog</a></li>
+                <li><a href="/contact">Contact us</a></li>
+                <li><a href="/about">About us</a></li>
+            </ul>
 
-      <!-- Search bar -->
-      <div class="searchbar">
-        <input type="text" placeholder="Tìm kiếm sản phẩm..." />
-        <button type="submit"><i class="fa fa-search"></i></button>
-      </div>
-
-<div class="actions">
-  <!-- Cart hover -->
-  <div class="cart-hover">
-    <a href="/cart" class="cart-btn" aria-label="Cart">
-      <i class="fa-solid fa-cart-shopping"></i>
-      <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
-        <span class="cart-badge"><%= cartCount %></span>
-      <% } %>
-    </a>
-
-    <!-- Mini cart panel -->
-    <div class="mini-cart">
-      <div class="mini-cart__title">🛍️ Sản Phẩm Mới Thêm</div>
-      <div class="mini-cart__list">
-        <% (cartItems || []).slice(0,5).forEach(item => { %>
-          <div class="mini-cart__item">
-            <img src="<%= item.image %>" alt="">
-            <div class="mini-cart__info">
-              <a class="mini-cart__name" href="/products/<%= item.slug %>"><%= item.name %></a>
-              <div class="mini-cart__meta">
-                <span>x<%= item.qty %></span>
-                <span class="price"><%= (item.price).toLocaleString('vi-VN') %>đ</span>
-              </div>
+            <!-- Search bar -->
+            <div class="searchbar">
+                <input type="text" placeholder="Tìm kiếm sản phẩm..." />
+                <button type="submit"><i class="fa fa-search"></i></button>
             </div>
-          </div>
-        <% }) %>
-      </div>
-      <div class="mini-cart__footer">
-        <span><%= (cartItems && cartItems.length) ? cartItems.length : 0 %> sản phẩm</span>
-        <a class="btn btn--view-cart" href="/cart">Xem Giỏ Hàng</a>
-      </div>
-      <span class="mini-cart__arrow"></span>
-    </div>
-  </div><!-- /cart-hover -->
 
-  <% if (currentUser && currentUser.fullName) { %>
-    <span class="me-3 user-name">Xin chào, <strong><%= currentUser.fullName %></strong></span>
-    <a href="/logout">
-      <i class="fa-solid fa-arrow-right-from-bracket"></i>
-    </a>
-  <% } else { %>
-    <a href="/signin" class="btn action-link">Sign in</a>
-  <% } %></div>
-    </nav>
-  </div>
+            <div class="actions">
+                <!-- Cart hover -->
+                <div class="cart-hover">
+                    <a href="/cart" class="cart-btn" aria-label="Cart">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <% if (typeof cartCount !== 'undefined' && cartCount >
+                        0) { %>
+                        <span class="cart-badge"><%= cartCount %></span>
+                        <% } %>
+                    </a>
+
+                    <!-- Mini cart panel -->
+                    <div class="mini-cart">
+                        <div class="mini-cart__title">🛍️ Sản Phẩm Mới Thêm</div>
+                        <div class="mini-cart__list">
+                            <% (cartItems || []).slice(0,5).forEach(item => { %>
+                            <div class="mini-cart__item">
+                                <img src="<%= item.image %>" alt="" />
+                                <div class="mini-cart__info">
+                                    <a
+                                        class="mini-cart__name"
+                                        href="/products/<%= item.slug %>"
+                                        ><%= item.name %></a
+                                    >
+                                    <div class="mini-cart__meta">
+                                        <span>x<%= item.qty %></span>
+                                        <span class="price"
+                                            ><%=
+                                            (item.price).toLocaleString('vi-VN')
+                                            %>đ</span
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                            <% }) %>
+                        </div>
+                        <div class="mini-cart__footer">
+                            <span
+                                ><%= (cartItems && cartItems.length) ?
+                                cartItems.length : 0 %> sản phẩm</span
+                            >
+                            <a class="btn btn--view-cart" href="/cart"
+                                >Xem Giỏ Hàng</a
+                            >
+                        </div>
+                        <span class="mini-cart__arrow"></span>
+                    </div>
+                </div>
+
+                <% if (currentUser && currentUser.fullName) { %>
+                <a href="/account" class="me-3 user-name">
+                    Xin chào, <strong><%= currentUser.fullName %></strong>
+                </a>
+                <a href="/logout" class="ic__logout">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </a>
+                <% } else { %>
+                <a href="/signin" class="btn action-link">Sign in</a>
+                <% } %>
+            </div>
+        </nav>
+    </div>
 </header>
