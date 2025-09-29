@@ -1,9 +1,11 @@
-<section class="auth container">
+<section class="auth container" style="max-width:480px;">
   <div class="auth-card">
     <h1 class="auth-title">Sign In</h1>
     <p class="auth-sub">Chào mừng quay lại K Shopping</p>
 
-    <form action="/signin" method="post" class="auth-form">
+    <div id="signinError" class="alert alert-danger d-none"></div>
+
+    <form id="signinForm" class="auth-form">
       <div class="mb-3">
         <label class="form-label">Email</label>
         <input name="email" type="email" class="form-control" placeholder="you@example.com" required>
@@ -22,9 +24,12 @@
         <a class="small" href="/forgot">Forgot password?</a>
       </div>
 
-      <button type="submit" class="btn btn-primary w-100">Sign In</button>
+      <button id="btnSignIn" type="button" class="btn btn-primary w-100">Sign In</button>
     </form>
 
-    <p class="auth-alt">Chưa có tài khoản? <a href="/signup">Sign up</a></p>
+    <p class="auth-alt mt-3">Chưa có tài khoản? <a href="/signup">Sign up</a></p>
   </div>
 </section>
+
+<!-- Nhúng JS riêng cho trang signin -->
+<script src="/javascripts/auth/signin.js"></script>

@@ -1,16 +1,20 @@
 const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 
-async function createUserLocal({ email, password, fullName }) {
-  const existing = await User.findOne({ email: email.toLowerCase() });
+const normalize = (s) => String(s || '').toLowerCase().trim();
+
+async function createUserLocal({ email, password, fullName, phone }) {
+  const mail = normalize(email);
+  const existing = await User.findOne({ email: mail });
   if (existing) throw new Error('Email đã được sử dụng');
 
   const passwordHash = await bcrypt.hash(password, 10);
 
   const user = new User({
-    email: email.toLowerCase(),
+    email: mail,
     passwordHash,
     fullName,
+    phone,
     roles: ['customer'],
     createdAt: new Date(),
     updatedAt: new Date()
@@ -20,7 +24,7 @@ async function createUserLocal({ email, password, fullName }) {
 }
 
 async function findUserByEmail(email) {
-  return await User.findOne({ email: String(email).toLowerCase().trim() });
+  return await User.findOne({ email: normalize(email) });
 }
 
 async function validatePassword(user, password) {

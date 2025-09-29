@@ -1,10 +1,7 @@
-// models/user.model.js
 const { Schema, model } = require('mongoose');
 
 const AddressSchema = new Schema({
-  label:     { type: String, trim: true },              // "Nhà", "Cty", v.v.
-  fullName:  { type: String, trim: true },
-  phone:     { type: String, trim: true },
+  label:     { type: String, trim: true },
   street:    { type: String, trim: true },
   ward:      { type: String, trim: true },
   district:  { type: String, trim: true },
@@ -13,7 +10,7 @@ const AddressSchema = new Schema({
 }, { _id: false });
 
 const LoyaltySchema = new Schema({
-  balance:       { type: Number, default: 0 },          // tích 10% đơn, dùng đơn sau
+  balance:       { type: Number, default: 0 },
   lastUpdatedAt: { type: Date }
 }, { _id: false });
 
@@ -27,12 +24,12 @@ const UserSchema = new Schema({
     type: String,
     required: true,
     unique: true,
-    lowercase: true,           // tự chuyển lowercase
+    lowercase: true,
     trim: true,
     index: true
   },
   passwordHash: {
-    type: String,              // Với OAuth-only có thể rỗng
+    type: String,
     default: null
   },
   fullName: {
@@ -40,9 +37,14 @@ const UserSchema = new Schema({
     required: true,
     trim: true
   },
+  phone: {
+    type: String,
+    required: true,
+    trim: true,
+  },
   roles: {
     type: [String],
-    default: ['customer'],     // hoặc ['admin']
+    default: ['customer'],
     enum: ['customer', 'admin']
   },
   addresses: {
@@ -68,15 +70,13 @@ UserSchema.pre('save', function(next) {
         hasDefault = true;
         return addr;
       }
-      // nếu đã có default rồi thì các default còn lại chuyển false
-      return { ...addr.toObject?.() ?? addr, isDefault: hasDefault ? false : !!addr.isDefault };
+      return { ...addr.toObject?.() ?? addr, isDefault: false };
     });
   }
   next();
 });
 
-// Index gợi ý (tìm nhanh theo tên/điện thoại trong sổ địa chỉ)
-UserSchema.index({ 'addresses.phone': 1 });
+// Index gợi ý (tìm nhanh theo city)
 UserSchema.index({ 'addresses.city': 1 });
 
 module.exports = model('User', UserSchema);
