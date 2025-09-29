@@ -4,12 +4,17 @@ const { body, validationResult } = require('express-validator');
 const signupRules = [
   body('fullName')
     .trim()
+    .notEmpty().withMessage("Họ tên bắt buộc")
     .isLength({ min: 2 })
     .withMessage('Họ tên ít nhất 2 ký tự'),
 
   body('email')
     .isEmail()
     .withMessage('Email không hợp lệ'),
+
+  body('phone')
+    .trim()
+    .matches(/^0[0-9]{9}$/).withMessage("Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0)"),
 
   body('password')
     .isLength({ min: 6 })
