@@ -1,82 +1,89 @@
 <section class="product-detail container">
-  <div class="pd-grid">
-    <!-- Gallery -->
-    <div class="pd-gallery">
-      <div class="pd-main">
-        <img src="<%= product.images[0] %>" alt="<%= product.name %>">
-      </div>
-      <div class="pd-thumbs">
-        <% product.images.forEach((img, i) => { %>
-          <img src="<%= img %>" alt="thumb <%= i %>">
-        <% }) %>
-      </div>
-    </div>
-
-    <!-- Info -->
-    <div class="pd-info">
-      <p class="pd-category"><%= product.category %></p>
-      <h1 class="pd-title"><%= product.name %></h1>
-
-      <div class="pd-meta">
-        <span class="pd-rating">⭐ <%= product.rating.toFixed(1) %> (<%= product.reviews %>)</span>
-      </div>
-
-      <div class="pd-price"><%= (product.price).toLocaleString('vi-VN') %>đ</div>
-
-      <% if (product.colors && product.colors.length) { %>
-        <div class="pd-colors">
-          <label>Màu sắc:</label>
-          <div class="swatches">
-            <% product.colors.forEach(c => { %>
-              <span class="swatch" style="--c:<%= c %>"></span>
-            <% }) %>
-          </div>
-        </div>
-      <% } %>
-
-      <% if (product.sizes && product.sizes.length) { %>
-        <div class="pd-sizes">
-          <label>Size:</label>
-          <div class="sizes">
-            <% product.sizes.forEach(s => { %>
-              <span class="size"><%= s %></span>
-            <% }) %>
-          </div>
-        </div>
-      <% } %>
-
-      <p class="pd-short"><%= product.shortDesc %></p>
-
-      <div class="pd-actions">
-        <button class="btn btn-primary">Add to Cart</button>
-        <button class="btn btn-outline-dark"><i class="fa-regular fa-heart"></i></button>
-      </div>
-
-      <div class="pd-desc">
-        <h3>Mô tả</h3>
-        <p><%= product.longDesc %></p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Related -->
-  <% if (related && related.length) { %>
-    <div class="related">
-      <h2 class="section-title">Related Products</h2>
-      <div class="grid products-grid">
-        <% related.forEach(p => { %>
-          <article class="card product-card">
-            <a class="product-thumb" href="/products/<%= p.slug %>">
-              <img src="<%= p.images[0] %>">
-            </a>
-            <div class="product-info">
-              <p class="category"><%= p.category %></p>
-              <h3><a href="/products/<%= p.slug %>"><%= p.name %></a></h3>
-              <p class="price"><%= (p.price).toLocaleString('vi-VN') %>đ</p>
+    <div class="pd-grid">
+        <!-- Gallery -->
+        <div class="pd-gallery">
+            <div class="pd-main">
+                <img src="<%= product.images[0] %>" alt="<%= product.name %>" />
             </div>
-          </article>
-        <% }) %>
-      </div>
+            <div class="pd-thumbs">
+                <% product.images.forEach((img, i) => { %>
+                <img src="<%= img %>" alt="thumb <%= i %>" />
+                <% }) %>
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div class="pd-info">
+            <p class="pd-category"><%= product.category %></p>
+            <h1 class="pd-title"><%= product.name %></h1>
+
+            <div class="pd-meta">
+                <span class="pd-rating"
+                    >⭐ <%= product.rating.toFixed(1) %> (<%= product.reviews
+                    %>)</span
+                >
+            </div>
+
+            <div class="pd-price">
+                <%= (product.price).toLocaleString('vi-VN') %>đ
+            </div>
+
+            <% if (product.colors && product.colors.length) { %>
+            <div class="pd-colors">
+                <label>Màu sắc:</label>
+                <div class="swatches">
+                    <% product.colors.forEach(c => { %>
+                    <span class="swatch" style="--c: <%= c %>"></span>
+                    <% }) %>
+                </div>
+            </div>
+            <% } %> <% if (product.sizes && product.sizes.length) { %>
+            <div class="pd-sizes">
+                <label>Size:</label>
+                <div class="sizes">
+                    <% product.sizes.forEach(s => { %>
+                    <span class="size"><%= s %></span>
+                    <% }) %>
+                </div>
+            </div>
+            <% } %>
+
+            <p class="pd-short"><%= product.shortDesc %></p>
+
+            <div class="pd-actions">
+                <button class="btn btn-primary">Add to Cart</button>
+                <button class="btn btn-outline-dark">
+                    <i class="fa-regular fa-heart"></i>
+                </button>
+            </div>
+
+            <div class="pd-desc">
+                <h3>Mô tả</h3>
+                <p><%= product.longDesc %></p>
+            </div>
+        </div>
     </div>
-  <% } %>
+
+    <!-- Related -->
+    <% if (related && related.length) { %>
+    <div class="related">
+        <h2 class="section-title">Related Products</h2>
+        <div class="grid products-grid">
+            <% related.forEach(p => { %>
+            <article class="card product-card">
+                <a class="product-thumb" href="/products/<%= p.slug %>">
+                    <img src="<%= p.images[0] %>" />
+                </a>
+                <div class="product-info">
+                    <p class="category"><%= p.category %></p>
+                    <h3><a href="/products/<%= p.slug %>"><%= p.name %></a></h3>
+                    <p class="price">
+                        <%= (p.price).toLocaleString('vi-VN') %>đ
+                    </p>
+                </div>
+            </article>
+            <% }) %>
+        </div>
+    </div>
+    <% } %>
 </section>

@@ -1,37 +1,48 @@
 <section class="blog-page container">
-  <header class="blog-header">
-    <h1>Our latest blog</h1>
-    <p class="muted">
-      On the other hand, we denounce with righteous indignation and dislike men who
-      are so beguiled and demoralized by the charms.
-    </p>
-  </header>
+    <header class="blog-header">
+        <h1>Our latest blog</h1>
+        <p class="muted">
+            On the other hand, we denounce with righteous indignation and
+            dislike men who are so beguiled and demoralized by the charms.
+        </p>
+    </header>
 
-  <div class="grid blog-grid">
-    <% const posts = [
-      {img:'https://picsum.photos/seed/b1/800/600', title:'To be our partner',        excerpt:'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium.'},
-      {img:'https://picsum.photos/seed/b2/800/600', title:'For best results work',    excerpt:'But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born.'},
-      {img:'https://picsum.photos/seed/b3/800/600', title:'Awesome tips',             excerpt:'There are many variations of passages of Lorem Ipsum available.'},
-      {img:'https://picsum.photos/seed/b4/800/600', title:'Printing and typesetting', excerpt:'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium.'},
-      {img:'https://picsum.photos/seed/b5/800/600', title:'Type of sports shoes',     excerpt:'But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born.'},
-      {img:'https://picsum.photos/seed/b6/800/600', title:'Awesome tips',             excerpt:'There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration.'},
-      {img:'https://picsum.photos/seed/b7/800/600', title:'To be our partner',        excerpt:'At vero eos et accusamus et iusto odio dignissimos ducimus.'},
-      {img:'https://picsum.photos/seed/b8/800/600', title:'For best results work',    excerpt:'But I must explain to you how all this mistaken idea was born.'},
-      {img:'https://picsum.photos/seed/b9/800/600', title:'Awesome tips',             excerpt:'There are many variations of passages of Lorem Ipsum available.'},
-    ]; %>
+    <div class="grid blog-grid">
+        <% const posts = [ {img:'https://picsum.photos/seed/b1/800/600',
+        title:'To be our partner', excerpt:'At vero eos et accusamus et iusto
+        odio dignissimos ducimus qui blanditiis praesentium.'},
+        {img:'https://picsum.photos/seed/b2/800/600', title:'For best results
+        work', excerpt:'But I must explain to you how all this mistaken idea of
+        denouncing pleasure and praising pain was born.'},
+        {img:'https://picsum.photos/seed/b3/800/600', title:'Awesome tips',
+        excerpt:'There are many variations of passages of Lorem Ipsum
+        available.'}, {img:'https://picsum.photos/seed/b4/800/600',
+        title:'Printing and typesetting', excerpt:'At vero eos et accusamus et
+        iusto odio dignissimos ducimus qui blanditiis praesentium.'},
+        {img:'https://picsum.photos/seed/b5/800/600', title:'Type of sports
+        shoes', excerpt:'But I must explain to you how all this mistaken idea of
+        denouncing pleasure and praising pain was born.'},
+        {img:'https://picsum.photos/seed/b6/800/600', title:'Awesome tips',
+        excerpt:'There are many variations of passages of Lorem Ipsum available,
+        but the majority have suffered alteration.'},
+        {img:'https://picsum.photos/seed/b7/800/600', title:'To be our partner',
+        excerpt:'At vero eos et accusamus et iusto odio dignissimos ducimus.'},
+        {img:'https://picsum.photos/seed/b8/800/600', title:'For best results
+        work', excerpt:'But I must explain to you how all this mistaken idea was
+        born.'}, {img:'https://picsum.photos/seed/b9/800/600', title:'Awesome
+        tips', excerpt:'There are many variations of passages of Lorem Ipsum
+        available.'}, ]; %> <% posts.forEach(p => { %>
+        <article class="post-card">
+            <a href="#!" class="post-thumb">
+                <img src="<%= p.img %>" alt="<%= p.title %>" />
+            </a>
+            <h3 class="post-title"><a href="#!"><%= p.title %></a></h3>
+            <p class="post-excerpt"><%= p.excerpt %></p>
+        </article>
+        <% }) %>
+    </div>
 
-    <% posts.forEach(p => { %>
-      <article class="post-card">
-        <a href="#!" class="post-thumb">
-          <img src="<%= p.img %>" alt="<%= p.title %>">
-        </a>
-        <h3 class="post-title"><a href="#!"><%= p.title %></a></h3>
-        <p class="post-excerpt"><%= p.excerpt %></p>
-      </article>
-    <% }) %>
-  </div>
-
-  <div class="blog-more">
-    <a href="#!" class="btn blog-load">Load More</a>
-  </div>
+    <div class="blog-more">
+        <a href="#!" class="btn blog-load">Load More</a>
+    </div>
 </section>
