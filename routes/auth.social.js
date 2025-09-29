@@ -16,15 +16,17 @@ router.get('/auth/google/callback',
 
 // Facebook login
 router.get('/auth/facebook',
-  passport.authenticate('facebook', { scope: ['email'] })
+  passport.authenticate('facebook', { scope: ['public_profile','email'], authType: 'rerequest' })
 );
 
 router.get('/auth/facebook/callback',
-  passport.authenticate('facebook', { failureRedirect: '/signin' }),
+  passport.authenticate('facebook', {
+    failureRedirect: '/signin',
+    failureFlash: true
+  }),
   (req, res) => {
     req.flash('success', 'Đăng nhập bằng Facebook thành công');
     res.redirect('/homepage');
   }
 );
-
 module.exports = router;
