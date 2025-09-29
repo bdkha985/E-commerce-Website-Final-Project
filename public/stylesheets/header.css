@@ -6,11 +6,12 @@
     --primary-color: #005461;
     --background-color: #F2EDE6;
     --text-color: #2D2D2D;
+    --header-h: 8rem;          /* chiều cao tổng thể header */
 }
 
 html,
 body {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 html {
@@ -20,6 +21,7 @@ html {
 body {
     font-size: 1.6rem;
     font-family: "Poppins", sans-serif;
+    padding-top: calc(var(--header-h) + 12px);
 }
 
 /* Common */
@@ -59,11 +61,13 @@ header .btn:hover {
 
 /* ======== Header ======== */
 .fixed-header {
-    background: var(--background-color);
-    padding-top: 26px;
-    position: sticky;
-    top: -26px;
-    z-index: 1;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  /* height: var(--header-h); */
+  background: var(--background-color);
+  z-index: 1000;
+  padding-top: 10px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
 }
 
 .hero-wrap {
@@ -76,9 +80,11 @@ header .btn:hover {
 }
 
 .navbar {
-    display: flex;
-    align-items: center;
-    padding: 12px 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  /* gap: 16px; */
+  padding: 16px 0;               /* bỏ 12px 0 cũ để header gọn */
 }
 
 .navbar .navbar__logo {
@@ -225,7 +231,8 @@ header .btn:hover {
   background: #ffffff;
   border-radius: 14px;
   box-shadow: 0 12px 28px rgba(0,0,0,.15);
-  display: none; z-index: 99;
+  display: none; 
+  z-index: 10000000;
   overflow: hidden;
   animation: fadeInUp .3s ease;
 }
