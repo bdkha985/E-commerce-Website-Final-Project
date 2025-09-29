@@ -59,7 +59,18 @@ router.get('/cart', (req, res) =>
 );
 
 // === Logout ===
-router.get('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/homepage'));
+router.get('/logout', (req, res, next) => {
+  // passport logout
+  req.flash('success', 'Bạn đã đăng xuất');
+
+  req.logout(err => {
+    if (err) return next(err);
+
+    // clear session local
+    req.session.destroy(() => {
+      res.clearCookie('connect.sid'); // xoá cookie session
+      res.redirect('/homepage'); // quay về trang đăng nhập
+    });
+  });
 });
 module.exports = router;

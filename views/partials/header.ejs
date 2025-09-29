@@ -58,8 +58,8 @@
     </div>
   </div><!-- /cart-hover -->
 
-  <% if (currentUser) { %>
-    <span class="me-3">Xin chào, <strong><%= currentUser.fullName %></strong></span>
+  <% if (currentUser && currentUser.fullName) { %>
+    <span class="me-3 user-name">Xin chào, <strong><%= currentUser.fullName %></strong></span>
     <a href="/logout">
       <i class="fa-solid fa-arrow-right-from-bracket"></i>
     </a>

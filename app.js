@@ -1,26 +1,43 @@
 require('dotenv').config();
 require('express-async-errors');
 
-const flash = require('connect-flash');
-const session = require('express-session');
-var createError = require('http-errors');
 const express = require('express');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const flash = require('connect-flash');
+const createError = require('http-errors');
+const passport = require('passport');
+
 const configViewEngine = require('./config/viewEngine');
-const webRoutes = require('./routes/web');
 const { connectDB } = require('./config/database');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+//Routes
+const webRoutes = require('./routes/web');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const socialAuthRoutes = require('./routes/auth.social');
+const authApiRoutes = require('./routes/auth.api')
+
+//Passport cấu hình
+require('./config/passport');
 
 const app = express();
 const port = process.env.PORT || 8888;
 const hostname = process.env.HOST_NAME || 'localhost';
 
+// ======== MIDDLEWARES =======
+// Logger
+app.use(logger('dev'));
+
+//Body parser
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+
 // FAKE DATA
 app.use((req, res, next) => {
-  // Demo: thay bằng session/DB sau
+  // TODO: thay bằng session/DB sau
   if (!res.locals.cartItems) {
     res.locals.cartItems = [
       { slug:'mid-century-modern-tshirt', name:'Mid Century Modern T-Shirt', qty:1, price:110000, image:'https://picsum.photos/seed/p1a/80/80' },
@@ -31,14 +48,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(logger('dev'));
-
-// parse body
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-
-// Check
+// Session
 app.use(session({
   secret: 'kshop-secret',
   resave: false,
@@ -46,33 +56,44 @@ app.use(session({
   cookie: { maxAge: 1000*60*60 } // 1h
 }));
 
+// Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(flash());
 app.use((req, res, next) => {
-  // đưa user đang đăng nhập ra view
-  if (req.session && req.session.fullName) {
-    res.locals.currentUser = {
+  // Ưu tiên passport (req.user), fallback session (local signin)
+  const u = req.user || (
+    req.session?.fullName ? {
+      id: req.session.userId,
       fullName: req.session.fullName,
       role: req.session.role
-    };
-  } else res.locals.currentUser = null;
+    } : null
+  );
 
-  // đưa flash ra view (nếu dùng toast)
+  res.locals.currentUser = u;
+  res.locals.isAuthenticated = !!u;
+
+  // flash cho toast
   res.locals.flashSuccess = req.flash('success');
   res.locals.flashError   = req.flash('error');
+
   next();
 });
 
 // config view engine
 configViewEngine(app);
 
-app.use('/api/auth', require('./routes/auth.api'));
 
-//web routes
+// ============ ROUTES ===========
+app.use('/api/auth', authApiRoutes);
+app.use('/', socialAuthRoutes);
 app.use('/', webRoutes);
-
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+
+// ================ DATABASE + SERVER ==================
 connectDB(process.env.MONGODB_URI)
   .then(() => {
     app.listen(port, hostname, () => {
@@ -83,7 +104,6 @@ connectDB(process.env.MONGODB_URI)
     console.error('❌ Failed to connect to MongoDB:', err.message);
     process.exit(1);
   });
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
