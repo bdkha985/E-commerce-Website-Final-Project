@@ -27,15 +27,27 @@ router.get("/", test);
 router.get("/signin", (req, res) =>
     render(res, "pages/auth/signin", { title: "Sign In" })
 );
-// router.post('/signin', signinRules, handleValidation, signin);
 
 router.get("/signup", (req, res) =>
     render(res, "pages/auth/signup", { title: "Sign Up" })
 );
-// router.post('/signup', signupRules, handleValidation, signup);
 
+// Reset password
 router.get("/forgot", (req, res) =>
-    render(res, "pages/auth/forgot", { title: "Forgot Password" })
+    render(res, "pages/auth/forgot", { title: "Quên mật khẩu" })
+);
+router.get("/verify-otp", (req, res) =>
+    render(res, "pages/auth/verify-otp", {
+        title: "Xác thực OTP",
+        email: req.query.email || "",
+    })
+);
+router.get("/reset-password", (req, res) =>
+    render(res, "pages/auth/reset-password", {
+        title: "Đặt mật khẩu mới",
+        email: req.query.email || "",
+        token: req.query.token || "",
+    })
 );
 
 // Account profile

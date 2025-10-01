@@ -1,24 +1,23 @@
-<section class="auth container">
+<!-- views/pages/auth/forgot.ejs -->
+<section class="auth container" style="max-width: 520px">
     <div class="auth-card">
-        <h1 class="auth-title">Forgot Password</h1>
-        <p class="auth-sub">Nhập email để nhận liên kết đặt lại mật khẩu</p>
-
-        <form action="/forgot" method="post" class="auth-form">
-            <div class="mb-4">
+        <h1 class="auth-title">Quên mật khẩu</h1>
+        <p class="auth-sub">Nhập email để nhận mã OTP</p>
+        <div id="forgotAlert" class="alert d-none"></div>
+        <form id="forgotForm" class="auth-form" novalidate>
+            <div class="mb-3">
                 <label class="form-label">Email</label>
                 <input
                     name="email"
                     type="email"
                     class="form-control"
-                    placeholder="you@example.com"
                     required />
             </div>
-
-            <button type="submit" class="btn btn-primary w-100">
-                Gửi liên kết
+            <button id="btnForgot" type="button" class="btn btn-primary w-100">
+                Gửi OTP
             </button>
         </form>
-
-        <p class="auth-alt"><a href="/signin">Quay lại Sign in</a></p>
     </div>
 </section>
+
+<script src="/javascripts/auth/forgot.js" defer></script>

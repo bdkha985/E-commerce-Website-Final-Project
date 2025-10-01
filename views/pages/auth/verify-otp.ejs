@@ -1,0 +1,28 @@
+<!-- views/pages/auth/verify-otp.ejs -->
+<section class="auth container" style="max-width: 520px">
+    <div class="auth-card">
+        <h1 class="auth-title">Xác thực OTP</h1>
+        <p class="auth-sub">Nhập mã OTP đã gửi tới email</p>
+        <div id="vAlert" class="alert d-none"></div>
+        <form id="vForm" class="auth-form">
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input
+                    name="email"
+                    type="email"
+                    class="form-control"
+                    value="<%= email || '' %>"
+                    required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">OTP</label>
+                <input name="otp" type="text" class="form-control" required />
+            </div>
+            <button id="btnVerify" type="button" class="btn btn-primary w-100">
+                Xác nhận
+            </button>
+        </form>
+    </div>
+</section>
+
+<script src="/javascripts/auth/verify-otp.js" defer></script>
