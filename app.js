@@ -19,6 +19,7 @@ const usersRouter = require("./routes/users");
 const socialAuthRoutes = require("./routes/auth.social");
 const authApiRoutes = require("./routes/auth.api");
 const accountApiRoutes = require("./routes/account.api.js");
+const passwordRecovery = require('./routes/passwordRecovery.api.js')
 
 //Passport cấu hình
 require("./config/passport");
@@ -104,6 +105,7 @@ configViewEngine(app);
 // ============ ROUTES ===========
 app.use("/api/auth", authApiRoutes);
 app.use("/api/account", accountApiRoutes);
+app.use('/api/auth', passwordRecovery)
 app.use("/", socialAuthRoutes);
 app.use("/", webRoutes);
 app.use("/", indexRouter);
