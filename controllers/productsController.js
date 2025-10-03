@@ -1,57 +1,88 @@
-// Demo data (sau thay bằng DB)
-const PRODUCTS = [
-  {
-    id: 'p1',
-    slug: 'mid-century-modern-tshirt',
-    name: 'Mid Century Modern T-Shirt',
-    price: 110000,
-    category: 'Men - Clothes',
-    rating: 5.0, reviews: 188,
-    images: [
-      'https://picsum.photos/seed/p1a/800/600',
-      'https://picsum.photos/seed/p1b/800/600',
-      'https://picsum.photos/seed/p1c/800/600'
-    ],
-    shortDesc: 'Áo thun cotton 230GSM, form regular.',
-    longDesc: 'Chất liệu cotton dày dặn, thấm hút tốt. In lụa bền màu.'
-  },
-  {
-    id: 'p2',
-    slug: 'corporate-office-shoes',
-    name: 'Corporate Office Shoes',
-    price: 399000,
-    category: 'Men - Shoes',
-    rating: 5.0, reviews: 1020,
-    images: [
-      'https://picsum.photos/seed/p2a/800/600',
-      'https://picsum.photos/seed/p2b/800/600'
-    ],
-    shortDesc: 'Giày da công sở cổ điển.',
-    longDesc: 'Da thật chống xước, đế êm chống trượt.'
-  }
-];
+// controllers/productsController.js
+const Product = require('../models/product.model');
 
-const list = (req, res) => {
-  res.render('layouts/main', {
-    title: 'Products',
-    body: 'pages/products',
-    products: PRODUCTS
-  });
+/**
+ * GET /products
+ * Danh sách sản phẩm (có phân trang & filter cơ bản qua query)
+ *  - ?q=keyword
+ *  - ?page=1&limit=12
+ */
+const list = async (req, res, next) => {
+  try {
+    const page  = Math.max(1, parseInt(req.query.page || '1', 10));
+    const limit = Math.min(60, Math.max(1, parseInt(req.query.limit || '15', 10)));
+    const skip  = (page - 1) * limit;
+
+    const cond = {};
+    if (req.query.q) {
+      const kw = String(req.query.q).trim();
+      cond.$or = [
+        { name:  { $regex: kw, $options: 'i' } },
+        { slug:  { $regex: kw, $options: 'i' } },
+        { tags:  { $regex: kw, $options: 'i' } },
+      ];
+    }
+
+    const [items, total] = await Promise.all([
+      Product
+        .find(cond)
+        .select('name slug images basePrice ratingAvg ratingCount')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Product.countDocuments(cond)
+    ]);
+
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+
+    return res.render('layouts/main', {
+      title: 'Products',
+      body: 'pages/products',   // views/pages/products.ejs
+      products: items,
+      pagination: { page, limit, total, totalPages, q: req.query.q || '' }
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-const detail = (req, res) => {
-  const { slug } = req.params;
-  const product = PRODUCTS.find(p => p.slug === slug);
-  if (!product) {
-    return res.status(404).render('error.ejs', { message: 'Product not found' });
+/**
+ * GET /products/:slug
+ * Chi tiết sản phẩm theo slug
+ */
+const detail = async (req, res, next) => {
+  try {
+    const slug = decodeURIComponent(req.params.slug || '').trim();
+    const product = await Product.findOne({ slug }).lean();
+
+    if (!product) {
+      return res.status(404).render('layouts/main', {
+        title: 'Không tìm thấy sản phẩm',
+        body: 'pages/404', // đảm bảo có views/pages/404.ejs
+        message: 'Sản phẩm này không tồn tại hoặc đã ngừng kinh doanh.'
+      });
+    }
+
+    // Gợi ý: related cùng brand (nếu có), fallback theo createdAt
+    const related = await Product.find({
+      _id: { $ne: product._id },
+      ...(product.brandId ? { brandId: product.brandId } : {})
+    })
+      .select('name slug images basePrice')
+      .sort(product.brandId ? { createdAt: -1 } : { createdAt: -1 })
+      .limit(4)
+      .lean();
+
+    return res.render('layouts/main', {
+      title: product.name,
+      body: 'pages/product-detail', // views/pages/product-detail.ejs
+      product,
+      related
+    });
+  } catch (err) {
+    next(err);
   }
-  const related = PRODUCTS.filter(p => p.slug !== slug).slice(0, 4);
-  res.render('layouts/main', {
-    title: product.name,
-    body: 'pages/product-detail',
-    product,
-    related
-  });
 };
 
-module.exports = { list, detail, PRODUCTS };
+module.exports = { list, detail };

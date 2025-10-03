@@ -1,89 +1,114 @@
 <section class="product-detail container">
-    <div class="pd-grid">
-        <!-- Gallery -->
-        <div class="pd-gallery">
-            <div class="pd-main">
-                <img src="<%= product.images[0] %>" alt="<%= product.name %>" />
-            </div>
-            <div class="pd-thumbs">
-                <% product.images.forEach((img, i) => { %>
-                <img src="<%= img %>" alt="thumb <%= i %>" />
-                <% }) %>
-            </div>
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb mb-3" style="margin-top: 2rem;">
+    <a href="/homepage">Home</a> <span>/</span>
+    <a href="/products">Products</a> <span>/</span>
+    <span><%= product?.name %></span>
+  </nav>
+
+  <div class="pd-wrap">
+    <!-- Gallery -->
+    <div class="pd-gallery">
+      <% 
+        const imgs = (product?.images?.length ? product.images : ['https://placehold.co/800x600?text=No+Image']);
+      %>
+      <div class="pd-main">
+        <img id="pdMainImg" src="<%= imgs[0] %>" alt="<%= product?.name %>">
+      </div>
+      <% if (imgs.length > 1) { %>
+        <div class="pd-thumbs">
+          <% imgs.forEach((src, i) => { %>
+            <img class="<%= i===0 ? 'active' : '' %>" src="<%= src %>" alt="thumb <%= i+1 %>"
+                 onclick="document.getElementById('pdMainImg').src=this.src;
+                          this.parentElement.querySelectorAll('img').forEach(t=>t.classList.remove('active'));
+                          this.classList.add('active');">
+          <% }) %>
         </div>
-
-        <!-- Info -->
-        <div class="pd-info">
-            <p class="pd-category"><%= product.category %></p>
-            <h1 class="pd-title"><%= product.name %></h1>
-
-            <div class="pd-meta">
-                <span class="pd-rating"
-                    >⭐ <%= product.rating.toFixed(1) %> (<%= product.reviews
-                    %>)</span
-                >
-            </div>
-
-            <div class="pd-price">
-                <%= (product.price).toLocaleString('vi-VN') %>đ
-            </div>
-
-            <% if (product.colors && product.colors.length) { %>
-            <div class="pd-colors">
-                <label>Màu sắc:</label>
-                <div class="swatches">
-                    <% product.colors.forEach(c => { %>
-                    <span class="swatch" style="--c: <%= c %>"></span>
-                    <% }) %>
-                </div>
-            </div>
-            <% } %> <% if (product.sizes && product.sizes.length) { %>
-            <div class="pd-sizes">
-                <label>Size:</label>
-                <div class="sizes">
-                    <% product.sizes.forEach(s => { %>
-                    <span class="size"><%= s %></span>
-                    <% }) %>
-                </div>
-            </div>
-            <% } %>
-
-            <p class="pd-short"><%= product.shortDesc %></p>
-
-            <div class="pd-actions">
-                <button class="btn btn-primary">Add to Cart</button>
-                <button class="btn btn-outline-dark">
-                    <i class="fa-regular fa-heart"></i>
-                </button>
-            </div>
-
-            <div class="pd-desc">
-                <h3>Mô tả</h3>
-                <p><%= product.longDesc %></p>
-            </div>
-        </div>
+      <% } %>
     </div>
 
-    <!-- Related -->
-    <% if (related && related.length) { %>
+    <!-- Info -->
+    <div class="pd-info">
+      <h1 class="pd-title"><%= product?.name %></h1>
+
+      <div class="pd-meta">
+        <% if (product?.ratingAvg) { %>
+          <span class="rating">★ <%= Number(product.ratingAvg).toFixed(1) %></span>
+          <% if (product?.ratingCount) { %>
+            <span class="text-muted">(<%= product.ratingCount %> đánh giá)</span>
+          <% } %>
+          <span class="sep">•</span>
+        <% } %>
+        <span class="sku">SKU: <%= (product?.variants && product.variants[0]?.sku) || '—' %></span>
+      </div>
+
+      <div class="pd-price">
+        <%= ((product?.variants && product.variants[0]?.price) || product?.basePrice || 0).toLocaleString('vi-VN') %>đ
+      </div>
+
+      <% if (product?.shortDesc) { %>
+        <p class="pd-short"><%= product.shortDesc %></p>
+      <% } %>
+
+      <!-- Variants (nếu có) -->
+      <% if (product?.variants?.length) { 
+           const colors = [...new Set(product.variants.map(v => v.color).filter(Boolean))];
+           const sizes  = [...new Set(product.variants.map(v => v.size).filter(Boolean))];
+      %>
+        <div class="pd-variants">
+          <% if (colors.length) { %>
+            <div class="variant-row">
+              <label>Màu sắc</label>
+              <div class="variant-list">
+                <% colors.forEach(c => { %><button class="variant-chip" type="button"><%= c %></button><% }) %>
+              </div>
+            </div>
+          <% } %>
+          <% if (sizes.length) { %>
+            <div class="variant-row">
+              <label>Size</label>
+              <div class="variant-list">
+                <% sizes.forEach(s => { %><button class="variant-chip" type="button"><%= s %></button><% }) %>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      <% } %>
+
+      <div class="pd-actions">
+        <button class="btn btn-dark">Add to cart</button>
+        <button class="btn btn-outline-dark"><i class="fa-regular fa-heart"></i></button>
+      </div>
+
+      <% if (product?.longDesc) { %>
+        <div class="pd-desc">
+          <h3>Chi tiết sản phẩm</h3>
+          <p><%= product.longDesc %></p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Related -->
+  <% if (related?.length) { %>
     <div class="related">
-        <h2 class="section-title">Related Products</h2>
-        <div class="grid products-grid">
-            <% related.forEach(p => { %>
-            <article class="card product-card">
-                <a class="product-thumb" href="/products/<%= p.slug %>">
-                    <img src="<%= p.images[0] %>" />
-                </a>
-                <div class="product-info">
-                    <p class="category"><%= p.category %></p>
-                    <h3><a href="/products/<%= p.slug %>"><%= p.name %></a></h3>
-                    <p class="price">
-                        <%= (p.price).toLocaleString('vi-VN') %>đ
-                    </p>
-                </div>
-            </article>
-            <% }) %>
-        </div>
+      <h3 class="mb-3">Sản phẩm liên quan</h3>
+      <div class="product-grid">
+        <% related.forEach(r => {
+             const img = (r.images && r.images[0]) || 'https://placehold.co/600x600?text=No+Image';
+             const price = (r.basePrice || 0).toLocaleString('vi-VN') + 'đ';
+        %>
+          <article class="product-card">
+            <a href="/products/<%= r.slug %>" class="thumb">
+              <img src="<%= img %>" alt="<%= r.name %>">
+            </a>
+            <div class="info">
+              <a class="name" href="/products/<%= r.slug %>"><%= r.name %></a>
+              <div class="meta"><span class="price"><%= price %></span></div>
+            </div>
+          </article>
+        <% }) %>
+      </div>
     </div>
-    <% } %>
+  <% } %>
 </section>

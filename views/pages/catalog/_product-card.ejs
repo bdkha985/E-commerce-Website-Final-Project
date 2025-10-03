@@ -1,0 +1,31 @@
+<%
+// Helper: lấy ảnh đại diện — ưu tiên images chung; fallback ảnh variant
+function pickImage(p) {
+  if (p.images?.length) return p.images[0];
+  if (p.variants?.length && p.variants[0].images?.length) return p.variants[0].images[0];
+  return 'https://picsum.photos/seed/placeholder/500/500';
+}
+function displayPrice(p) {
+  let price = p.basePrice || 0;
+  if (Array.isArray(p.variants) && p.variants.length) {
+    const min = p.variants.reduce((acc, v) => Math.min(acc, v.price), Infinity);
+    if (isFinite(min)) price = min;
+  }
+  return (price || 0).toLocaleString('vi-VN') + 'đ';
+}
+%>
+
+<article class="p-card">
+  <a class="thumb" href="/products/<%= p.slug %>">
+    <img src="<%= pickImage(p) %>" alt="<%= p.name %>">
+  </a>
+  <div class="info">
+    <h3 class="name line-clamp"><a href="/products/<%= p.slug %>"><%= p.name %></a></h3>
+    <div class="meta">
+      <span class="price"><%= displayPrice(p) %></span>
+      <% if (p.brandId?.name) { %>
+        <span class="brand"><%= p.brandId.name %></span>
+      <% } %>
+    </div>
+  </div>
+</article>

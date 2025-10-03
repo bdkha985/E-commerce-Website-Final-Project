@@ -1,43 +1,67 @@
-<section class="products-page container">
-    <h1 class="section-title">Find Your Products</h1>
+<section class="products container">
+  <!-- Head + search -->
+  <div class="d-flex align-items-end justify-content-between mb-4">
+    <div>
+      <h1 class="mb-1">Tất cả sản phẩm</h1>
+      <% if (pagination?.total) { %>
+        <div class="text-muted"><%= pagination.total %> sản phẩm</div>
+      <% } %>
+    </div>
 
-    <!-- Bộ lọc và sort -->
-    <div class="products-toolbar">
-        <button class="btn btn-outline-dark">All Filters</button>
+    <form class="d-flex" method="get" action="/products" style="gap:8px;">
+      <input class="form-control" type="text" name="q" placeholder="Tìm sản phẩm..."
+             value="<%= pagination?.q || '' %>">
+      <button class="btn btn-dark">Tìm</button>
+    </form>
+  </div>
 
-        <div class="sort-box">
-            <label for="sort">Sort By:</label>
-            <select id="sort">
-                <option value="relevancy">Relevancy</option>
-                <option value="price-low">Price: Low → High</option>
-                <option value="price-high">Price: High → Low</option>
-            </select>
+  <!-- Grid -->
+  <div class="product-grid">
+    <% (products || []).forEach(p => { 
+         const img = (p.images && p.images[0]) || 'https://placehold.co/600x600?text=No+Image';
+         const price = (p.basePrice || 0).toLocaleString('vi-VN') + 'đ';
+    %>
+      <article class="product-card">
+        <a href="/products/<%= p.slug %>" class="thumb">
+          <img src="<%= img %>" alt="<%= p.name %>">
+        </a>
+        <div class="info">
+          <a class="name" href="/products/<%= p.slug %>"><%= p.name %></a>
+          <div class="meta">
+            <span class="price">
+              <%= price %></span>
+            <% if (p.ratingAvg) { %>
+              <span class="rating">
+                ★ <%= Number(p.ratingAvg).toFixed(1) %>
+                <% if (p.ratingCount) { %><small class="text-muted">(<%= p.ratingCount %>)</small><% } %>
+              </span>
+            <% } %>
+          </div>
         </div>
-    </div>
+      </article>
+    <% }) %>
+  </div>
 
-    <!-- Grid sản phẩm -->
-    <div class="grid products-grid">
-        <% (products || []).forEach(p => { %>
-        <article class="card product-card">
-            <a class="product-thumb" href="/products/<%= p.slug %>">
-                <img
-                    src="<%= (p.images && p.images[0]) || 'https://picsum.photos/seed/na/400/400' %>"
-                    alt="<%= p.name %>" />
-                <div class="product-overlay">
-                    <button class="btn add-to-cart" type="button">
-                        Add to Cart
-                    </button>
-                    <button class="btn-fav" type="button">
-                        <i class="fa-regular fa-heart"></i>
-                    </button>
-                </div>
-            </a>
-            <div class="product-info">
-                <p class="category"><%= p.category %></p>
-                <h3><a href="/products/<%= p.slug %>"><%= p.name %></a></h3>
-                <p class="price"><%= (p.price).toLocaleString('vi-VN') %>đ</p>
-            </div>
-        </article>
-        <% }) %>
-    </div>
+  <!-- Pagination -->
+  <% if (pagination && pagination.totalPages > 1) { 
+       const page = pagination.page;
+       const totalPages = pagination.totalPages;
+       const q = pagination.q ? `&q=${encodeURIComponent(pagination.q)}` : '';
+  %>
+    <nav class="pagination-wrap">
+      <ul class="pagination">
+        <li class="page-item <%= page <= 1 ? 'disabled' : '' %>">
+          <a class="page-link" href="/products?page=<%= page - 1 %><%= q %>">«</a>
+        </li>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <li class="page-item <%= i === page ? 'active' : '' %>">
+            <a class="page-link" href="/products?page=<%= i %><%= q %>"><%= i %></a>
+          </li>
+        <% } %>
+        <li class="page-item <%= page >= totalPages ? 'disabled' : '' %>">
+          <a class="page-link" href="/products?page=<%= page + 1 %><%= q %>">»</a>
+        </li>
+      </ul>
+    </nav>
+  <% } %>
 </section>

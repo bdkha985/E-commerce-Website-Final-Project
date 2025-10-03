@@ -1,6 +1,7 @@
 const express = require("express");
+const router = express.Router();
 
-const { test, render } = require("../controllers/homeController");
+const { render } = require("../controllers/homeController");
 const products = require("../controllers/productsController");
 const {
     signupRules,
@@ -8,9 +9,9 @@ const {
     handleValidation,
 } = require("../middlewares/authValidator");
 const requireLoginPage = require("../middlewares/requireLoginPage");
+const catalog  = require('../controllers/catalogController');
 
-const router = express.Router();
-
+// ========== Trang tĩnh / auth ==========
 router.get("/homepage", (req, res) =>
     render(res, "pages/index.ejs", { title: "Trang chủ" })
 );
@@ -18,18 +19,12 @@ router.get("/", (req, res) =>
     render(res, "pages/index.ejs", { title: "Trang chủ" })
 );
 
-router.get("/", test);
-// router.get('/products', (req,res) =>
-//     render(res, 'pages/products', {title: 'Products'})
-//     );
-
-// Auth
 router.get("/signin", (req, res) =>
-    render(res, "pages/auth/signin", { title: "Sign In" })
+    render(res, "pages/auth/signin", { title: "Đăng nhập" })
 );
 
 router.get("/signup", (req, res) =>
-    render(res, "pages/auth/signup", { title: "Sign Up" })
+    render(res, "pages/auth/signup", { title: "Đăng kí" })
 );
 
 // Reset password
@@ -55,10 +50,6 @@ router.get("/account", requireLoginPage, (req, res) =>
     render(res, "pages/account/index", { title: "Tài khoản" })
 );
 
-// Products list & detail
-router.get("/products", products.list);
-router.get("/products/:slug", products.detail);
-
 // Blog
 router.get("/blog", (req, res) => render(res, "pages/blog", { title: "Blog" }));
 
@@ -74,6 +65,14 @@ router.get("/about", (req, res) =>
 
 // Cart
 router.get("/cart", (req, res) => render(res, "pages/cart", { title: "Cart" }));
+
+// ========== CATALOG ==========
+router.get('/c/:slug', catalog.categoryPage);      // Trang theo category (men, women, ...)
+router.get('/products/all', catalog.allProductsPage); // Tất cả sản phẩm (catalog-style)
+
+// ========== PRODUCTS ==========
+router.get('/products',       products.list);    // Danh sách sản phẩm (search, filter, phân trang)
+router.get('/products/:slug', products.detail);  // Trang chi tiết sản phẩm
 
 // === Logout ===
 router.get("/logout", (req, res, next) => {

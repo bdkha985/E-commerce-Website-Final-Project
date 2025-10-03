@@ -1,0 +1,86 @@
+<section class="catalog container">
+  <div class="cat-head">
+    <h1 class="cat-title"><%= category.name %></h1>
+    <nav class="cat-breadcrumb">
+      <a href="/homepage">Home</a> <span>/</span>
+      <span><%= category.name %></span>
+    </nav>
+  </div>
+
+  <div class="cat-layout">
+    <!-- Sidebar filter -->
+    <aside class="cat-side">
+      <form id="catFilter" class="filter-card" method="get">
+        <h3 class="f-title">Bộ lọc</h3>
+
+        <div class="f-group">
+          <label class="f-label">Thương hiệu</label>
+          <select name="brand" class="form-select">
+            <option value="">Tất cả</option>
+            <% brands.forEach(b => { %>
+              <option value="<%= b.slug %>" <%= (query.brand === b.slug ? 'selected' : '') %>><%= b.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="f-group">
+          <label class="f-label">Khoảng giá (VND)</label>
+          <div class="d-flex gap-2">
+            <input class="form-control" name="pmin" type="number" placeholder="Từ" value="<%= query.pmin %>">
+            <input class="form-control" name="pmax" type="number" placeholder="Đến" value="<%= query.pmax %>">
+          </div>
+        </div>
+
+        <div class="f-group">
+          <label class="f-label">Sắp xếp</label>
+          <select name="sort" class="form-select">
+            <option value="newest"     <%= query.sort==='newest'?'selected':'' %>>Mới nhất</option>
+            <option value="price_asc"  <%= query.sort==='price_asc'?'selected':'' %>>Giá tăng dần</option>
+            <option value="price_desc" <%= query.sort==='price_desc'?'selected':'' %>>Giá giảm dần</option>
+          </select>
+        </div>
+
+        <button class="btn btn-dark w-100" type="submit">Áp dụng</button>
+      </form>
+
+<% if (children && children.length) { %>
+  <div class="filter-card">
+    <h3 class="f-title">Danh mục con</h3>
+    <ul class="subcats">
+      <% children.forEach(c => { %>
+        <li><a href="/c/<%= c.slug %>"><%= c.name %></a></li>
+      <% }) %>
+    </ul>
+  </div>
+<% } %>
+    </aside>
+
+    <!-- Product grid -->
+    <div class="cat-main">
+      <div class="p-grid">
+        <% if (!products.length) { %>
+          <div class="alert alert-info">Chưa có sản phẩm phù hợp.</div>
+        <% } %>
+        <% products.forEach(p => { %>
+          <%- include('./_product-card', { p }) %>
+        <% }) %>
+      </div>
+
+      <!-- Pagination -->
+      <% if (pageCount > 1) { %>
+        <nav class="pagination-wrap">
+          <ul class="pagination">
+            <% for (let i=1; i<=pageCount; i++) { %>
+              <li class="page-item <%= (i===page ? 'active':'') %>">
+                <a class="page-link" href="?<%= new URLSearchParams({ ...query, page: i }).toString() %>"><%= i %></a>
+              </li>
+            <% } %>
+          </ul>
+        </nav>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- JS (gọn): giữ nguyên query khi submit -->
+<script src="/javascripts/catalog.js" defer></script>
