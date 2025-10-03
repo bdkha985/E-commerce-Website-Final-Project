@@ -109,6 +109,22 @@
             </article>
         </div>
     </section>
+    <!-- DANH MUC NOI BAT -->
+    <section class="container home-cats">
+        <h2 class="section-title">Danh mục nổi bật</h2>
+        <div class="grid cat-tiles">
+            <% (navCategories || []).slice(0,6).forEach(c => { %>
+            <a class="cat-tile" href="/c/<%= c.slug %>">
+                <div class="thumb">
+                    <img
+                        src="https://placehold.co/600x400?text=<%= encodeURIComponent(c.name) %>"
+                        alt="<%= c.name %>" />
+                </div>
+                <h3><%= c.name %></h3>
+            </a>
+            <% }) %>
+        </div>
+    </section>
     <!-- 3. Blog -->
     <section id="blog" class="blog container">
         <h2 class="section-title">Blog</h2>

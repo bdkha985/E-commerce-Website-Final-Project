@@ -13,6 +13,7 @@ const configViewEngine = require("./config/viewEngine");
 const { connectDB } = require("./config/database");
 
 //Routes
+const Category = require('./models/category.model');
 const webRoutes = require("./routes/web");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
@@ -99,6 +100,21 @@ app.use((req, res, next) => {
     next();
 });
 
+// TÉT
+app.use(async (req, res, next) => {
+  try {
+    // tuỳ cấu trúc: parentId = null là category cấp 1
+    const cats = await Category.find({ parentId: null })
+      .select('name slug')
+      .sort({ name: 1 })
+      .lean();
+    res.locals.navCategories = cats;  // mảng [{name, slug}, ...]
+  } catch (e) {
+    res.locals.navCategories = [];
+  }
+  next();
+});
+
 // config view engine
 configViewEngine(app);
 
@@ -130,6 +146,7 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
+      console.error('ERROR HANDLER:', err); // thêm dòng này
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get("env") === "development" ? err : {};

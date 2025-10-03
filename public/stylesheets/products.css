@@ -1,95 +1,64 @@
-body {
-    background: var(--background-color);
-}
-
-.products-page {
-  padding: 60px 0;
-}
-
-.products-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 20px 0 40px;
-}
-
-.products-grid {
+/* product grid */
+.product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+  gap: 24px;
 }
 
-.product-info {
-  margin-top: 12px;
-}
-
-/* Vùng thumbnail */
-.product-card .product-thumb {
-  position: relative;
+/* card base */
+.product-card {
+  border-radius: 14px;
   overflow: hidden;
-  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #eee;
+  transition: all .25s ease;
+  position: relative;
+  cursor: pointer;
+}
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0,0,0,.12);
+  border-color: transparent;
 }
 
-.product-card img {
+/* thumb */
+.product-card .thumb {
+  display: block;
+  overflow: hidden;
+}
+.product-card .thumb img {
   width: 100%;
   display: block;
-  transition: transform 0.3s ease;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  transition: transform .4s ease;
+}
+.product-card:hover .thumb img {
+  transform: scale(1.06);
 }
 
-.product-card:hover img {
-  transform: scale(1.05);
+/* info */
+.product-card .info {
+  padding: 14px;
 }
-
-/* Overlay mặc định ẩn */
-.product-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  opacity: 0;
+.product-card .name {
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #111;
+  text-decoration: none;
+}
+.product-card .name:hover { color: #e11d48; }
+.product-card .meta {
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  padding: 20px;
-  gap: 10px;
-  transition: opacity 0.3s ease;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: .9rem;
 }
-
-.product-card:hover .product-overlay {
-  opacity: 1;
+.product-card .price {
+  color: #e11d48;
+  font-weight: 700;
 }
-
-/* Nút Add to Cart */
-.add-to-cart {
-  background: var(--primary-color);
-  color: #fff;
-  padding: 8px 18px;
-  border: none;
-  border-radius: 6px;
-  font-size: 1.4rem;
-  cursor: pointer;
-}
-
-.add-to-cart:hover {
-  opacity: 0.9;
-}
-
-/* Nút trái tim */
-.btn-fav {
-  background: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-fav i {
-  color: #e63946;
-  font-size: 1.6rem;
+.product-card .rating {
+  color: #f59e0b;
 }
