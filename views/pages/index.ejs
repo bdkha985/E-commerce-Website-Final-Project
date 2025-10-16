@@ -85,30 +85,41 @@
     </section>
     <!-- 2. Products -->
     <section id="products" class="products container">
-        <h2 class="section-title">Best Seller &amp; New Collection</h2>
+        <h2 class="section-title">Best Seller</h2>
         <div class="grid">
-            <article class="card" data-badge="New">
-                <img src="https://picsum.photos/seed/p1/400/400" alt="" />
-                <h3>Áo khoác dáng rộng</h3>
-                <p class="price">790.000đ</p>
-            </article>
-            <article class="card" data-badge="New">
-                <img src="https://picsum.photos/seed/p2/400/400" alt="" />
-                <h3>Áo thun cotton</h3>
-                <p class="price">239.000đ</p>
-            </article>
-            <article class="card" data-badge="New">
-                <img src="https://picsum.photos/seed/p3/400/400" alt="" />
-                <h3>Quần jeans straight</h3>
-                <p class="price">599.000đ</p>
-            </article>
+            <% (bestSellers || []).forEach(p => { %>
             <article class="card">
-                <img src="https://picsum.photos/seed/p4/400/400" alt="" />
-                <h3>Sơ mi Oxford</h3>
-                <p class="price">429.000đ</p>
+                <a href="/products/<%= p.slug %>">
+                    <img src="<%= p._thumb %>" alt="<%= p.name %>" />
+                </a>
+                <h3 class="line-clamp">
+                    <a href="/products/<%= p.slug %>"><%= p.name %></a>
+                </h3>
+                <p class="price">
+                    <%= (p._price || 0).toLocaleString('vi-VN') %>đ
+                </p>
             </article>
+            <% }) %>
+        </div>
+
+        <h2 class="section-title" style="margin-top: 32px">New Collection</h2>
+        <div class="grid">
+            <% (newCollection || []).forEach(p => { %>
+            <article class="card" data-badge="New">
+                <a href="/products/<%= p.slug %>">
+                    <img src="<%= p._thumb %>" alt="<%= p.name %>" />
+                </a>
+                <h3 class="line-clamp">
+                    <a href="/products/<%= p.slug %>"><%= p.name %></a>
+                </h3>
+                <p class="price">
+                    <%= (p._price || 0).toLocaleString('vi-VN') %>đ
+                </p>
+            </article>
+            <% }) %>
         </div>
     </section>
+
     <!-- DANH MUC NOI BAT -->
     <section class="container home-cats">
         <h2 class="section-title">Danh mục nổi bật</h2>

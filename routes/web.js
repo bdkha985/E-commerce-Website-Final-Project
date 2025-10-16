@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { render } = require("../controllers/homeController");
+const { render, getHomePage } = require("../controllers/homeController");
 const products = require("../controllers/productsController");
 const {
     signupRules,
@@ -12,12 +12,15 @@ const requireLoginPage = require("../middlewares/requireLoginPage");
 const catalog  = require('../controllers/catalogController');
 
 // ========== Trang tĩnh / auth ==========
-router.get("/homepage", (req, res) =>
-    render(res, "pages/index.ejs", { title: "Trang chủ" })
-);
-router.get("/", (req, res) =>
-    render(res, "pages/index.ejs", { title: "Trang chủ" })
-);
+// router.get("/homepage", (req, res) =>
+//     render(res, "pages/index.ejs", { title: "Trang chủ" })
+// );
+// router.get("/", (req, res) =>
+//     render(res, "pages/index.ejs", { title: "Trang chủ" })
+// );
+
+router.get('/', getHomePage);   
+router.get('/homepage', getHomePage);  
 
 router.get("/signin", (req, res) =>
     render(res, "pages/auth/signin", { title: "Đăng nhập" })
@@ -71,7 +74,7 @@ router.get('/c/:slug', catalog.categoryPage);      // Trang theo category (men, 
 router.get('/products/all', catalog.allProductsPage); // Tất cả sản phẩm (catalog-style)
 
 // ========== PRODUCTS ==========
-router.get('/products',       products.list);    // Danh sách sản phẩm (search, filter, phân trang)
+// router.get('/products',       products.list); 
 router.get('/products/:slug', products.detail);  // Trang chi tiết sản phẩm
 
 // === Logout ===
