@@ -71,7 +71,7 @@ const detail = async (req, res, next) => {
     })
       .select('name slug images basePrice')
       .sort(product.brandId ? { createdAt: -1 } : { createdAt: -1 })
-      .limit(4)
+      .limit(5)
       .lean();
 
     return res.render('layouts/main', {

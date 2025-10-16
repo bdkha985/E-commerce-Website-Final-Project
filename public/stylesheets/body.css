@@ -153,14 +153,40 @@
   filter: saturate(1.05) contrast(1.02);
 }
 
-/* .card::before {
+.products .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+  gap: 24px;
+}
+.products .card {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(0,0,0,.06);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.products .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(0,0,0,.12);
+}
+.products .card img {
+  width: 100%; height: 220px; object-fit: cover;
+  display: block;
+}
+.products .card h3 {
+  font-size: 1.5rem; margin: 10px 12px 4px;
+}
+.products .card .price {
+  font-weight: 700; color: #e11d48; margin: 0 12px 12px;
+}
+.products .card[data-badge]::after{
   content: attr(data-badge);
   position: absolute; top: 10px; left: 10px;
-  background: var(--primary-color);
-  color: #fff; font-weight: 700;
-  font-size: 1.2rem; padding: 4px 8px; border-radius: 999px;
-  opacity: .95;
-} */
+  background: #0ea5e9; color:#fff; font-weight:700; font-size: 1.2rem;
+  padding: 4px 8px; border-radius: 999px;
+}
+
 
 /* Contact form */
 .contact-form {
