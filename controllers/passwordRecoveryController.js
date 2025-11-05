@@ -1,4 +1,5 @@
 // controllers/passwordRecoveryController.js
+
 const { body, validationResult } = require("express-validator");
 const {
     createResetRequest,
@@ -16,7 +17,6 @@ async function forgot(req, res) {
 
     const { email } = req.body;
     await createResetRequest(email, req.ip);
-    // Trả về thông điệp an toàn, không leak
     res.json({ ok: true, message: "Nếu email tồn tại, mã OTP đã được gửi" });
 }
 

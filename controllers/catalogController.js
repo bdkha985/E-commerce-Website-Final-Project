@@ -1,4 +1,5 @@
 // controllers/catalogController.js
+
 const Product  = require('../models/product.model');
 const Category = require('../models/category.model');
 const Brand    = require('../models/brand.model');
@@ -65,7 +66,7 @@ const categoryPage = async (req, res, next) => {
       body: 'pages/catalog/category',
       category,
       brands,
-      children: [], // nếu bạn có sub-category thì query thêm
+      children: [],
       products: filtered,
       page,
       pageCount,

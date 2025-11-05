@@ -1,4 +1,4 @@
-/* =========== Account Page – Fresh UI =========== */
+/* =========== Account Page =========== */
 
 .account.container {
     padding-top: 32px;
@@ -8,8 +8,9 @@
 /* Layout */
 .account .account-grid {
     display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 28px;
+    grid-template-columns: 300px 1fr;
+    gap: 32px;
+    align-items: start;
 }
 
 @media (max-width: 992px) {
@@ -18,48 +19,81 @@
     }
 }
 
-/* Sidebar */
+/* Sidebar với hiệu ứng gradient */
 .account-aside {
     background: #fff;
-    border: 1px solid #eef2f7;
-    border-radius: 16px;
-    padding: 18px;
-    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    position: sticky;
+    top: 100px;
+    transition: all 0.3s ease;
 }
 
+.account-aside:hover {
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
+    transform: translateY(-2px);
+}
+
+/* User info với gradient avatar */
 .account-user {
     display: flex;
-    gap: 14px;
+    gap: 16px;
     align-items: center;
-    margin-bottom: 14px;
-    padding-bottom: 14px;
-    border-bottom: 1px dashed #e5e7eb;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f1f5f9;
 }
 
 .account-user .avatar {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    background: #0ea5e9;
+    background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
     color: #fff;
     display: grid;
     place-items: center;
     font-weight: 800;
-    font-size: 1.8rem;
+    font-size: 2rem;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.account-user .avatar::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.account-user:hover .avatar::after {
+    opacity: 0.3;
+}
+
+.account-user:hover .avatar {
+    transform: scale(1.05) rotate(5deg);
 }
 
 .account-user .name {
     font-weight: 700;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     font-size: 1.8rem;
     color: #111827;
+    line-height: 1.2;
 }
+
 .account-user .email {
     font-size: 1.35rem;
     color: #6b7280;
 }
 
-/* Sidebar menu */
+/* Sidebar menu với hover effects */
 .account-menu {
     display: grid;
     gap: 8px;
@@ -67,132 +101,279 @@
 
 .account-menu button {
     width: 100%;
-    border: 1px solid #eef2f7;
-    background: #f8fafc;
-    padding: 12px 14px;
+    border: 1px solid #f1f5f9;
+    background: #fafbfc;
+    padding: 14px 16px;
     border-radius: 12px;
     cursor: pointer;
     text-align: left;
     font-weight: 600;
     font-size: 1.5rem;
-    color: #0f172a;
-    transition: all 0.18s ease;
+    color: #475569;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.account-menu button::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #0ea5e9, #3b82f6);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
 }
 
 .account-menu button:hover {
-    background: #eef2ff;
-    border-color: #e5e7eb;
+    background: #f0f9ff;
+    border-color: #bfdbfe;
+    color: #0c4a6e;
+    transform: translateX(4px);
+}
+
+.account-menu button:hover::before {
+    transform: scaleY(1);
 }
 
 .account-menu button.active {
-    background: #e0e7ff;
-    border-color: #c7d2fe;
-    color: #111827;
+    background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+    border-color: #93c5fd;
+    color: #1e40af;
+    font-weight: 700;
 }
 
-/* Main content card */
+.account-menu button.active::before {
+    transform: scaleY(1);
+}
+
+/* Icon cho menu items */
+.account-menu button i {
+    margin-right: 10px;
+    font-size: 1.6rem;
+    transition: transform 0.3s ease;
+}
+
+.account-menu button:hover i,
+.account-menu button.active i {
+    transform: scale(1.2);
+}
+
+/* Main content card với glassmorphism nhẹ */
 .account-content {
     background: #fff;
-    border: 1px solid #eef2f7;
-    border-radius: 16px;
-    padding: 22px;
-    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    transition: all 0.3s ease;
+}
+
+.account-content:hover {
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
 }
 
 .tab-panel h3 {
-    font-size: 2.2rem;
+    font-size: 2.4rem;
     font-weight: 800;
     color: #0f172a;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
-/* Form controls: to, rõ, dễ click */
+.tab-panel p {
+    color: #64748b;
+    margin-bottom: 24px;
+    font-size: 1.5rem;
+}
+
+/* Form controls: đẹp, rõ, dễ click */
 .account .form-label {
     font-weight: 600;
     color: #334155;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     font-size: 1.5rem;
-}
-.account .form-control {
-    padding: 14px 14px;
-    font-size: 1.6rem; /* value to hơn */
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    transition: border-color 0.15s, box-shadow 0.15s;
-}
-.account .form-control:focus {
-    border-color: #60a5fa;
-    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2);
+    display: block;
 }
 
-/* Buttons: gọn hơn, nhìn “định hình” hơn */
+.account .form-control {
+    padding: 14px 16px;
+    font-size: 1.6rem;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    transition: all 0.25s ease;
+    background: #fff;
+    width: 100%;
+}
+
+.account .form-control:hover {
+    border-color: #cbd5e1;
+}
+
+.account .form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+/* Buttons: hiện đại, nổi bật */
 .account .btn {
-    --btn-radius: 10px;
-    --btn-pad-y: 10px;
-    --btn-pad-x: 14px;
+    --btn-radius: 12px;
+    --btn-pad-y: 12px;
+    --btn-pad-x: 20px;
     --btn-fs: 1.5rem;
     border-radius: var(--btn-radius) !important;
     padding: var(--btn-pad-y) var(--btn-pad-x) !important;
     font-size: var(--btn-fs) !important;
     line-height: 1.2;
     font-weight: 700;
+    transition: all 0.25s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.account .btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.account .btn:hover::before {
+    width: 300px;
+    height: 300px;
 }
 
 .account .btn.btn-primary {
-    background: #2563eb !important;
-    border-color: #2563eb !important;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    border-color: transparent !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
+
 .account .btn.btn-primary:hover {
-    background: #1d4ed8 !important;
-    border-color: #1d4ed8 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
 }
 
 .account .btn.btn-outline-dark {
-    border-color: #0f172a !important;
+    border: 2px solid #0f172a !important;
     color: #0f172a !important;
     background: transparent !important;
 }
+
 .account .btn.btn-outline-dark:hover {
     background: #0f172a !important;
     color: #fff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
 }
 
-/* Alerts */
+/* Alerts với modern style */
 .account .alert {
     border-radius: 12px;
     font-size: 1.5rem;
-    padding: 12px 14px;
+    padding: 14px 18px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-/* Address list */
+.account .alert-success {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #065f46;
+}
+
+.account .alert-danger {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #991b1b;
+}
+
+/* Address list với card design */
 .addr-list {
-    margin-top: 12px;
+    margin-top: 20px;
     display: grid;
-    gap: 12px;
+    gap: 16px;
 }
 
 .addr-item {
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 12px;
-    background: #fafafa;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 18px;
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
 }
+
+.addr-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #3b82f6, #2563eb);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.addr-item:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateX(4px);
+}
+
+.addr-item:hover::before {
+    transform: scaleY(1);
+}
+
 .addr-item .meta {
     color: #64748b;
     font-size: 1.45rem;
-    margin-top: 4px;
-}
-.addr-item .actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
+    margin-top: 6px;
+    line-height: 1.6;
 }
 
-/* Dùng badge mặc định của BS nhưng tăng kích thước nhẹ */
+.addr-item .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.addr-item .actions .btn {
+    padding: 8px 16px !important;
+    font-size: 1.35rem !important;
+}
+
+/* Badge với modern style */
 .addr-item .badge {
     font-size: 1.2rem;
-    padding: 6px 8px;
+    padding: 6px 12px;
     border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #fff;
+}
+
+.badge-secondary {
+    background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+    color: #fff;
 }
 
 /* Utilities */
@@ -200,53 +381,145 @@
     display: none !important;
 }
 
-#modalAddAddress .form-label {
-    font-size: 1.4rem;
-    font-weight: 600;
-    margin-bottom: 6px;
-}
-#modalAddAddress .form-control {
-    font-size: 1.5rem;
-    padding: 12px 14px;
-    border-radius: 10px;
-}
-
-/* Modal form input */
+/* Modal form styling */
+#modalAddAddress .form-label,
 #modalAddress .form-label {
     font-size: 1.4rem;
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
+    color: #334155;
 }
+
+#modalAddAddress .form-control,
 #modalAddress .form-control {
     font-size: 1.5rem;
-    padding: 12px 14px;
+    padding: 12px 16px;
     border-radius: 10px;
+    border: 2px solid #e5e7eb;
+    transition: all 0.25s ease;
+}
+
+#modalAddAddress .form-control:focus,
+#modalAddress .form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
 /* Confirm modal */
 #modalConfirmDelete .modal-body {
     font-size: 1.5rem;
+    padding: 24px;
 }
 
-/* Address item */
-.addr-item {
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 12px;
-    background: #fafafa;
+#modalConfirmDelete .modal-header {
+    border-bottom: 2px solid #fee2e2;
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
 }
-.addr-item .meta {
+
+/* Form groups spacing */
+.account .mb-3 {
+    margin-bottom: 20px;
+}
+
+.account .form-group {
+    margin-bottom: 20px;
+}
+
+/* Divider */
+.account hr {
+    border: none;
+    border-top: 2px solid #f1f5f9;
+    margin: 24px 0;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: #94a3b8;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state h4 {
+    font-size: 1.8rem;
+    font-weight: 600;
     color: #64748b;
-    font-size: 1.45rem;
-    margin-top: 4px;
+    margin-bottom: 8px;
 }
-.addr-item .actions {
+
+.empty-state p {
+    font-size: 1.4rem;
+    color: #94a3b8;
+}
+
+/* Loading state */
+.loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(4px);
     display: flex;
-    gap: 8px;
-    margin-left: 10px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    z-index: 10;
 }
-.addr-list {
-    display: grid;
-    gap: 12px;
-    margin-top: 12px;
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e5e7eb;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .account-aside {
+        position: relative;
+        top: 0;
+    }
+    
+    .account .account-grid {
+        gap: 24px;
+    }
+}
+
+@media (max-width: 576px) {
+    .account-content {
+        padding: 20px;
+        border-radius: 16px;
+    }
+    
+    .account-aside {
+        padding: 20px;
+        border-radius: 16px;
+    }
+    
+    .tab-panel h3 {
+        font-size: 2rem;
+    }
+    
+    .account-user {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .addr-item .actions {
+        flex-direction: column;
+    }
+    
+    .addr-item .actions .btn {
+        width: 100%;
+    }
 }

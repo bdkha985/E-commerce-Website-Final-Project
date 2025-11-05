@@ -1,5 +1,4 @@
 <%
-// Helper: lấy ảnh đại diện — ưu tiên images chung; fallback ảnh variant
 function pickImage(p) {
   if (p.images?.length) return p.images[0];
   if (p.variants?.length && p.variants[0].images?.length) return p.variants[0].images[0];

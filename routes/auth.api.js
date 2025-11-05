@@ -2,15 +2,22 @@
 const express = require("express");
 const { body } = require("express-validator");
 const { apiSignin, apiSignup } = require("../controllers/authApiController");
-const {
-    signupRules,
-    signinRules,
-    handleValidation,
-} = require("../middlewares/authValidator");
+const { forceChangePassword } = require("../controllers/forceChangePasswordController")
+const { signupRules, signinRules, handleApiValidation } = require("../middlewares/authValidator");
 
 const router = express.Router();
 
-router.post("/signup", signupRules, apiSignup);
-router.post("/signin", signinRules, apiSignin);
+router.post("/signup", signupRules, handleApiValidation, apiSignup);
+router.post("/signin", signinRules, handleApiValidation, apiSignin);
+
+router.post(
+    "/force-change-password",
+    [
+        body("newPassword")
+            .isLength({ min: 6 }).withMessage("Mật khẩu mới phải ít nhất 6 ký tự"),
+    ],
+    handleApiValidation,
+    forceChangePassword
+);
 
 module.exports = router;

@@ -15,10 +15,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const payload = {
       fullName: fd.get('fullName')?.trim(),
       email: fd.get('email')?.trim(),
-      phone: fd.get('phone')?.trim(),
-      password: fd.get('password'),
-      confirmPassword: fd.get('confirmPassword')
+      address: {
+        street: fd.get('street')?.trim(),
+        ward: fd.get('ward')?.trim(),
+        city: fd.get('city')?.trim(),
+        label: 'Mặc định'
+      }
     };
+
+    if (!payload.fullName || !payload.email || !payload.address.street || !payload.address.ward || !payload.address.city) {
+        if (errorBox) { errorBox.textContent = 'Vui lòng nhập đầy đủ thông tin.'; errorBox.classList.remove('d-none'); }
+        else alert('Vui lòng nhập đầy đủ thông tin.');
+        btn.disabled = false;
+        return;
+    }
 
     try {
       const res = await fetch('/api/auth/signup', {
@@ -28,8 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify(payload)
       });
 
-      const text = await res.text();
-      let data = {}; try { data = JSON.parse(text); } catch {}
+      const data = await res.json();
 
       if (!res.ok || !data.ok) {
         const msg = data.message || `Đăng ký thất bại (HTTP ${res.status})`;
@@ -39,8 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // set cờ nếu muốn hiện toast ở homepage
       sessionStorage.setItem('justSignedUp', '1');
+      alert('Đăng ký thành công! Vui lòng kiểm tra email để nhận mật khẩu tạm thời.');
       window.location.href = '/homepage';
     } catch (err) {
       if (errorBox) { errorBox.textContent = 'Không thể kết nối máy chủ.'; errorBox.classList.remove('d-none'); }

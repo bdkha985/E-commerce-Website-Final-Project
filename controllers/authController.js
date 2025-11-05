@@ -1,4 +1,5 @@
 // controllers/authController.js
+
 const { validationResult } = require("express-validator");
 const {
     createUserLocal,
@@ -13,7 +14,6 @@ const signup = async (req, res) => {
     try {
         const user = await createUserLocal({ email, password, fullName });
 
-        // set session login luôn
         req.session.userId = user._id;
         req.session.fullName = user.fullName;
         req.session.role = "customer";
@@ -38,15 +38,13 @@ const signin = async (req, res, next) => {
             return res.redirect("/signin");
         }
 
-        // Lưu session
         req.session.userId = user._id.toString();
         req.session.fullName = user.fullName;
         req.session.role = (user.roles || []).includes("admin")
             ? "admin"
             : "customer";
 
-        // Remember me (tùy chọn)
-        if (remember) req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 7; // 7 ngày
+        if (remember) req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 7; // 7 ngay
 
         req.flash("success", "Đăng nhập thành công");
         return res.redirect("/homepage");

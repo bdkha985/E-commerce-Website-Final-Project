@@ -1,3 +1,5 @@
+//config/database.js
+
 const mongoose = require("mongoose");
 
 async function connectDB(uri) {
@@ -8,7 +10,7 @@ async function connectDB(uri) {
         });
 
         console.log("✅ Connected to MongoDB");
-        console.log("   Database:", mongoose.connection.name);
+        console.log("Database:", mongoose.connection.name);
     } catch (err) {
         console.error("❌ MongoDB connection error:", err.message);
         process.exit(1);

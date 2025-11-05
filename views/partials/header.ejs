@@ -37,45 +37,49 @@
                 <div class="cart-hover">
                     <a href="/cart" class="cart-btn" aria-label="Cart">
                         <i class="fa-solid fa-cart-shopping"></i>
-                        <% if (typeof cartCount !== 'undefined' && cartCount >
-                        0) { %>
+                        <% if (locals.cartCount && cartCount > 0) { %>
                         <span class="cart-badge"><%= cartCount %></span>
+                        <% } else { 
+                            %> <span class="cart-badge">0</span> %>
                         <% } %>
                     </a>
 
                     <!-- Mini cart panel -->
                     <div class="mini-cart">
-                        <div class="mini-cart__title">🛍️ Sản Phẩm Mới Thêm</div>
+                        <div class="mini-cart__title">🛍️ Giỏ Hàng Của Bạn</div>
                         <div class="mini-cart__list">
-                            <% (cartItems || []).slice(0,5).forEach(item => { %>
+                            <% if (locals.cartItems && cartItems.length > 0) { %> 
+                            <% cartItems.slice(0, 5).forEach(item => { %>
                             <div class="mini-cart__item">
-                                <img src="<%= item.image %>" alt="" />
+                                <img
+                                    src="<%= item.image || 'https://placehold.co/80x80?text=No+Img' %>"
+                                    alt="<%= item.name %>" />
                                 <div class="mini-cart__info">
                                     <a
                                         class="mini-cart__name"
-                                        href="/products/<%= item.slug %>"
-                                        ><%= item.name %></a
-                                    >
+                                        href="/products/<%= item.slug %>">
+                                        <%= item.name %>
+                                    </a>
                                     <div class="mini-cart__meta">
                                         <span>x<%= item.qty %></span>
-                                        <span class="price"
-                                            ><%=
-                                            (item.price).toLocaleString('vi-VN')
-                                            %>đ</span
-                                        >
+                                        <span class="price"><%= (item.price || 0).toLocaleString('vi-VN') %>đ</span>
                                     </div>
                                 </div>
                             </div>
-                            <% }) %>
+                            <% }) %> <% } else { %>
+                            <p
+                                style="
+                                    padding: 15px;
+                                    text-align: center;
+                                    color: #6c757d;
+                                ">
+                                Giỏ hàng của bạn đang trống.
+                            </p>
+                            <% } %>
                         </div>
                         <div class="mini-cart__footer">
-                            <span
-                                ><%= (cartItems && cartItems.length) ?
-                                cartItems.length : 0 %> sản phẩm</span
-                            >
-                            <a class="btn btn--view-cart" href="/cart"
-                                >Xem Giỏ Hàng</a
-                            >
+                            <span><%= (locals.cartItems && cartItems.length) ? cartItems.length : 0 %> sản phẩm</span>
+                            <a class="btn btn--view-cart" href="/cart">Xem Giỏ Hàng</a>
                         </div>
                         <span class="mini-cart__arrow"></span>
                     </div>

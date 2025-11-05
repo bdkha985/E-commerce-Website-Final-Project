@@ -1,16 +1,16 @@
 // controllers/authApiController.js
+
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const User = require("../models/user.model");
 const {
-    createUserLocal,
     findUserByEmail,
     validatePassword,
+    createUserAndSendPassword
 } = require("../services/user.service");
 
-// ĐĂNG KÝ (API JSON)
+// ĐĂNG KÝ
 const apiSignup = async (req, res) => {
-    // validate input
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -22,30 +22,27 @@ const apiSignup = async (req, res) => {
         });
     }
 
-    const { email, password, fullName, phone } = req.body;
+    const { email, fullName, address } = req.body;
 
     try {
-        const user = await createUserLocal({
+        const user = await createUserAndSendPassword({
             email,
-            password,
             fullName,
-            phone,
+            address
         });
 
-        // set session ngay sau khi đăng ký
-        req.session.userId = user._id.toString();
-        req.session.fullName = user.fullName;
-        req.session.role = "customer";
+        // req.session.userId = user._id.toString();
+        // req.session.fullName = user.fullName;
+        // req.session.role = "customer";
 
         req.flash("success", "Đăng kí thành công");
         return res.status(201).json({
             ok: true,
-            message: "Đăng ký thành công",
+            message: "Đăng ký thành công, Vui lòng kiểm tra email để nhận mật khẩu tạm thời.",
             user: {
                 id: user._id,
                 email: user.email,
                 fullName: user.fullName,
-                phone: user.phone,
                 roles: user.roles,
             },
         });
@@ -57,7 +54,6 @@ const apiSignup = async (req, res) => {
 };
 
 const apiSignin = async (req, res) => {
-    // validate input
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -85,7 +81,17 @@ const apiSignin = async (req, res) => {
             .json({ ok: false, message: "Email hoặc mật khẩu sai" });
     }
 
-    // set session cho web
+    if (user.mustChangePassword) {
+        req.session.tempUserId = user._id.toString();
+        req.session.tempUserEmail = user.email;
+
+        return res.status(200).json({
+            ok: true,
+            forcePasswordChange: true,
+            message: "Đăng nhập thành công. Vui lòng đổi mật khẩu.",
+        });
+    }
+    
     req.session.userId = user._id.toString();
     req.session.fullName = user.fullName;
     req.session.role = (user.roles || []).includes("admin")

@@ -20,7 +20,7 @@
                     placeholder=" "
                     required
                     minlength="2" />
-                <label>Full name</label>
+                <label>Họ tên</label>
             </div>
             <div class="form-floating mb-3">
                 <input
@@ -31,35 +31,27 @@
                     required />
                 <label>Email</label>
             </div>
+
+            <p class="mb-2 fw-bold">Địa chỉ giao hàng:</p>
+
             <div class="form-floating mb-3">
-                <input
-                    name="phone"
-                    type="text"
-                    class="form-control"
-                    placeholder=" "
-                    required />
-                <label>Số điện thoại</label>
+                <input name="street" type="text" class="form-control" placeholder=" " required />
+                <label>Số nhà, Tên đường</label>
             </div>
-            <div class="form-floating mb-3">
-                <input
-                    name="password"
-                    type="password"
-                    class="form-control"
-                    placeholder=" "
-                    required
-                    minlength="6" />
-                <label>Password</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input
-                    name="confirmPassword"
-                    type="password"
-                    class="form-control"
-                    placeholder=" "
-                    required
-                    minlength="6" />
-                <label>Confirm Password</label>
-            </div>
+             <div class="row g-2 mb-3">
+                 <div class="col-md">
+                     <div class="form-floating">
+                         <input name="ward" type="text" class="form-control" placeholder=" " required />
+                         <label>Phường / Xã</label>
+                     </div>
+                 </div>
+                 <div class="col-md">
+                     <div class="form-floating">
+                         <input name="city" type="text" class="form-control" placeholder=" " required />
+                         <label>Tỉnh / Thành phố</label>
+                     </div>
+                 </div>
+             </div>
 
             <button id="btnSignUp" type="button" class="btn btn-primary w-100">
                 Sign Up

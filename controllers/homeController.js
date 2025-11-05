@@ -31,7 +31,6 @@ const getHomePage = async (req, res, next) => {
             Product.find().sort({ createdAt: -1 }).limit(5).lean(),
         ]);
 
-        // Chuẩn hoá dữ liệu hiển thị (ảnh + giá) để ejs dùng đơn giản
         const mapView = (arr) =>
             (arr || []).map((p) => ({
                 ...p,

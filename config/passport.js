@@ -1,3 +1,5 @@
+//config/passport.js
+
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
@@ -49,8 +51,6 @@ passport.use(
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                // Debug xem profile
-                // console.log('[FB profile]', JSON.stringify(profile, null, 2));
 
                 const facebookId = profile.id;
                 const email = profile.emails?.[0]?.value?.toLowerCase() || null;
@@ -66,7 +66,7 @@ passport.use(
                     "oauth.facebookId": facebookId,
                 });
 
-                // 2) Nếu chưa có, thử khớp theo email (đã đăng ký local trước)
+                // 2) Nếu chưa có, thử khớp theo email
                 if (!user && email) {
                     user = await User.findOne({ email });
                     if (user) {
@@ -75,14 +75,14 @@ passport.use(
                     }
                 }
 
-                // 3) Nếu vẫn chưa có, tạo mới (KHÔNG ép phone)
+                // 3) Nếu vẫn chưa có, tạo mới
                 if (!user) {
                     try {
                         user = await User.create({
                             fullName: displayName,
-                            email: email || `fb-${facebookId}@example.local`, // fallback khi FB không trả email
+                            email: email || `fb-${facebookId}@example.local`,
                             passwordHash: null,
-                            phone: "", // để trống; sau này yêu cầu bổ sung
+                            phone: "",
                             roles: ["customer"],
                             oauth: { facebookId },
                         });
@@ -107,7 +107,6 @@ passport.use(
                 return done(null, user);
             } catch (err) {
                 console.error("[FacebookStrategy ERROR]", err);
-                // Đừng ném err -> 500; trả về false để đi failureRedirect
                 return done(null, false, {
                     message: "Xác thực Facebook thất bại.",
                 });

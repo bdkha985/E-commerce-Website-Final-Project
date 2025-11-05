@@ -1,3 +1,4 @@
+//app.js
 require("dotenv").config();
 require("express-async-errors");
 
@@ -8,6 +9,14 @@ const logger = require("morgan");
 const flash = require("connect-flash");
 const createError = require("http-errors");
 const passport = require("passport");
+
+const { createClient } = require("redis");
+const CR = require("connect-redis");
+const RedisStore =
+  (CR && typeof CR === "function" && CR) ||  
+  (CR && typeof CR.default === "function" && CR.default) ||
+  (CR && typeof CR.RedisStore === "function" && CR.RedisStore);
+
 
 const configViewEngine = require("./config/viewEngine");
 const { connectDB } = require("./config/database");
@@ -25,6 +34,17 @@ const passwordRecovery = require('./routes/passwordRecovery.api.js')
 //Passport cấu hình
 require("./config/passport");
 
+// Redis client (node-redis v4)
+const redisClient = createClient({ url: "redis://redis:6379" });
+redisClient.on("error", (err) => console.error("Redis Client Error", err));
+redisClient.connect().catch(console.error);
+
+// Tạo store
+const store = new RedisStore({
+  client: redisClient,
+  prefix: "kshop:sess:",
+});
+
 const app = express();
 const port = process.env.PORT || 8888;
 const hostname = process.env.HOST_NAME || "localhost";
@@ -38,39 +58,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// FAKE DATA
-app.use((req, res, next) => {
-    // TODO: thay bằng session/DB sau
-    if (!res.locals.cartItems) {
-        res.locals.cartItems = [
-            {
-                slug: "mid-century-modern-tshirt",
-                name: "Mid Century Modern T-Shirt",
-                qty: 1,
-                price: 110000,
-                image: "https://picsum.photos/seed/p1a/80/80",
-            },
-            {
-                slug: "corporate-office-shoes",
-                name: "Corporate Office Shoes",
-                qty: 1,
-                price: 399000,
-                image: "https://picsum.photos/seed/p2a/80/80",
-            },
-        ];
-    }
-    res.locals.cartCount = res.locals.cartItems.length;
-    next();
-});
-
 // Session
 app.use(
-    session({
-        secret: "kshop-secret",
-        resave: false,
-        saveUninitialized: false,
-        cookie: { maxAge: 1000 * 60 * 60 }, // 1h
-    })
+  session({
+    store,
+    secret: "kshop-secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 1000 * 60 * 60 },
+  })
 );
 
 // Passport
@@ -79,7 +75,6 @@ app.use(passport.session());
 
 app.use(flash());
 app.use((req, res, next) => {
-    // Ưu tiên passport (req.user), fallback session (local signin)
     const u =
         req.user ||
         (req.session?.fullName
@@ -100,10 +95,9 @@ app.use((req, res, next) => {
     next();
 });
 
-// TÉT
+// Test
 app.use(async (req, res, next) => {
   try {
-    // tuỳ cấu trúc: parentId = null là category cấp 1
     const cats = await Category.find({ parentId: null })
       .select('name slug')
       .sort({ name: 1 })
@@ -146,8 +140,7 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-      console.error('ERROR HANDLER:', err); // thêm dòng này
-    // set locals, only providing error in development
+      console.error('ERROR HANDLER:', err); // test
     res.locals.message = err.message;
     res.locals.error = req.app.get("env") === "development" ? err : {};
 

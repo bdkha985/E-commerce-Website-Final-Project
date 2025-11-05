@@ -1,3 +1,5 @@
+//models/user.model.js
+
 const { Schema, model } = require("mongoose");
 
 const AddressSchema = new Schema(
@@ -72,6 +74,10 @@ const UserSchema = new Schema(
         loyaltyPoints: {
             type: LoyaltySchema,
             default: () => ({ balance: 0, lastUpdatedAt: new Date() }),
+        },
+        mustChangePassword: {
+            type: Boolean,
+            default: false
         },
     },
     { timestamps: true }

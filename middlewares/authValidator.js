@@ -1,6 +1,7 @@
+//middlewares/authValidator.js
+
 const { body, validationResult } = require("express-validator");
 
-// Các rule cho signup
 const signupRules = [
     body("fullName")
         .trim()
@@ -11,42 +12,44 @@ const signupRules = [
 
     body("email").isEmail().withMessage("Email không hợp lệ"),
 
-    body("phone")
-        .trim()
-        .matches(/^0[0-9]{9}$/)
-        .withMessage("Số điện thoại không hợp lệ (10 số, bắt đầu bằng 0)"),
-
-    body("password")
-        .isLength({ min: 6 })
-        .withMessage("Mật khẩu ít nhất 6 ký tự"),
-
-    body("confirmPassword").custom((value, { req }) => {
-        if (value !== req.body.password) {
-            throw new Error("Mật khẩu xác nhận không khớp");
-        }
-        return true;
-    }),
+    body("address.street")
+            .trim()
+            .notEmpty().withMessage("Địa chỉ đường không được trống"),
+        body("address.ward")
+            .trim()
+            .notEmpty().withMessage("Phường/Xã không được trống"),
+        body("address.city")
+            .trim()
+            .notEmpty().withMessage("Tỉnh/Thành phố không được trống"),
 ];
 
-// Các rule cho signin
 const signinRules = [
     body("email").isEmail().withMessage("Email không hợp lệ"),
     body("password").notEmpty().withMessage("Mật khẩu không được để trống"),
 ];
 
-// Middleware chung để bắt lỗi validate
 const handleValidation = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        // Ghép nhiều lỗi thành 1 chuỗi, cách nhau bằng dấu phẩy
         const msg = errors
             .array()
             .map((e) => e.msg)
             .join(", ");
         req.flash("error", msg);
-        return res.redirect("back"); // quay lại trang trước (signup hoặc signin)
+        return res.redirect("back");
     }
     next();
 };
 
-module.exports = { signupRules, signinRules, handleValidation };
+const handleApiValidation = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            ok: false,
+            message: errors.array().map((e) => e.msg).join(", "),
+        });
+    }
+    next();
+};
+
+module.exports = { signupRules, signinRules, handleValidation, handleApiValidation };

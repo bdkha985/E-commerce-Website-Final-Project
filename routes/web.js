@@ -30,6 +30,14 @@ router.get("/signup", (req, res) =>
     render(res, "pages/auth/signup", { title: "Đăng kí" })
 );
 
+router.get("/force-change-password", (req, res) => {
+    // Kiểm tra xem có tempUserId trong session không
+    if (!req.session.tempUserId) {
+        return res.redirect('/signin'); // Nếu không có, quay lại đăng nhập
+    }
+    render(res, "pages/auth/force-change-password", { title: "Đổi Mật Khẩu" });
+});
+
 // Reset password
 router.get("/forgot", (req, res) =>
     render(res, "pages/auth/forgot", { title: "Quên mật khẩu" })
@@ -70,8 +78,8 @@ router.get("/about", (req, res) =>
 router.get("/cart", (req, res) => render(res, "pages/cart", { title: "Cart" }));
 
 // ========== CATALOG ==========
-router.get('/c/:slug', catalog.categoryPage);      // Trang theo category (men, women, ...)
-router.get('/products/all', catalog.allProductsPage); // Tất cả sản phẩm (catalog-style)
+router.get('/c/:slug', catalog.categoryPage);  
+router.get('/products/all', catalog.allProductsPage);
 
 // ========== PRODUCTS ==========
 // router.get('/products',       products.list); 

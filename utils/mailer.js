@@ -6,12 +6,11 @@ const transporter = nodemailer.createTransport({
     port: +(process.env.SMTP_PORT || 465),
     secure: (process.env.SMTP_SECURE || "true") === "true",
     auth: {
-        user: process.env.SMTP_USER, // your-email@gmail.com
-        pass: process.env.SMTP_PASS, // App Password (Gmail cần app password 16 ký tự)
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
     },
 });
 
-// Kiểm tra cấu hình SMTP khi server start (chỉ log, không throw)
 (async () => {
     try {
         await transporter.verify();
@@ -20,6 +19,36 @@ const transporter = nodemailer.createTransport({
         console.error("❌ SMTP verify failed:", e.message);
     }
 })();
+
+async function sendWelcomeEmail(to, fullName) {
+    const html = `
+    <p>Chào mừng, ${fullName}!</p>
+    <p>Cảm ơn bạn đã đăng ký tài khoản tại K Shopping.</p>
+    <p>Chúng tôi rất vui khi có bạn đồng hành.</p>
+  `;
+    return transporter.sendMail({
+        from: `"K Shopping" <${process.env.SMTP_USER}>`,
+        to,
+        subject: "Chào mừng bạn đến với K Shopping 🎉",
+        html,
+    });
+}
+
+async function sendTemporaryPasswordEmail(to, tempPassword) {
+    const html = `
+    <p>Xin chào,</p>
+    <p>Cảm ơn bạn đã đăng ký tài khoản tại K Shopping.</p>
+    <p>Mật khẩu tạm thời của bạn là: <b style="font-size:1.2rem; background: #eee; padding: 5px 8px; border-radius: 4px;">${tempPassword}</b></p>
+    <p>Vui lòng sử dụng mật khẩu này để đăng nhập lần đầu và đổi mật khẩu ngay lập tức.</p>
+    <p>Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>
+  `;
+    return transporter.sendMail({
+        from: `"K Shopping" <${process.env.SMTP_USER}>`,
+        to,
+        subject: "Mật khẩu tạm thời - K Shopping",
+        html,
+    });
+}
 
 async function sendOtpEmail(to, otp, expiresAt) {
     const html = `
@@ -36,4 +65,4 @@ async function sendOtpEmail(to, otp, expiresAt) {
     });
 }
 
-module.exports = { sendOtpEmail };
+module.exports = { sendOtpEmail, sendWelcomeEmail, sendTemporaryPasswordEmail };

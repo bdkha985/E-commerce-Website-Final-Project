@@ -1,12 +1,6 @@
 // controllers/productsController.js
 const Product = require('../models/product.model');
 
-/**
- * GET /products
- * Danh sách sản phẩm (có phân trang & filter cơ bản qua query)
- *  - ?q=keyword
- *  - ?page=1&limit=12
- */
 const list = async (req, res, next) => {
   try {
     const page  = Math.max(1, parseInt(req.query.page || '1', 10));
@@ -47,10 +41,6 @@ const list = async (req, res, next) => {
   }
 };
 
-/**
- * GET /products/:slug
- * Chi tiết sản phẩm theo slug
- */
 const detail = async (req, res, next) => {
   try {
     const slug = decodeURIComponent(req.params.slug || '').trim();
@@ -59,7 +49,7 @@ const detail = async (req, res, next) => {
     if (!product) {
       return res.status(404).render('layouts/main', {
         title: 'Không tìm thấy sản phẩm',
-        body: 'pages/404', // đảm bảo có views/pages/404.ejs
+        body: 'pages/404',
         message: 'Sản phẩm này không tồn tại hoặc đã ngừng kinh doanh.'
       });
     }
@@ -71,7 +61,7 @@ const detail = async (req, res, next) => {
     })
       .select('name slug images basePrice')
       .sort(product.brandId ? { createdAt: -1 } : { createdAt: -1 })
-      .limit(5)
+      .limit(4)
       .lean();
 
     return res.render('layouts/main', {

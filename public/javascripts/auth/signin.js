@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('[signin] DOM ready');
 
   const form = document.getElementById('signinForm');
   const btn  = document.getElementById('btnSignIn');
@@ -35,17 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin', // để cookie session hoạt động
+        credentials: 'same-origin',
         body: JSON.stringify(payload)
       });
 
-      // Dạng parser “an toàn”: thử đọc text -> cố parse JSON
-      const text = await res.text();
-      let data = {};
-      try { data = JSON.parse(text); } catch { /* response không phải JSON */ }
-
-      console.log('[signin] response status=', res.status, 'data=', data);
-
+      const data = await res.json();
       if (!res.ok || !data.ok) {
         const msg = data.message || `Đăng nhập thất bại (HTTP ${res.status})`;
         showError(msg);
@@ -53,8 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Thành công → điều hướng
-      window.location.href = '/homepage';
+      // KIỂM TRA CỜ TỪ API
+      if (data.forcePasswordChange) {
+          window.location.href = '/force-change-password';
+      } else {
+          window.location.href = '/homepage';
+      }    
     } catch (err) {
       console.error('[signin] fetch error:', err);
       showError('Không thể kết nối máy chủ.');

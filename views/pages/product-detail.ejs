@@ -50,7 +50,7 @@
         <p class="pd-short"><%= product.shortDesc %></p>
       <% } %>
 
-      <!-- Variants (nếu có) -->
+      <!-- Variants -->
       <% if (product?.variants?.length) { 
            const colors = [...new Set(product.variants.map(v => v.color).filter(Boolean))];
            const sizes  = [...new Set(product.variants.map(v => v.size).filter(Boolean))];

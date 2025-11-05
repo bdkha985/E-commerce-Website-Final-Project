@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const slugify = require('slugify');
 
 const Brand = require('../models/brand.model');
-const Category = require('../models/category.model'); // bạn đang đặt file là "caterogy"
+const Category = require('../models/category.model');
 const Product = require('../models/product.model');
 
 function s(str) {
@@ -52,7 +52,7 @@ async function main() {
   categories.forEach(c => (catMap[c.slug] = c._id));
   console.log(`✅ Seeded ${categories.length} categories`);
 
-  // Helper tạo 1 product “đủ chất”
+  // Helper tạo 1 product
   const makeProduct = ({ name, base, catSlug, brand, seedKey, tag = [] }) => {
     const basePrice = base + rand(-20000, 80000);
     const images = [
@@ -89,7 +89,7 @@ async function main() {
       images,
       basePrice,
       variants,
-      ratingAvg: +(Math.random() * 2 + 3).toFixed(1), // 3.0–5.0
+      ratingAvg: +(Math.random() * 2 + 3).toFixed(1),
       ratingCount: rand(10, 500),
       tags: tag,
     };

@@ -1,3 +1,5 @@
+//middlewares/requireLogin.api.js
+
 const requireLoginApi = (req, res, next) => {
     const isLogged = !!(req.user || req.session?.userId);
     if (!isLogged)

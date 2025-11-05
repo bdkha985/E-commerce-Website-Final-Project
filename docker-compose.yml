@@ -1,0 +1,75 @@
+services:
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    ports:
+      - "80:80"
+    networks:
+      - kshop-network
+    deploy:
+      replicas: 1
+
+  app:
+    image: kshop-app:latest
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - MONGODB_URI=mongodb://db:27017/web_nodejs
+      - HOST_NAME=0.0.0.0
+    env_file:
+      - .env
+    networks:
+      - kshop-network
+    deploy:
+      replicas: 3
+    command: npm run dev
+
+  db:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_DATABASE=web_nodejs
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - kshop-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      replicas: 1
+
+  redis:
+    image: redis:alpine
+    networks:
+      - kshop-network
+    deploy:
+
+  worker:
+    image: kshop-app:latest
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - MONGODB_URI=mongodb://db:27017/web_nodejs
+      - HOST_NAME=0.0.0.0
+    env_file:
+      - .env
+    networks:
+      - kshop-network
+    deploy:
+      replicas: 1
+    command: node worker.js
+
+networks:
+  kshop-network:
+    driver: overlay
+
+volumes:
+  mongodb_data:
