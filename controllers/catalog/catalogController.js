@@ -1,8 +1,8 @@
 // controllers/catalogController.js
 
-const Product  = require('../models/product.model');
-const Category = require('../models/category.model');
-const Brand    = require('../models/brand.model');
+const Product  = require('../../models/product.model');
+const Category = require('../../models/category.model');
+const Brand    = require('../../models/brand.model');
 
 function getDisplayPrice(p) {
   if (Array.isArray(p.variants) && p.variants.length) {

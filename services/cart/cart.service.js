@@ -1,6 +1,6 @@
 // services/cart.service.js
-const Product = require('../models/product.model');
-const User = require('../models/user.model');
+const Product = require('../../models/product.model');
+const User = require('../../models/user.model');
 
 /**
  * Lấy giỏ hàng (hoặc từ session, hoặc từ DB)

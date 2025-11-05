@@ -1,7 +1,7 @@
 // routes/passwordRecovery.api.js
 const express = require("express");
 const { body } = require("express-validator");
-const ctrl = require("../controllers/passwordRecoveryController");
+const ctrl = require("../../controllers/auth/passwordRecoveryController");
 
 const router = express.Router();
 

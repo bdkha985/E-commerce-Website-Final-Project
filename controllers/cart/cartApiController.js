@@ -1,6 +1,6 @@
 // controllers/cartApiController.js
 const { validationResult } = require("express-validator");
-const cartService = require('../services/cart.service.js');
+const cartService = require('../../services/cart/cart.service.js');
 
 // Hàm helper để gửi phản hồi thành công (tránh lặp code)
 function sendSuccessResponse(res, cart, message) {

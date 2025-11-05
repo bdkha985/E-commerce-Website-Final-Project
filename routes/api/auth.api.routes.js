@@ -1,9 +1,9 @@
 // routes/auth.api.js
 const express = require("express");
 const { body } = require("express-validator");
-const { apiSignin, apiSignup } = require("../controllers/authApiController");
-const { forceChangePassword } = require("../controllers/forceChangePasswordController")
-const { signupRules, signinRules, handleApiValidation } = require("../middlewares/authValidator");
+const { apiSignin, apiSignup } = require("../../controllers/auth/authApiController");
+const { forceChangePassword } = require("../../controllers/auth/forceChangePasswordController")
+const { signupRules, signinRules, handleApiValidation } = require("../../middlewares/authValidator");
 
 const router = express.Router();
 

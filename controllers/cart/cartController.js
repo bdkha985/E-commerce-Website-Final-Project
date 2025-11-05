@@ -1,5 +1,5 @@
 // controllers/cartController.js
-const cartService = require('../services/cart.service');
+const cartService = require('../../services/cart/cart.service');
 
 const getCartPage = async (req, res, next) => {
     try {

@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const cartApiController = require('../controllers/cartApiController');
+const cartApiController = require('../../controllers/cart/cartApiController');
 
 // POST /api/cart/add
 router.post(

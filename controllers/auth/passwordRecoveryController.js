@@ -5,7 +5,7 @@ const {
     createResetRequest,
     verifyOtp,
     resetPassword,
-} = require("../services/passwordReset.service");
+} = require("../../services/auth/passwordReset.service");
 
 // POST /api/auth/forgot
 async function forgot(req, res) {

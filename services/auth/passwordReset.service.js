@@ -1,9 +1,9 @@
 // services/passwordReset.service.js
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
-const User = require("../models/user.model");
-const PasswordReset = require("../models/passwordReset.model");
-const { sendOtpEmail } = require("../utils/mailer");
+const User = require("../../models/user.model");
+const PasswordReset = require("../../models/passwordReset.model");
+const { sendOtpEmail } = require("../../utils/mailer");
 
 const OTP_LENGTH = +(process.env.OTP_LENGTH || 6);
 const OTP_EXPIRES_MIN = +(process.env.OTP_EXPIRES_MIN || 10);

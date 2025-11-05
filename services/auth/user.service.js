@@ -1,8 +1,8 @@
-const User = require("../models/user.model");
+const User = require("../../models/user.model");
 const bcrypt = require("bcrypt");
 const Redis = require("ioredis");
 const crypto = require("crypto");
-const { sendTemporaryPasswordEmail } = require("../utils/mailer");
+const { sendTemporaryPasswordEmail } = require("../../utils/mailer");
 
 const normalize = (s) =>
     String(s || "")

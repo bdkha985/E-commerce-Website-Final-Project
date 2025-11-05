@@ -5,8 +5,8 @@ const {
     createUserLocal,
     findUserByEmail,
     validatePassword,
-} = require("../services/user.service");
-const User = require("../models/user.model");
+} = require("../../services/auth/user.service");
+const User = require("../../models/user.model");
 const bcrypt = require("bcrypt");
 
 const signup = async (req, res) => {

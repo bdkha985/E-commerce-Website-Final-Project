@@ -1,7 +1,7 @@
 // controllers/forceChangePasswordController.js
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
-const User = require("../models/user.model");
+const User = require("../../models/user.model");
 
 async function forceChangePassword(req, res) {
     const errors = validationResult(req);

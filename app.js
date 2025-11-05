@@ -20,18 +20,13 @@ const RedisStore =
 
 const configViewEngine = require("./config/viewEngine");
 const { connectDB } = require("./config/database");
-const cartService = require('./services/cart.service');
+const cartService = require('./services/cart/cart.service.js');
 
 //Routes
 const Category = require('./models/category.model');
-const webRoutes = require("./routes/web");
-const indexRouter = require("./routes/index");
-const usersRouter = require("./routes/users");
-const socialAuthRoutes = require("./routes/auth.social");
-const authApiRoutes = require("./routes/auth.api");
-const accountApiRoutes = require("./routes/account.api.js");
-const passwordRecovery = require('./routes/passwordRecovery.api.js')
-const cartApiRoutes = require("./routes/cart.api.js");
+const webRoutes = require("./routes/web.routes.js");
+const socialAuthRoutes = require("./routes/auth.social.routes.js");
+const apiRoutes = require("./routes/api"); // <-- CHỈ CẦN 1 DÒNG NÀY
 
 //Passport cấu hình
 require("./config/passport");
@@ -124,14 +119,9 @@ app.use(async (req, res, next) => {
 configViewEngine(app);
 
 // ============ ROUTES ===========
-app.use("/api/auth", authApiRoutes);
-app.use("/api/account", accountApiRoutes);
-app.use('/api/auth', passwordRecovery);
-app.use('/api/cart', cartApiRoutes);
+app.use('/api', apiRoutes);
 app.use("/", socialAuthRoutes);
 app.use("/", webRoutes);
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
 
 // ================ DATABASE + SERVER ==================
 connectDB(process.env.MONGODB_URI)

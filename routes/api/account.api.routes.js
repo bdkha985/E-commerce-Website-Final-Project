@@ -2,8 +2,8 @@
 
 const express = require("express");
 const { body } = require("express-validator");
-const requireLoginApi = require("../middlewares/requireLogin.api");
-const ctrl = require("../controllers/accountApiController.js");
+const requireLoginApi = require("../../middlewares/requireLogin.api.js");
+const ctrl = require("../../controllers/account/accountApiController.js");
 
 const router = express.Router();
 

@@ -2,12 +2,12 @@
 
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
-const User = require("../models/user.model");
+const User = require("../../models/user.model");
 const {
     findUserByEmail,
     validatePassword,
     createUserAndSendPassword
-} = require("../services/user.service");
+} = require("../../services/auth/user.service");
 
 // ĐĂNG KÝ
 const apiSignup = async (req, res) => {
