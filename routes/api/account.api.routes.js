@@ -3,7 +3,7 @@
 const express = require("express");
 const { body } = require("express-validator");
 const requireLoginApi = require("../../middlewares/requireLogin.api.js");
-const ctrl = require("../../controllers/account/accountApiController.js");
+const ctrl = require("../../controllers/account/account.api.controller.js");
 
 const router = express.Router();
 

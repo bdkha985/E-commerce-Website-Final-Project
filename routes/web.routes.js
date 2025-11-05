@@ -1,16 +1,16 @@
 const express = require("express");
 const router = express.Router();
 
-const { render, getHomePage } = require("../controllers/web/homeController");
-const products = require("../controllers/catalog/productsController");
+const { render, getHomePage } = require("../controllers/web/home.controller");
+const products = require("../controllers/catalog/product.controller");
 const {
     signupRules,
     signinRules,
     handleValidation,
 } = require("../middlewares/authValidator");
 const requireLoginPage = require("../middlewares/requireLoginPage");
-const catalog  = require('../controllers/catalog/catalogController');
-const cartController = require('../controllers/cart/cartController');
+const catalog  = require('../controllers/catalog/catalog.controller');
+const cartController = require('../controllers/cart/cart.controller');
 
 // ========== Trang tĩnh / auth ==========
 // router.get("/homepage", (req, res) =>
