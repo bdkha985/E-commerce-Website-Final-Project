@@ -1,82 +1,124 @@
 <section class="cart-page container">
-    <h1 class="section-title">Giỏ Hàng</h1>
+    <h1>Giỏ Hàng</h1>
+    <p class="cart-subtitle">
+        Bạn đang có <span id="cart-item-count"><%= (cartItems || []).length %></span> sản phẩm trong giỏ hàng
+    </p>
 
     <div class="cart-layout">
-        <div class="cart-table">
-            <div class="cart-row cart-head">
+        <div class="cart-main">
+            <div class="cart-head">
                 <div>Sản phẩm</div>
                 <div class="t-center">Số lượng</div>
+                <div class="t-right">Đơn giá</div>
                 <div class="t-right">Tổng tiền</div>
                 <div class="t-center">Xóa</div>
             </div>
 
-            <%# Kiểm tra xem giỏ hàng có tồn tại và có sản phẩm không %>
-            <% if (locals.cartItems && cartItems.length > 0) { %>
-                <% cartItems.forEach(item => { %>
-                <div class="cart-row" data-product-id="<%= item.productId %>"> <%# Thêm data attribute nếu cần cho JS %>
-                    <div class="cart-prod">
-                        <%# Sử dụng ảnh placeholder nếu không có ảnh %>
-                        <img src="<%= item.image || 'https://placehold.co/92x92?text=No+Img' %>" alt="<%= item.name %>" />
-                        <div>
-                            <a class="name" href="/products/<%= item.slug %>">
-                                <%= item.name %>
-                            </a>
-                             <%# Hiển thị thêm thông tin biến thể nếu có %>
-                             <% if (item.variantInfo) { %>
-                                <small class="text-muted"><%= item.variantInfo %></small>
-                             <% } %>
-                            <div class="price">
-                                <%= (item.price || 0).toLocaleString('vi-VN') %>đ
+            <div id="cart-body-items">
+                <% if (cartItems && cartItems.length > 0) { %>
+                    <% cartItems.forEach(item => { %>
+                    <div class="cart-row" data-sku="<%= item.sku %>">
+                        <div class="cart-prod">
+                            <img src="<%= item.image || 'https://placehold.co/100x100?text=No+Img' %>" alt="<%= item.name %>" />
+                            <div class="cart-prod-info">
+                                <a class="name" href="/products/<%= item.slug %>">
+                                    <%= item.name %>
+                                </a>
+                                <div class="variant">SKU: <%= item.sku %></div>
                             </div>
                         </div>
+
+                        <div class="t-center">
+                            <div class="qty-box">
+                                <button class="btn-qty-down" data-sku="<%= item.sku %>" type="button">-</button>
+                                <input type="text" class="qty-input" value="<%= item.quantity %>" data-sku="<%= item.sku %>" readonly>
+                                <button class="btn-qty-up" data-sku="<%= item.sku %>" type="button">+</button>
+                            </div>
+                        </div>
+                        
+                        <div class="cart-price t-right">
+                            <%= (item.price || 0).toLocaleString('vi-VN') %>đ
+                        </div>
+
+                        <div class="cart-total t-right">
+                            <%= ((item.price || 0) * (item.quantity || 0)).toLocaleString('vi-VN') %>đ
+                        </div>
+
+                        <div class="t-center">
+                            <button class="cart-remove" data-sku="<%= item.sku %>" aria-label="Xóa sản phẩm">
+                                <i class="fa-regular fa-trash-can"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="t-center qty">
-                        <%# Cần thêm input hoặc nút để thay đổi số lượng bằng JS %>
-                        <span class="qty-box"><%= item.qty %></span>
+                    <% }) %>
+                <% } else { %>
+                    <div class="empty-cart" id="empty-cart-message">
+                        <div class="empty-cart-icon">
+                            <i class="fa-solid fa-cart-shopping" style="font-size: 5rem; color: #cbd5e1;"></i>
+                        </div>
+                        <h2>Giỏ hàng của bạn đang trống</h2>
+                        <p>Hãy khám phá thêm sản phẩm của chúng tôi!</p>
+                        <a href="/products/all" class="btn" style="background: var(--primary-color); color: #fff;">Tiếp tục mua sắm</a>
                     </div>
-                    <div class="t-right">
-                        <%= ((item.price || 0) * (item.qty || 0)).toLocaleString('vi-VN') %>đ
-                    </div>
-                    <div class="t-center">
-                        <%# Nút xóa, cần JS để xử lý %>
-                        <button class="btn btn-sm btn-outline-danger btn-remove-item" aria-label="Xóa sản phẩm">
-                             <i class="fa-regular fa-trash-can"></i>
-                        </button>
-                    </div>
-                </div>
-                <% }) %>
-            <% } else { %>
-                <%# Hiển thị thông báo khi giỏ hàng trống %>
-                <div class="cart-row">
-                    <p style="grid-column: 1 / -1; text-align: center; padding: 20px 0; color: #6c757d;">
-                        Giỏ hàng của bạn đang trống. <a href="/products/all">Tiếp tục mua sắm</a>!
-                    </p>
-                </div>
+                <% } %>
+            </div>
+
+            <% if (cartItems && cartItems.length > 0) { %>
+            <div class="cart-actions">
+                <a href="/products/all" class="btn-continue">
+                    <i class="fa-solid fa-arrow-left"></i> Tiếp tục mua sắm
+                </a>
+                <button class="btn-clear-cart" id="btn-clear-all" style="background: #fef2f2; border-color: #fecaca; color: #ef4444;">
+                    Xóa toàn bộ giỏ hàng
+                </button>
+            </div>
             <% } %>
         </div>
 
         <aside class="cart-summary">
-            <%# Tính tổng tiền từ cartItems thật %>
-            <% const totalAmount = (locals.cartItems && cartItems.length > 0) ? cartItems.reduce((sum, item) => sum + (item.price || 0) * (item.qty || 0), 0) : 0; %>
+            <h3>Tóm Tắt Đơn Hàng</h3>
+            
             <div class="sum-row">
-                <span>Tổng tiền</span>
-                <strong>
-                    <%= totalAmount.toLocaleString('vi-VN') %>đ
+                <span>Tạm tính</span>
+                <strong id="summary-subtotal">
+                    <%= (cartSummary.subtotal || 0).toLocaleString('vi-VN') %>đ
                 </strong>
             </div>
-            <%# Chỉ hiển thị nút thanh toán nếu có hàng %>
-            <% if (totalAmount > 0) { %>
-                <a class="btn btn-checkout" href="/checkout">THANH TOÁN</a>
+
+            <div class="discount-code">
+                <h4>Mã giảm giá</h4>
+                <div class="discount-input">
+                    <input type="text" id="discount-input" placeholder="Nhập mã của bạn">
+                    <button id="btn-apply-discount" type="button">Áp dụng</button>
+                </div>
+                <small id="discount-message" style="color: #ef4444; font-size: 1.3rem; margin-top: 5px; display: block;"></small>
+            </div>
+
+            <div class="sum-row">
+                <span>Phí vận chuyển</span>
+                <strong id="summary-shipping">
+                    <%= (cartSummary.shippingFee || 0).toLocaleString('vi-VN') %>đ
+                </strong>
+            </div>
+            <div class="sum-row">
+                <span>Thuế (VAT 8%)</span>
+                <strong id="summary-tax">
+                    <%= (cartSummary.tax || 0).toLocaleString('vi-VN') %>đ
+                </strong>
+            </div>
+
+            <div class="sum-row total">
+                <span>Tổng cộng</span>
+                <span class="amount" id="summary-total">
+                    <%= (cartSummary.total || 0).toLocaleString('vi-VN') %>đ
+                </span>
+            </div>
+
+            <% if (cartItems && cartItems.length > 0) { %>
+                <a class="btn-checkout" href="/checkout">TIẾN HÀNH THANH TOÁN</a>
             <% } else { %>
-                <button class="btn btn-checkout disabled" disabled>THANH TOÁN</button>
+                <button class="btn-checkout" disabled style="opacity: 0.6; cursor: not-allowed;">TIẾN HÀNH THANH TOÁN</button>
             <% } %>
         </aside>
     </div>
-
-    <div class="cart-actions">
-        <a href="/products/all" class="btn btn-continue">TIẾP TỤC MUA SẮM</a>
-    </div>
 </section>
-
-<%# Bạn sẽ cần thêm file JS riêng cho trang giỏ hàng để xử lý cập nhật số lượng, xóa sản phẩm %>
-<%# <script src="/javascripts/cart.js" defer></script> %>

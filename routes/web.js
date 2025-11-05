@@ -10,6 +10,7 @@ const {
 } = require("../middlewares/authValidator");
 const requireLoginPage = require("../middlewares/requireLoginPage");
 const catalog  = require('../controllers/catalogController');
+const cartController = require('../controllers/cartController');
 
 // ========== Trang tĩnh / auth ==========
 // router.get("/homepage", (req, res) =>
@@ -75,7 +76,7 @@ router.get("/about", (req, res) =>
 );
 
 // Cart
-router.get("/cart", (req, res) => render(res, "pages/cart", { title: "Cart" }));
+router.get("/cart", cartController.getCartPage);
 
 // ========== CATALOG ==========
 router.get('/c/:slug', catalog.categoryPage);  

@@ -80,3 +80,10 @@ Sau khi stack đã được triển khai và các dịch vụ đang chạy, bạ
 ```bash
 docker stack rm kshop_stack
 ```
+
+---
+
+## RESET
+```
+docker stack deploy -c docker-compose.yml kshop_stack
+```
