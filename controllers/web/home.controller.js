@@ -1,4 +1,4 @@
-const Product = require("../models/product.model");
+const Product = require("../../models/product.model");
 
 function render(res, viewPath, locals = {}) {
     res.render("layouts/main", { body: viewPath, ...locals });

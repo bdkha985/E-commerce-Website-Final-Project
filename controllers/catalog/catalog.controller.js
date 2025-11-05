@@ -1,8 +1,8 @@
 // controllers/catalogController.js
 
-const Product  = require('../models/product.model');
-const Category = require('../models/category.model');
-const Brand    = require('../models/brand.model');
+const Product  = require('../../models/product.model');
+const Category = require('../../models/category.model');
+const Brand    = require('../../models/brand.model');
 
 function getDisplayPrice(p) {
   if (Array.isArray(p.variants) && p.variants.length) {
@@ -35,7 +35,15 @@ const categoryPage = async (req, res, next) => {
     const pmax = req.query.pmax ? parseInt(req.query.pmax, 10) : null;
     const sortQ = req.query.sort || 'newest';
 
-    const where = { categoryIds: category._id };
+    const categoryIdList = [category._id];
+
+    const childrenCategories = await Category.find({ parentId: category._id }).select('_id').lean();
+    if (childrenCategories.length > 0) {
+        childrenCategories.forEach(c => categoryIdList.push(c._id));
+    }
+
+    const where = { categoryIds: { $in: categoryIdList } };
+    
     if (brandSlug) {
       const b = await Brand.findOne({ slug: brandSlug }).select('_id').lean();
       if (b) where.brandId = b._id;

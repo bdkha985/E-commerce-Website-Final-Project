@@ -1,15 +1,16 @@
 const express = require("express");
 const router = express.Router();
 
-const { render, getHomePage } = require("../controllers/homeController");
-const products = require("../controllers/productsController");
+const { render, getHomePage } = require("../controllers/web/home.controller");
+const products = require("../controllers/catalog/product.controller");
 const {
     signupRules,
     signinRules,
     handleValidation,
 } = require("../middlewares/authValidator");
 const requireLoginPage = require("../middlewares/requireLoginPage");
-const catalog  = require('../controllers/catalogController');
+const catalog  = require('../controllers/catalog/catalog.controller');
+const cartController = require('../controllers/cart/cart.controller');
 
 // ========== Trang tĩnh / auth ==========
 // router.get("/homepage", (req, res) =>
@@ -75,7 +76,7 @@ router.get("/about", (req, res) =>
 );
 
 // Cart
-router.get("/cart", (req, res) => render(res, "pages/cart", { title: "Cart" }));
+router.get("/cart", cartController.getCartPage);
 
 // ========== CATALOG ==========
 router.get('/c/:slug', catalog.categoryPage);  

@@ -1,5 +1,5 @@
 // controllers/productsController.js
-const Product = require('../models/product.model');
+const Product = require('../../models/product.model');
 
 const list = async (req, res, next) => {
   try {
@@ -44,8 +44,7 @@ const list = async (req, res, next) => {
 const detail = async (req, res, next) => {
   try {
     const slug = decodeURIComponent(req.params.slug || '').trim();
-    const product = await Product.findOne({ slug }).lean();
-
+    const product = await Product.findOne({ slug }).populate('brandId', 'name').lean();
     if (!product) {
       return res.status(404).render('layouts/main', {
         title: 'Không tìm thấy sản phẩm',

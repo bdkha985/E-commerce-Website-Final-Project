@@ -2,12 +2,12 @@
 
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
-const User = require("../models/user.model");
+const User = require("../../models/user.model");
 const {
     findUserByEmail,
     validatePassword,
     createUserAndSendPassword
-} = require("../services/user.service");
+} = require("../../services/auth/user.service");
 
 // ĐĂNG KÝ
 const apiSignup = async (req, res) => {
@@ -92,23 +92,32 @@ const apiSignin = async (req, res) => {
         });
     }
     
-    req.session.userId = user._id.toString();
-    req.session.fullName = user.fullName;
-    req.session.role = (user.roles || []).includes("admin")
-        ? "admin"
-        : "customer";
-    req.session.avatarUrl = user.avatarUrl || "";
+req.login(user, (err) => {
+        if (err) {
+            console.error("Lỗi req.login:", err);
+            return res.status(500).json({ ok: false, message: "Lỗi khi tạo phiên đăng nhập." });
+        }
 
-    req.flash("success", "Đăng nhập thành công");
-    return res.status(200).json({
-        ok: true,
-        message: "Đăng nhập thành công",
-        user: {
-            id: user._id,
-            email: user.email,
-            fullName: user.fullName,
-            roles: user.roles,
-        },
+        // Sau khi login thành công, req.user đã được thiết lập
+        
+        // (Chúng ta vẫn gán session phụ cho middleware app.js)
+        req.session.fullName = user.fullName;
+        req.session.role = (user.roles || []).includes("admin")
+            ? "admin"
+            : "customer";
+        req.session.avatarUrl = user.avatarUrl || "";
+
+        req.flash("success", "Đăng nhập thành công");
+        return res.status(200).json({
+            ok: true,
+            message: "Đăng nhập thành công",
+            user: {
+                id: user._id,
+                email: user.email,
+                fullName: user.fullName,
+                roles: user.roles,
+            },
+        });
     });
 };
 

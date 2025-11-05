@@ -2,7 +2,7 @@
 
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
-const User = require("../models/user.model");
+const User = require("../../models/user.model");
 
 // Helper get id
 function getUserId(req) {

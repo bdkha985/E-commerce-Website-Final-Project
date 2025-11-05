@@ -1,114 +1,159 @@
+<!--views/pages/product-detail.ejs  -->
 <section class="product-detail container">
-  <!-- Breadcrumb -->
-  <nav class="breadcrumb mb-3" style="margin-top: 2rem;">
+  <nav class="pd-breadcrumb" style="margin-top: 2rem;">
     <a href="/homepage">Home</a> <span>/</span>
-    <a href="/products">Products</a> <span>/</span>
-    <span><%= product?.name %></span>
+    <a href="/products/all">Products</a> <span>/</span>
+    <span class="current"><%= product?.name %></span>
   </nav>
 
   <div class="pd-wrap">
-    <!-- Gallery -->
     <div class="pd-gallery">
       <% 
         const imgs = (product?.images?.length ? product.images : ['https://placehold.co/800x600?text=No+Image']);
       %>
       <div class="pd-main">
         <img id="pdMainImg" src="<%= imgs[0] %>" alt="<%= product?.name %>">
+
+        <button id="pdSlidePrev" class="pd-slide-btn prev" aria-label="Previous image">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button id="pdSlideNext" class="pd-slide-btn next" aria-label="Next image">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
       </div>
       <% if (imgs.length > 1) { %>
-        <div class="pd-thumbs">
-          <% imgs.forEach((src, i) => { %>
-            <img class="<%= i===0 ? 'active' : '' %>" src="<%= src %>" alt="thumb <%= i+1 %>"
-                 onclick="document.getElementById('pdMainImg').src=this.src;
-                          this.parentElement.querySelectorAll('img').forEach(t=>t.classList.remove('active'));
-                          this.classList.add('active');">
-          <% }) %>
-        </div>
+      <div class="pd-thumbs">
+        <% imgs.forEach((src, i) => { %>
+        <img class="pd-thumb-item <%= i===0 ? 'active' : '' %>" src="<%= src %>" alt="thumb <%= i+1 %>">
+        <% }) %>
+      </div>
       <% } %>
     </div>
 
-    <!-- Info -->
     <div class="pd-info">
+      <% if (product?.brandId?.name) { %>
+      <span class="pd-brand"><%= product.brandId.name %></span>
+      <% } %>
+
       <h1 class="pd-title"><%= product?.name %></h1>
 
-      <div class="pd-meta">
+      <div class="pd-rating">
         <% if (product?.ratingAvg) { %>
-          <span class="rating">★ <%= Number(product.ratingAvg).toFixed(1) %></span>
-          <% if (product?.ratingCount) { %>
-            <span class="text-muted">(<%= product.ratingCount %> đánh giá)</span>
-          <% } %>
-          <span class="sep">•</span>
+        <span class="stars">★ <%= Number(product.ratingAvg).toFixed(1) %></span>
+        <% if (product?.ratingCount) { %>
+        <span class="rating-info">(<%= product.ratingCount %> đánh giá)</span>
         <% } %>
-        <span class="sku">SKU: <%= (product?.variants && product.variants[0]?.sku) || '—' %></span>
+        <% } else { %>
+        <span class="rating-info">Chưa có đánh giá</span>
+        <% } %>
       </div>
 
-      <div class="pd-price">
-        <%= ((product?.variants && product.variants[0]?.price) || product?.basePrice || 0).toLocaleString('vi-VN') %>đ
+      <div class_id="pd-meta-row" style="margin-top: 8px;">
+        <span class="sku">SKU: <span id="pdSku"><%= (product?.variants && product.variants[0]?.sku) || 'N/A' %></span></span>
+      </div>
+
+
+      <div class="pd-price-section">
+        <div class="pd-price-wrap">
+          <span class="pd-price" id="pdPrice">
+            <%= ((product?.variants && product.variants[0]?.price) || product?.basePrice || 0).toLocaleString('vi-VN') %>đ
+          </span>
+        </div>
+        <span class="pd-tax-info">Đã bao gồm VAT</span>
       </div>
 
       <% if (product?.shortDesc) { %>
-        <p class="pd-short"><%= product.shortDesc %></p>
+      <p class="pd-short-desc" style="min-height: 8em;">
+        <%= product.shortDesc %><br>
+        Đây là dòng 2 của mô tả sản phẩm.<br>
+        Đây là dòng 3 của mô tả sản phẩm.<br>
+        Đây là dòng 4 của mô tả sản phẩm.<br>
+        Đây là dòng 5 của mô tả sản phẩm.
+      </p>
       <% } %>
 
-      <!-- Variants -->
       <% if (product?.variants?.length) { 
            const colors = [...new Set(product.variants.map(v => v.color).filter(Boolean))];
            const sizes  = [...new Set(product.variants.map(v => v.size).filter(Boolean))];
+           
+           // Truyền dữ liệu variants cho JS qua data-attribute
+           const variantsJson = JSON.stringify(product.variants.map(v => ({
+             sku: v.sku,
+             color: v.color,
+             size: v.size,
+             price: v.price,
+             stock: v.stock,
+             images: v.images || []
+           })));
       %>
-        <div class="pd-variants">
-          <% if (colors.length) { %>
-            <div class="variant-row">
-              <label>Màu sắc</label>
-              <div class="variant-list">
-                <% colors.forEach(c => { %><button class="variant-chip" type="button"><%= c %></button><% }) %>
-              </div>
-            </div>
-          <% } %>
-          <% if (sizes.length) { %>
-            <div class="variant-row">
-              <label>Size</label>
-              <div class="variant-list">
-                <% sizes.forEach(s => { %><button class="variant-chip" type="button"><%= s %></button><% }) %>
-              </div>
-            </div>
-          <% } %>
+<div class="pd-variants" 
+     data-variants="<%= variantsJson %>"
+     data-product-id="<%= product._id %>">
+             <% if (colors.length) { %>
+        <div class="variant-group" id="group-color">
+          <label class="variant-label">Màu sắc: <strong id="selectedColorText"></strong></label>
+          <div class="variant-list">
+            <% colors.forEach(c => { %>
+            <button class="variant-chip" type="button" data-variant-type="color" data-value="<%= c %>">
+              <%= c %>
+            </button>
+            <% }) %>
+          </div>
         </div>
+        <% } %>
+        <% if (sizes.length) { %>
+        <div class="variant-group" id="group-size">
+          <label class="variant-label">Size: <strong id="selectedSizeText"></strong></label>
+          <div class="variant-list">
+            <% sizes.forEach(s => { %>
+            <button class="variant-chip" type="button" data-variant-type="size" data-value="<%= s %>">
+              <%= s %>
+            </button>
+            <% }) %>
+          </div>
+        </div>
+        <% } %>
+      </div>
       <% } %>
 
       <div class="pd-actions">
-        <button class="btn btn-dark">Add to cart</button>
-        <button class="btn btn-outline-dark"><i class="fa-regular fa-heart"></i></button>
+        <button class="btn-add-cart" id="btnAddToCart" disabled>
+          <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ hàng
+        </button>
+        <button class="btn-wishlist"><i class="fa-regular fa-heart"></i></button>
       </div>
 
       <% if (product?.longDesc) { %>
-        <div class="pd-desc">
-          <h3>Chi tiết sản phẩm</h3>
-          <p><%= product.longDesc %></p>
-        </div>
+      <div class="pd-description">
+        <h3>Chi tiết sản phẩm</h3>
+        <p><%= product.longDesc %></p>
+      </div>
       <% } %>
     </div>
   </div>
 
-  <!-- Related -->
+
   <% if (related?.length) { %>
-    <div class="related">
-      <h3 class="mb-3">Sản phẩm liên quan</h3>
-      <div class="product-grid">
-        <% related.forEach(r => {
+  <div class="related">
+    <h3 class="mb-3">Sản phẩm liên quan</h3>
+    <div class="product-grid">
+      <% related.forEach(r => {
              const img = (r.images && r.images[0]) || 'https://placehold.co/600x600?text=No+Image';
              const price = (r.basePrice || 0).toLocaleString('vi-VN') + 'đ';
         %>
-          <article class="product-card">
-            <a href="/products/<%= r.slug %>" class="thumb">
-              <img src="<%= img %>" alt="<%= r.name %>">
-            </a>
-            <div class="info">
-              <a class="name" href="/products/<%= r.slug %>"><%= r.name %></a>
-              <div class="meta"><span class="price"><%= price %></span></div>
-            </div>
-          </article>
-        <% }) %>
-      </div>
+      <article class="product-card">
+        <a href="/products/<%= r.slug %>" class="thumb">
+          <img src="<%= img %>" alt="<%= r.name %>">
+        </a>
+        <div class="info">
+          <a class="name" href="/products/<%= r.slug %>"><%= r.name %></a>
+          <div class="meta"><span class="price"><%= price %></span></div>
+        </div>
+      </article>
+      <% }) %>
     </div>
+  </div>
   <% } %>
 </section>
+
+<script src="/javascripts/product-detail.js" defer></script>

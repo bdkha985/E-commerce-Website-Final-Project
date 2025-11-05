@@ -20,16 +20,13 @@ const RedisStore =
 
 const configViewEngine = require("./config/viewEngine");
 const { connectDB } = require("./config/database");
+const cartService = require('./services/cart/cart.service.js');
 
 //Routes
 const Category = require('./models/category.model');
-const webRoutes = require("./routes/web");
-const indexRouter = require("./routes/index");
-const usersRouter = require("./routes/users");
-const socialAuthRoutes = require("./routes/auth.social");
-const authApiRoutes = require("./routes/auth.api");
-const accountApiRoutes = require("./routes/account.api.js");
-const passwordRecovery = require('./routes/passwordRecovery.api.js')
+const webRoutes = require("./routes/web.routes.js");
+const socialAuthRoutes = require("./routes/auth.social.routes.js");
+const apiRoutes = require("./routes/api"); // <-- CHỈ CẦN 1 DÒNG NÀY
 
 //Passport cấu hình
 require("./config/passport");
@@ -74,25 +71,34 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(flash());
-app.use((req, res, next) => {
-    const u =
-        req.user ||
-        (req.session?.fullName
-            ? {
-                  id: req.session.userId,
-                  fullName: req.session.fullName,
-                  role: req.session.role,
-              }
-            : null);
 
-    res.locals.currentUser = u;
-    res.locals.isAuthenticated = !!u;
+app.use(async (req, res, next) => {
+    try {
+        // Lấy thông tin User
+        const u = req.user || (req.session?.fullName ? {
+            id: req.session.userId,
+            fullName: req.session.fullName,
+            role: req.session.role,
+        } : null);
 
-    // flash cho toast
-    res.locals.flashSuccess = req.flash("success");
-    res.locals.flashError = req.flash("error");
+        res.locals.currentUser = u;
+        res.locals.isAuthenticated = !!u;
 
-    next();
+        // Lấy thông tin giỏ hàng
+        const cartItems = await cartService.getCart(req);
+        const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+        res.locals.cartItems = cartItems; // Cho mini-cart
+        res.locals.cartCount = totalItems; // Cho badge
+
+        // Flash cho toast
+        res.locals.flashSuccess = req.flash("success");
+        res.locals.flashError = req.flash("error");
+
+        next();
+    } catch (err) {
+        next(err); // Chuyển lỗi nếu có
+    }
 });
 
 // Test
@@ -113,13 +119,9 @@ app.use(async (req, res, next) => {
 configViewEngine(app);
 
 // ============ ROUTES ===========
-app.use("/api/auth", authApiRoutes);
-app.use("/api/account", accountApiRoutes);
-app.use('/api/auth', passwordRecovery)
+app.use('/api', apiRoutes);
 app.use("/", socialAuthRoutes);
 app.use("/", webRoutes);
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
 
 // ================ DATABASE + SERVER ==================
 connectDB(process.env.MONGODB_URI)
