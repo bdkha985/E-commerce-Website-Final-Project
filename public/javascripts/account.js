@@ -1,26 +1,12 @@
+// public/javascripts/account.js
 (function () {
     const $ = (s) => document.querySelector(s);
     const $$ = (s) => document.querySelectorAll(s);
 
-    // === BIẾN TOÀN CỤC (để phân trang client) ===
-    let allUserAddresses = [];
-    const ADDRESS_LIMIT = 3; // 3 địa chỉ 1 trang
+    // === CONSTANTS ===
     const ORDER_LIMIT = 5; // 5 đơn hàng 1 trang
-    
-    // Tabs
-    $$(".account-menu button").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            $$(".account-menu button").forEach((b) =>
-                b.classList.remove("active")
-            );
-            btn.classList.add("active");
 
-            $$(".tab-panel").forEach((p) => p.classList.add("d-none"));
-            $("#tab-" + btn.dataset.tab).classList.remove("d-none");
-        });
-    });
-
-    // Helpers
+    // === HÀM HELPER ===
     const showAlert = (el, type, msg) => {
         el.className = `alert alert-${type}`;
         el.textContent = msg;
@@ -29,13 +15,67 @@
         el.className = "alert d-none";
         el.textContent = "";
     };
+    const formatCurrency = (val) => (val || 0).toLocaleString('vi-VN') + 'đ';
 
-    // Load profile
+    /**
+     * Helper render các nút phân trang
+     */
+    function renderPagination(containerId, pagination, clickHandlerName) {
+        const container = $(`#${containerId}`);
+        if (!container) return;
+
+        const { page, totalPages } = pagination;
+        if (totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+
+        let html = '<ul class="pagination">';
+        
+        // Nút Previous
+        html += `<li class="page-item ${page === 1 ? 'disabled' : ''}">
+            <span class="page-link" ${page > 1 ? `onclick="${clickHandlerName}(${page - 1})"` : ''}>«</span>
+        </li>`;
+
+        // Các nút số
+        for (let i = 1; i <= totalPages; i++) {
+            html += `<li class="page-item ${i === page ? 'active' : ''}">
+                <span class="page-link" ${i !== page ? `onclick="${clickHandlerName}(${i})"` : ''}>${i}</span>
+            </li>`;
+        }
+
+        // Nút Next
+        html += `<li class="page-item ${page >= totalPages ? 'disabled' : ''}">
+            <span class="page-link" ${page < totalPages ? `onclick="${clickHandlerName}(${page + 1})"` : ''}>»</span>
+        </li>`;
+        
+        html += '</ul>';
+        container.innerHTML = html;
+    }
+
+    // === 1. LOGIC TABS ===
+    $$(".account-menu button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            $$(".account-menu button").forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            $$(".tab-panel").forEach((p) => p.classList.add("d-none"));
+            $("#tab-" + btn.dataset.tab).classList.remove("d-none");
+
+            // Kích hoạt tải khi bấm tab
+            if (btn.dataset.tab === 'orders' && !$('#order-list-container').innerHTML.includes('order-item-row')) {
+                loadOrderHistory(1);
+            }
+            if (btn.dataset.tab === 'addresses' && !$('#addrList').innerHTML.includes('addr-item')) {
+                loadAddresses(); // Tải địa chỉ (logic cũ)
+            }
+        });
+    });
+
+    // === 2. LOGIC PROFILE & PASSWORD (Giữ nguyên) ===
     async function loadMe() {
         const r = await fetch("/api/account/me");
         const data = await r.json();
         if (!data.ok) return;
-
         const u = data.user;
         $("#accName").textContent = u.fullName;
         if ($("#accEmail")) $("#accEmail").textContent = u.email || "";
@@ -44,7 +84,6 @@
         prof.phone.value = u.phone || "";
         renderLoyalty(u.loyaltyPoints);
     }
-
     function renderLoyalty(lp) {
         const box = $("#loyaltyBox");
         if (!lp) return (box.textContent = "Chưa có điểm thưởng");
@@ -58,8 +97,6 @@
       </div>
     `;
     }
-
-    // Save profile
     $("#btnSaveProfile")?.addEventListener("click", async () => {
         const alert = $("#profileAlert");
         hideAlert(alert);
@@ -82,13 +119,10 @@
         showAlert(alert, "success", "Cập nhật thành công");
         $("#accName").textContent = body.fullName;
     });
-
-    // Change password
     $("#btnChangePass")?.addEventListener("click", async () => {
         const f = $("#formChangePass");
         const alert = $("#passAlert");
         hideAlert(alert);
-
         const body = {
             currentPassword: f.currentPassword.value,
             newPassword: f.newPassword.value,
@@ -110,20 +144,26 @@
         f.reset();
     });
 
-    // Addresses
+    // === 3. LOGIC ĐỊA CHỈ (Giữ nguyên logic cũ, không phân trang) ===
     async function loadAddresses() {
         const r = await fetch("/api/account/addresses");
         const data = await r.json();
         if (!data.ok) return;
         const list = $("#addrList");
         list.innerHTML = "";
+        
+        if (data.addresses.length === 0) {
+            list.innerHTML = '<div class="empty-state"><p>Bạn chưa thêm địa chỉ nào.</p></div>';
+            return;
+        }
+        
         (data.addresses || []).forEach((a, i) => {
             const div = document.createElement("div");
             div.className = "addr-item";
             div.innerHTML = `
         <div><b>${a.label}</b> ${
                 a.isDefault
-                    ? '<span class="badge text-bg-primary ms-1">Mặc định</span>'
+                    ? '<span class="badge status-pending" style="background: #dbeafe; color: #1e40af;">Mặc định</span>'
                     : ""
             }</div>
         <div class="meta">${a.street}, ${a.ward}, ${a.city}</div>
@@ -140,8 +180,6 @@
             list.appendChild(div);
         });
     }
-
-    // mở modal
     $("#btnAddAddress")?.addEventListener("click", () => {
         const form = $("#formAddress");
         form.reset();
@@ -150,14 +188,11 @@
         $("#modalAddressTitle").textContent = "Thêm địa chỉ mới";
         new bootstrap.Modal($("#modalAddress")).show();
     });
-
-    // -------- SAVE (ADD or EDIT) --------
     $("#btnSaveAddress")?.addEventListener("click", async () => {
-        const mode = $("#addrMode").value; // 'add' | 'edit'
+        const mode = $("#addrMode").value;
         const idx = $("#addrIdx").value;
         const form = $("#formAddress");
         const payload = Object.fromEntries(new FormData(form).entries());
-
         let r;
         if (mode === "add") {
             r = await fetch("/api/account/addresses", {
@@ -172,17 +207,15 @@
                 body: JSON.stringify(payload),
             });
         }
-
         const data = await r.json();
         if (data.ok) {
             bootstrap.Modal.getInstance($("#modalAddress"))?.hide();
             form.reset();
-            await loadAddresses();
+            await loadAddresses(); // Gọi lại hàm load cũ
         } else {
             alert(data.message || "Lưu địa chỉ thất bại");
         }
     });
-    // -------- CONFIRM DELETE --------
     $("#btnConfirmDelete")?.addEventListener("click", async () => {
         const idx = $("#delIdx").value;
         const r = await fetch(`/api/account/addresses/${idx}`, {
@@ -191,44 +224,36 @@
         const data = await r.json();
         if (data.ok) {
             bootstrap.Modal.getInstance($("#modalConfirmDelete"))?.hide();
-            await loadAddresses();
+            await loadAddresses(); // Gọi lại hàm load cũ
         } else {
             alert(data.message || "Xóa địa chỉ thất bại");
         }
     });
-    // -------- LIST ITEM ACTIONS (edit / delete / default) --------
     $("#addrList")?.addEventListener("click", async (e) => {
         const btn = e.target.closest("button[data-act]");
         if (!btn) return;
         const idx = btn.dataset.idx;
-
         if (btn.dataset.act === "def") {
             await fetch(`/api/account/addresses/${idx}/default`, {
                 method: "POST",
             });
             return loadAddresses();
         }
-
         if (btn.dataset.act === "del") {
-            // mở modal confirm delete
             $("#delIdx").value = idx;
             new bootstrap.Modal($("#modalConfirmDelete")).show();
             return;
         }
-
         if (btn.dataset.act === "edit") {
-            // fetch lại để đảm bảo dữ liệu mới nhất
             const r0 = await fetch("/api/account/addresses");
             const d0 = await r0.json();
             const cur = d0.addresses?.[idx];
             if (!cur) return;
-
             const form = $("#formAddress");
             form.label.value = cur.label || "";
             form.street.value = cur.street || "";
             form.ward.value = cur.ward || "";
             form.city.value = cur.city || "";
-
             $("#addrMode").value = "edit";
             $("#addrIdx").value = String(idx);
             $("#modalAddressTitle").textContent = "Sửa địa chỉ";
@@ -237,21 +262,14 @@
         }
     });
 
-    // === 4. LOGIC TAB ĐƠN HÀNG ===
-    
-    // Elements
-    const tabOrdersBtn = $('button[data-tab="orders"]');
+    // === 4. LOGIC ĐƠN HÀNG (ĐÃ NÂNG CẤP - PHÂN TRANG SERVER) ===
     const orderListView = $('#order-list-view');
     const orderDetailView = $('#order-detail-view');
     const orderListContainer = $('#order-list-container');
     const orderDetailContainer = $('#order-detail-container');
     const btnBackToList = $('#btn-back-to-list');
     const btnRefreshOrders = $('#btn-refresh-orders');
-
-    // Helper format tiền
-    const formatCurrency = (val) => (val || 0).toLocaleString('vi-VN') + 'đ';
-
-    // Hàm render 1 hàng của đơn hàng
+    
     function renderOrderRow(order) {
         return `
             <div class="order-item-row">
@@ -259,26 +277,18 @@
                     <span class="order-code">#${order.code}</span>
                     <span class="order-date">${new Date(order.createdAt).toLocaleDateString('vi-VN')}</span>
                 </div>
-                <div class="order-total">
-                    ${formatCurrency(order.total)}
-                </div>
+                <div class="order-total">${formatCurrency(order.total)}</div>
                 <div class="order-status">
-                    <span class="badge status-${order.status?.toLowerCase()}">${order.status}</span>
+                    <span class="badge status-${(order.status || 'pending').toLowerCase()}">${order.status || 'Pending'}</span>
                 </div>
                 <div class="order-actions">
-                    <button class="btn btn-sm btn-outline-dark btn-view-detail" data-code="${order.code}">
-                        Xem
-                    </button>
+                    <button class="btn btn-sm btn-outline-dark btn-view-detail" data-code="${order.code}">Xem</button>
                 </div>
             </div>
         `;
     }
     
-    // Hàm render chi tiết đơn hàng (Đáp ứng yêu cầu PDF)
     function renderOrderDetail(order) {
-        // [cite: 121] Hiển thị thông tin chi tiết
-        // [cite: 123-125] Hiển thị lịch sử trạng thái
-        
         const itemsHtml = order.items.map(item => `
             <div class="summary-item">
                 <img src="${item.image || 'https://placehold.co/80x80?text=No+Img'}" alt="${item.name}">
@@ -289,22 +299,13 @@
                 <span class="price">${formatCurrency(item.price * item.quantity)}</span>
             </div>
         `).join('');
-
         const statusHistoryHtml = order.statusHistory.slice().reverse().map(hist => `
             <tr>
                 <td><span class="badge status-${hist.status?.toLowerCase()}">${hist.status}</span></td>
                 <td>${new Date(hist.updatedAt).toLocaleString('vi-VN')}</td>
             </tr>
-        `).join(''); // [cite: 125] Sắp xếp (reverse)
-
-        let paymentMethodText = '';
-        if (order.paymentMethod === 'COD') {
-            paymentMethodText = 'Thanh toán khi nhận hàng (COD)';
-        } else {
-            paymentMethodText = (order.paymentStatus === 'Paid') 
-                ? 'Đã thanh toán (VNPAY)' 
-                : 'Chờ thanh toán (VNPAY)';
-        }
+        `).join('');
+        const paymentMethodText = (order.paymentMethod === 'COD') ? 'Thanh toán khi nhận hàng (COD)' : 'Đã thanh toán (VNPAY)';
 
         return `
             <div class="order-result-summary" style="background: #fff;">
@@ -319,7 +320,6 @@
                     <div class="sum-row total"><span>Tổng cộng</span><span class="amount">${formatCurrency(order.total)}</span></div>
                 </div>
             </div>
-
             <div class="order-details-grid" style="margin-top: 24px;">
                 <div class="order-details-col">
                     <h3>Thông tin giao hàng</h3>
@@ -332,15 +332,10 @@
                 </div>
                 <div class="order-details-col">
                     <h3>Thanh toán & Trạng thái</h3>
-                    <p>
-                        <strong>Phương thức:</strong><br>
-                        ${paymentMethodText}
-                    </p>
+                    <p><strong>Phương thức:</strong><br>${paymentMethodText}</p>
                     <h3 style="margin-top: 16px;">Lịch sử trạng thái</h3>
                     <table class="status-history-table">
-                        <thead>
-                            <tr><th>Trạng thái</th><th>Thời gian</th></tr>
-                        </thead>
+                        <thead><tr><th>Trạng thái</th><th>Thời gian</th></tr></thead>
                         <tbody>${statusHistoryHtml}</tbody>
                     </table>
                 </div>
@@ -348,35 +343,34 @@
         `;
     }
 
-    // Hàm gọi API lấy danh sách đơn hàng
-    async function loadOrderHistory() {
+    // Tải 1 trang đơn hàng (phân trang server)
+    // Phải export ra global (window) để inline onclick="" có thể gọi
+    window.loadOrderHistory = async (page = 1) => {
         orderListContainer.innerHTML = '<div class="loading-overlay" style="display: flex;"><div class="spinner"></div></div>';
         try {
-            const res = await fetch('/api/account/orders');
+            const res = await fetch(`/api/account/orders?page=${page}&limit=${ORDER_LIMIT}`);
             const data = await res.json();
             if (!data.ok) throw new Error(data.message);
 
             if (data.orders.length === 0) {
                 orderListContainer.innerHTML = '<div class="empty-state"><p>Bạn chưa có đơn hàng nào.</p></div>';
-                return;
+            } else {
+                orderListContainer.innerHTML = data.orders.map(renderOrderRow).join('');
             }
-            orderListContainer.innerHTML = data.orders.map(renderOrderRow).join('');
+            renderPagination('order-pagination-container', data.pagination, 'loadOrderHistory');
         } catch (err) {
             orderListContainer.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
         }
     }
 
-    // Hàm gọi API lấy chi tiết đơn hàng
     async function loadOrderDetail(code) {
         orderDetailContainer.innerHTML = '<div class="loading-overlay" style="display: flex;"><div class="spinner"></div></div>';
         orderListView.classList.add('d-none');
         orderDetailView.classList.remove('d-none');
-        
         try {
             const res = await fetch(`/api/account/orders/${code}`);
             const data = await res.json();
             if (!data.ok) throw new Error(data.message);
-            
             orderDetailContainer.innerHTML = renderOrderDetail(data.order);
         } catch (err) {
             orderDetailContainer.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
@@ -384,25 +378,14 @@
     }
 
     // Gán sự kiện
-    // 1. Chỉ tải đơn hàng khi nhấn vào tab
-    tabOrdersBtn?.addEventListener('click', () => {
-        // Chỉ tải lần đầu
-        if (!orderListContainer.innerHTML.includes('order-item-row')) {
-            loadOrderHistory();
-        }
-    });
-
-    // 2. Quay lại danh sách
     btnBackToList?.addEventListener('click', (e) => {
         e.preventDefault();
         orderDetailView.classList.add('d-none');
         orderListView.classList.remove('d-none');
     });
-    
-    // 3. Refresh danh sách
-    btnRefreshOrders?.addEventListener('click', loadOrderHistory);
+    btnRefreshOrders?.addEventListener('click', () => loadOrderHistory(1));
 
-    // 4. Bấm "Xem" (Event Delegation)
+    // Event Delegation cho cả list (chỉ "Xem")
     orderListContainer.addEventListener('click', (e) => {
         const detailButton = e.target.closest('.btn-view-detail');
         if (detailButton) {
@@ -411,9 +394,8 @@
         }
     });
 
-    // === KẾT THÚC CODE MỚI ===
-
-    // init
+    // === 5. INIT ===
     loadMe();
-    loadAddresses();
+    loadAddresses(); // Tải địa chỉ (logic cũ)
+
 })();

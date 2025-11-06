@@ -266,13 +266,31 @@ const setDefaultAddressByIndex = async (req, res) => {
 // GET /api/account/orders
 const getOrderHistory = async (req, res) => {
     const id = getUserId(req);
-    // Sắp xếp theo ngày tạo mới nhất
-    const orders = await Order.find({ userId: id })
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 5));
+    const skip = (page - 1) * limit;
+
+    const [orders, totalOrders] = await Promise.all([
+      Order.find({ userId: id })
         .sort({ createdAt: -1 })
-        .select('code createdAt total status paymentMethod') // Chỉ lấy các trường cần
-        .lean();
-    
-    res.json({ ok: true, orders });
+        .select('code createdAt total status paymentMethod')
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Order.countDocuments({ userId: id })
+    ]);
+
+    const totalPages = Math.max(1, Math.ceil(totalOrders / limit) || 1);
+    return res.json({
+      ok: true,
+      orders,
+      pagination: { page, limit, totalPages, totalOrders }
+    });
+  } catch (err) {
+    console.error('getOrderHistory error:', err);
+    return res.status(500).json({ ok: false, message: 'Không lấy được lịch sử đơn hàng' });
+  }
 };
 
 // GET /api/account/orders/:code

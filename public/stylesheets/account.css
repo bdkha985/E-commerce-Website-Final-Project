@@ -541,6 +541,55 @@
     .order-details-grid { grid-template-columns: 1fr; }
 }
 
+/* === CSS CHO PHÂN TRANG === */
+.pagination-wrap {
+  display: flex;
+  justify-content: center;
+  padding-top: 24px;
+  border-top: 1px solid #f1f5f9;
+}
+.pagination {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.pagination li a,
+.pagination li span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  color: #475569;
+  font-weight: 600;
+  font-size: 1.4rem;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+.pagination li a:hover {
+  background: #f0f9ff;
+  border-color: #3b82f6; /* Màu xanh của tab account */
+  color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+.pagination li.active span {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #3b82f6;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+.pagination li.disabled span {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f8fafc;
+}
 
 /* Loading state */
 .loading-overlay {
