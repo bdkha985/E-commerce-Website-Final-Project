@@ -1,0 +1,119 @@
+<link rel="stylesheet" href="/stylesheets/checkout.css">
+<link rel="stylesheet" href="/stylesheets/order-result.css">
+
+<section class="order-result-container">
+
+    <% if (locals.order && (order.status === 'Confirmed' || order.status === 'Pending')) { %>
+        <div class="order-result-header">
+            <div class="order-result-icon icon-success">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h1>Cảm ơn bạn đã đặt hàng!</h1>
+            <p>
+                Đơn hàng <strong><%= order.code %></strong>
+                <% if (order.paymentMethod === 'COD') { %>
+                    đã được xác nhận.
+                <% } else { %>
+                    đã được thanh toán thành công.
+                <% } %>
+            </p>
+        </div>
+
+        <% if (locals.tempPassword && locals.tempEmail) { %>
+            <div class="account-creation-box">
+                <h3>Một tài khoản đã được tạo cho bạn!</h3>
+                <p>Một email chứa thông tin này đã được gửi đến <strong><%= tempEmail %></strong>.</p>
+                <p style="margin-top: 10px;">
+                    Mật khẩu tạm thời của bạn là: <kbd><%= tempPassword %></kbd>
+                </p>
+                <p style="margin-top: 5px;">Vui lòng đăng nhập và đổi mật khẩu sớm nhất.</p>
+            </div>
+        <% } %>
+        <div class="order-result-summary" style="margin-top: 24px;">
+            <h3>Tóm tắt đơn hàng</h3>
+            <div class="summary-items-list">
+                <% order.items.forEach(item => { %>
+                <div class="summary-item">
+                    <img src="<%= item.image || 'https://placehold.co/80x80?text=No+Img' %>" alt="<%= item.name %>">
+                    <div class="summary-item-info">
+                        <span class="name"><%= item.name %> (x<%= item.quantity %>)</span>
+                        <span class="sku">SKU: <%= item.sku %></span>
+                    </div>
+                    <span class="price"><%= (item.price * item.quantity).toLocaleString('vi-VN') %>đ</span>
+                </div>
+                <% }) %>
+            </div>
+            <div class="summary-breakdown">
+
+                <div class="sum-row">
+                    <span>Tạm tính</span>
+                    <strong><%= order.subtotal.toLocaleString('vi-VN') %>đ</strong>
+                </div>
+
+                <div class="sum-row">
+                    <span>Vận chuyển</span>
+                    <strong><%= order.shippingFee.toLocaleString('vi-VN') %>đ</strong>
+                </div>
+
+                <div class="sum-row">
+                    <span>Thuế (VAT 8%)</span>
+                    <strong><%= order.tax.toLocaleString('vi-VN') %>đ</strong>
+                </div>
+
+                <% if (order.discountApplied > 0) { %>
+                <div class="sum-row success">
+                    <span>Giảm giá (<%= order.discountCode %>)</span>
+                    <strong>-<%= order.discountApplied.toLocaleString('vi-VN') %>đ</strong>
+                </div>
+                <% } %>
+
+                <% if (order.loyaltyPointsUsed > 0) { %>
+                <div class="sum-row success"> <span>Sử dụng điểm thưởng</span>
+                    <strong>-<%= order.loyaltyPointsUsed.toLocaleString('vi-VN') %>đ</strong>
+                </div>
+                <% } %>
+
+                <div class="sum-row total">
+                    <span>Tổng cộng</span>
+                    <span class="amount"><%= order.total.toLocaleString('vi-VN') %>đ</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="order-details-grid" style="margin-top: 24px;">
+            <div class="order-details-col">
+                <h3>Thông tin giao hàng</h3>
+                <p>
+                    <strong><%= order.shippingAddress.fullName %></strong><br>
+                    <%= order.shippingAddress.phone %><br>
+                    <%= order.email %><br>
+                    <%= order.shippingAddress.street %>, <%= order.shippingAddress.ward %>, <%= order.shippingAddress.city %>
+                </p>
+            </div>
+            <div class="order-details-col">
+                <h3>Phương thức thanh toán</h3>
+                <p>
+                    <% if (order.paymentMethod === 'COD') { %>
+                        Thanh toán khi nhận hàng (COD)
+                    <% } else { %>
+                        Đã thanh toán qua VNPAY
+                    <% } %>
+                </p>
+            </div>
+        </div>
+
+    <% } else { %>
+        <div class="order-result-header">
+             <div class="order-result-icon icon-fail">
+                <i class="fa-solid fa-circle-xmark"></i>
+            </div>
+            <h1>Đơn hàng Thất bại</h1>
+            <p>Đã có lỗi xảy ra. Vui lòng kiểm tra lại giỏ hàng hoặc liên hệ CSKH.</p>
+         </div>
+    <% } %>
+
+    <div style="text-align: center; margin-top: 32px;">
+        <a href="/homepage" class="btn btn-primary" style="background: var(--primary-color); color: #fff;">Về Trang chủ</a>
+        <a href="/account" class="btn btn-outline-dark" style="margin-left: 10px;">Xem Lịch sử đơn hàng</a>
+    </div>
+</section>

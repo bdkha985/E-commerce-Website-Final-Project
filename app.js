@@ -20,13 +20,14 @@ const RedisStore =
 
 const configViewEngine = require("./config/viewEngine");
 const { connectDB } = require("./config/database");
-const cartService = require('./services/cart/cart.service.js');
 
 //Routes
+const cartService = require('./services/cart/cart.service.js');
 const Category = require('./models/category.model');
+
 const webRoutes = require("./routes/web.routes.js");
 const socialAuthRoutes = require("./routes/auth.social.routes.js");
-const apiRoutes = require("./routes/api"); // <-- CHỈ CẦN 1 DÒNG NÀY
+const apiRoutes = require("./routes/api");
 
 //Passport cấu hình
 require("./config/passport");

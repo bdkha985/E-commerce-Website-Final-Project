@@ -11,6 +11,7 @@ const {
 const requireLoginPage = require("../middlewares/requireLoginPage");
 const catalog  = require('../controllers/catalog/catalog.controller');
 const cartController = require('../controllers/cart/cart.controller');
+const checkoutController = require('../controllers/checkout/checkout.controller');
 
 // ========== Trang tĩnh / auth ==========
 // router.get("/homepage", (req, res) =>
@@ -77,6 +78,15 @@ router.get("/about", (req, res) =>
 
 // Cart
 router.get("/cart", cartController.getCartPage);
+
+// Checkout
+router.get("/checkout", checkoutController.getCheckoutPage);
+
+// Trang mà VNPAY sẽ trả về
+router.get("/checkout/vnpay_return", checkoutController.handleVnpayReturn);
+
+// Trang hiển thị kết quả (Thành công/Thất bại)
+router.get("/order/result/:orderCode", checkoutController.getOrderResultPage);
 
 // ========== CATALOG ==========
 router.get('/c/:slug', catalog.categoryPage);  

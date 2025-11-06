@@ -1,4 +1,4 @@
-// routes/cart.api.js
+// routes/api/cart.api.routes.js
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
@@ -32,6 +32,19 @@ router.delete(
 router.delete(
     '/clear',
     cartApiController.clearCart
+);
+
+// POST /api/cart/apply-discount
+router.post(
+    '/apply-discount',
+    [ body('code').notEmpty().withMessage('Vui lòng nhập mã') ],
+    cartApiController.applyDiscount
+);
+
+// GET /api/cart/items
+router.get(
+    '/items',
+    cartApiController.getCartItems
 );
 
 module.exports = router;

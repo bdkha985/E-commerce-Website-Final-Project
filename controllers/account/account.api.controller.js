@@ -3,6 +3,7 @@
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const User = require("../../models/user.model");
+const Order = require('../../models/order.model');
 
 // Helper get id
 function getUserId(req) {
@@ -261,6 +262,51 @@ const setDefaultAddressByIndex = async (req, res) => {
         addresses: user.addresses,
     });
 };
+
+// GET /api/account/orders
+const getOrderHistory = async (req, res) => {
+    const id = getUserId(req);
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 5));
+    const skip = (page - 1) * limit;
+
+    const [orders, totalOrders] = await Promise.all([
+      Order.find({ userId: id })
+        .sort({ createdAt: -1 })
+        .select('code createdAt total status paymentMethod')
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Order.countDocuments({ userId: id })
+    ]);
+
+    const totalPages = Math.max(1, Math.ceil(totalOrders / limit) || 1);
+    return res.json({
+      ok: true,
+      orders,
+      pagination: { page, limit, totalPages, totalOrders }
+    });
+  } catch (err) {
+    console.error('getOrderHistory error:', err);
+    return res.status(500).json({ ok: false, message: 'Không lấy được lịch sử đơn hàng' });
+  }
+};
+
+// GET /api/account/orders/:code
+const getOrderDetail = async (req, res) => {
+    const id = getUserId(req);
+    const { code } = req.params;
+
+    const order = await Order.findOne({ userId: id, code: code }).lean();
+    
+    if (!order) {
+        return res.status(404).json({ ok: false, message: "Không tìm thấy đơn hàng" });
+    }
+
+    res.json({ ok: true, order });
+};
+
 module.exports = {
     getMe,
     updateProfile,
@@ -270,4 +316,7 @@ module.exports = {
     updateAddressByIndex,
     removeAddressByIndex,
     setDefaultAddressByIndex,
+    getOrderHistory,
+    getOrderDetail,
+    
 };

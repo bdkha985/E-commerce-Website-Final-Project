@@ -3,7 +3,7 @@
 // === Helper: Định dạng tiền tệ ===
 const formatCurrency = (amount) => (amount || 0).toLocaleString('vi-VN') + 'đ';
 
-// === Helper: Gửi request API (tránh lặp code) ===
+// === Helper: Gửi request API (BẢN SỬA LỖI CUỐI CÙNG) ===
 async function sendCartRequest(url, method, body = null) {
     try {
         const options = {
@@ -14,19 +14,32 @@ async function sendCartRequest(url, method, body = null) {
             options.body = JSON.stringify(body);
         }
         const response = await fetch(url, options);
-        const data = await response.json();
 
+        // ĐỌC JSON
+        const data = await response.json(); 
+
+        // KIỂM TRA OK SAU KHI ĐỌC JSON
         if (!response.ok) {
+            // Nếu server trả về lỗi (400, 404, 500), data sẽ là { ok: false, message: "..." }
             throw new Error(data.message || 'Lỗi không xác định');
         }
+        
+        // Nếu response.ok, data là { ok: true, ... }
         return data;
+
     } catch (err) {
+        // Lỗi này xảy ra do 2 lý do:
+        // 1. Lỗi mạng (offline).
+        // 2. Lỗi `response.json()` (khi server trả về HTML thay vì JSON).
         console.error('Lỗi API giỏ hàng:', err);
-        // Hiển thị toast lỗi (nếu có)
+        
         const toastEl = document.getElementById('toastError');
         if(toastEl) {
             const toastBody = toastEl.querySelector('.toast-body');
-            toastBody.textContent = err.message;
+            // Hiển thị lỗi logic (nếu có) hoặc lỗi chung
+            toastBody.textContent = (err.message.includes("JSON")) 
+                ? "Lỗi máy chủ, không thể đọc phản hồi." 
+                : err.message;
             new bootstrap.Toast(toastEl).show();
         } else {
             alert(`Lỗi: ${err.message}`);
@@ -48,7 +61,7 @@ function updateMiniCart(cart, totalItems) {
 
     // 2. Cập nhật Footer Mini-cart
     if (miniCartFooterSpan) {
-        miniCartFooterSpan.textContent = `${cart.length} sản phẩm`;
+        miniCartFooterSpan.textContent = `${(cart || []).length} sản phẩm`;
     }
 
     // 3. Cập nhật danh sách Mini-cart
@@ -65,9 +78,7 @@ function updateMiniCart(cart, totalItems) {
                 <div class="mini-cart__item">
                     <img src="${item.image || 'https://placehold.co/80x80?text=No+Img'}" alt="${item.name}">
                     <div class="mini-cart__info">
-                        <a class="mini-cart__name" href="/products/${item.slug}">
-                            ${item.name}
-                        </a>
+                        <a class="mini-cart__name" href="/products/${item.slug}">${item.name}</a>
                         <div class="mini-cart__meta">
                             <span>x${item.quantity}</span>
                             <span class="price">${formatCurrency(item.price)}</span>
@@ -82,7 +93,12 @@ function updateMiniCart(cart, totalItems) {
 
 // === HÀM CẬP NHẬT TRANG GIỎ HÀNG (/cart) ===
 function updateCartPageView(data) {
-    if (!data) return;
+    // === CHỐT AN TOÀN QUAN TRỌNG (FIX LỖI) ===
+    if (typeof data !== 'object' || data === null) {
+        // console.error("updateCartPageView nhận được data rỗng hoặc sai định dạng:", data);
+        return; 
+    }
+    // === KẾT THÚC CHỐT AN TOÀN ===
 
     // Cập nhật tóm tắt đơn hàng
     document.getElementById('summary-subtotal').textContent = formatCurrency(data.subtotal);
@@ -90,6 +106,17 @@ function updateCartPageView(data) {
     document.getElementById('summary-tax').textContent = formatCurrency(data.tax);
     document.getElementById('summary-total').textContent = formatCurrency(data.total);
     
+    // Cập nhật hiển thị giảm giá
+    const discountRow = document.getElementById('discount-row');
+    // Kiểm tra data.appliedDiscountCode có tồn tại không
+    if (data.discountApplied > 0 && data.appliedDiscountCode) {
+        document.getElementById('summary-discount').textContent = `-${formatCurrency(data.discountApplied)}`;
+        document.getElementById('discount-code-text').textContent = data.appliedDiscountCode;
+        discountRow.style.display = 'flex'; // Hiện dòng giảm giá
+    } else {
+        discountRow.style.display = 'none'; // Ẩn đi
+    }
+
     // Cập nhật số lượng item
     const countEl = document.getElementById('cart-item-count');
     if (countEl) {
@@ -101,9 +128,7 @@ function updateCartPageView(data) {
         const cartBody = document.getElementById('cart-body-items');
         cartBody.innerHTML = `
             <div class="empty-cart" id="empty-cart-message">
-                <div class="empty-cart-icon">
-                    <i class="fa-solid fa-cart-shopping" style="font-size: 5rem; color: #cbd5e1;"></i>
-                </div>
+                <div class="empty-cart-icon"><i class="fa-solid fa-cart-shopping" style="font-size: 5rem; color: #cbd5e1;"></i></div>
                 <h2>Giỏ hàng của bạn đang trống</h2>
                 <p>Hãy khám phá thêm sản phẩm của chúng tôi!</p>
                 <a href="/products/all" class="btn" style="background: var(--primary-color); color: #fff;">Tiếp tục mua sắm</a>
@@ -119,17 +144,15 @@ function updateCartPageView(data) {
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- 1. LOGIC TOÀN CỤC (Lắng nghe sự kiện) ---
-    // Lắng nghe sự kiện 'cart:updated' từ product-detail.js
     document.addEventListener('cart:updated', (e) => {
         const { cart, totalItems } = e.detail;
         updateMiniCart(cart, totalItems);
     });
 
-
     // --- 2. LOGIC TRANG GIỎ HÀNG (Chỉ chạy nếu ở /cart) ---
     const cartBody = document.getElementById('cart-body-items');
     if (!cartBody) {
-        return; // Không phải trang giỏ hàng, dừng ở đây
+        return; // Không phải trang giỏ hàng
     }
 
     // Xử lý sự kiện (Event Delegation) cho trang cart
@@ -143,9 +166,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (target.closest('.cart-remove')) {
             const data = await sendCartRequest(`/api/cart/remove/${sku}`, 'DELETE');
             if (data) {
-                row.remove(); // Xóa hàng khỏi DOM
-                updateCartPageView(data); // Cập nhật tóm tắt
-                updateMiniCart(data.cart, data.totalItems); // Cập nhật mini-cart
+                row.remove(); 
+                updateCartPageView(data); 
+                updateMiniCart(data.cart, data.totalItems); 
             }
             return;
         }
@@ -153,19 +176,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // 2. Cập nhật số lượng
         const qtyInput = row.querySelector('.qty-input');
         let newQuantity = parseInt(qtyInput.value, 10);
-
         if (target.closest('.btn-qty-up')) {
             newQuantity += 1;
         } else if (target.closest('.btn-qty-down')) {
             newQuantity -= 1;
         } else {
-            return; // Không làm gì
+            return; 
         }
         
-        // Gọi API cập nhật
         const data = await sendCartRequest(`/api/cart/update/${sku}`, 'PATCH', { quantity: newQuantity });
         
         if (data) {
+            // API thành công
             if (newQuantity <= 0) {
                 row.remove();
             } else {
@@ -175,14 +197,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     row.querySelector('.cart-total').textContent = formatCurrency(updatedItem.price * updatedItem.quantity);
                 }
             }
-            // Cập nhật lại toàn bộ
             updateCartPageView(data);
             updateMiniCart(data.cart, data.totalItems);
         } else {
-            // Nếu lỗi, trả lại giá trị cũ (vì API đã báo lỗi)
-            // (Hiện tại API đã tự giới hạn số lượng, nên chỉ cần update)
-            const currentItem = (await sendCartRequest('/api/cart/items', 'GET'))?.cart.find(item => item.sku === sku);
-            if(currentItem) qtyInput.value = currentItem.quantity;
+            // Nếu lỗi (ví dụ hết hàng), gọi API GET /items để lấy lại số lượng đúng
+            const errorData = await sendCartRequest('/api/cart/items', 'GET'); 
+            if (errorData) {
+                const currentItem = errorData.cart.find(item => item.sku === sku);
+                if (currentItem) {
+                    qtyInput.value = currentItem.quantity;
+                } else {
+                    row.remove(); 
+                }
+                updateCartPageView(errorData);
+                updateMiniCart(errorData.cart, errorData.totalItems);
+            }
         }
     });
 
@@ -190,28 +219,47 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnClearAll = document.getElementById('btn-clear-all');
     if (btnClearAll) {
         btnClearAll.addEventListener('click', async () => {
-            if (!confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?')) {
-                return;
-            }
+            if (!confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?')) return;
             const data = await sendCartRequest('/api/cart/clear', 'DELETE');
             if (data) {
-                updateCartPageView(data); // Sẽ tự hiển thị giỏ hàng trống
+                updateCartPageView(data); 
                 updateMiniCart(data.cart, data.totalItems);
             }
         });
     }
 
-    // 4. (Tạm thời) Xử lý Mã giảm giá
+    // 4. Xử lý Mã giảm giá
     const btnApplyDiscount = document.getElementById('btn-apply-discount');
+    const inputDiscount = document.getElementById('discount-input');
+    const msgEl = document.getElementById('discount-message');
+
     if (btnApplyDiscount) {
-        btnApplyDiscount.addEventListener('click', () => {
-            const code = document.getElementById('discount-input').value;
-            const msgEl = document.getElementById('discount-message');
+        btnApplyDiscount.addEventListener('click', async () => {
+            const code = inputDiscount.value;
             if (code === '') {
                 msgEl.textContent = 'Vui lòng nhập mã.';
-            } else {
-                msgEl.textContent = `Mã "${code}" không hợp lệ.`;
+                return;
             }
+            
+            btnApplyDiscount.disabled = true;
+            btnApplyDiscount.textContent = 'Đang...';
+            msgEl.textContent = '';
+
+            const data = await sendCartRequest('/api/cart/apply-discount', 'POST', { code });
+
+            if (data) {
+                updateCartPageView(data); 
+                updateMiniCart(data.cart, data.totalItems); 
+                msgEl.textContent = data.message;
+                msgEl.style.color = '#16a34a';
+                inputDiscount.value = data.appliedDiscountCode; 
+            } else {
+                msgEl.textContent = 'Mã không hợp lệ hoặc đã hết hạn.';
+                msgEl.style.color = '#ef4444';
+            }
+
+            btnApplyDiscount.disabled = false;
+            btnApplyDiscount.textContent = 'Áp dụng';
         });
     }
 });
