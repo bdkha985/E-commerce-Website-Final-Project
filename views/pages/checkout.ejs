@@ -1,0 +1,141 @@
+<link rel="stylesheet" href="/stylesheets/checkout.css">
+
+<section class="checkout-page container">
+  <div class="checkout-layout">
+
+    <div class="checkout-main">
+      <h1>Thông tin Thanh toán</h1>
+
+      <form id="checkout-form">
+
+        <% if (userInfo) { %>
+        <p class="checkout-greeting">
+          Đang thanh toán với tư cách <strong><%= userInfo.fullName %></strong>.
+          (<a href="/logout">Đăng xuất?</a>)
+        </p>
+        <input type="hidden" name="email" value="<%= userInfo.email %>">
+
+        <div class="form-group">
+          <label for="fullName">Họ tên</label>
+          <input type="text" id="fullName" name="fullName" class="form-control" value="<%= userInfo.fullName %>" required>
+        </div>
+        <% } else { %>
+        <p class="checkout-greeting">
+          Bạn đã có tài khoản? <a href="/signin?redirect=/checkout">Đăng nhập</a>
+        </p>
+        <div class="form-group">
+          <label for="email">Email (Để nhận thông tin đơn hàng)</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="ban@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="fullName">Họ tên người nhận</label>
+          <input type="text" id="fullName" name="fullName" class="form-control" placeholder="Nguyễn Văn A" required>
+        </div>
+        <% } %>
+
+        <div class="form-group">
+          <label for="phone">Số điện thoại</label>
+          <input type="tel" id="phone" name="phone" class="form-control" value="<%= userInfo?.phone || '' %>" required>
+        </div>
+
+        <% if (allUserAddresses && allUserAddresses.length > 0) { %>
+        <div class="form-group saved-address-group">
+          <label for="addressSelector">Chọn địa chỉ</label>
+          <select id="addressSelector" class="form-control">
+            <!-- <option value="">-- Chọn một địa chỉ --</option> -->
+            <% allUserAddresses.forEach(addr => { %>
+            <option value="<%= addr.label %>" <%= (defaultAddress && defaultAddress.label === addr.label) ? 'selected' : '' %> data-street="<%= addr.street %>" data-ward="<%= addr.ward %>" data-city="<%= addr.city %>">
+
+              <%= addr.label %> (<%= addr.street %>, <%= addr.ward %>, ...)
+            </option>
+            <% }) %>
+          </select>
+        </div>
+        <% } %>
+        <div class="form-group">
+          <label for="street">Địa chỉ (Số nhà, Tên đường)</label>
+          <input type="text" id="street" name="street" class="form-control" value="<%= defaultAddress?.street || '' %>" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ward">Phường / Xã</label>
+            <input type="text" id="ward" name="ward" class="form-control" value="<%= defaultAddress?.ward || '' %>" required>
+          </div>
+          <div class="form-group">
+            <label for="city">Tỉnh / Thành phố</label>
+            <input type="text" id="city" name="city" class="form-control" value="<%= defaultAddress?.city || '' %>" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="notes">Ghi chú đơn hàng (Tùy chọn)</label>
+          <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Giao hàng sau 5 giờ chiều..."></textarea>
+        </div>
+
+      </form>
+    </div>
+
+    <aside class="checkout-summary">
+      <h3>Đơn Hàng Của Bạn</h3>
+
+      <div class="summary-items-list">
+        <% summary.cart.forEach(item => { %>
+        <div class="summary-item">
+          <img src="<%= item.image || 'https://placehold.co/80x80?text=No+Img' %>" alt="<%= item.name %>">
+          <div class="summary-item-info">
+            <span class="name"><%= item.name %> (x<%= item.quantity %>)</span>
+            <span class="sku">SKU: <%= item.sku %></span>
+          </div>
+          <span class="price"><%= (item.price * item.quantity).toLocaleString('vi-VN') %>đ</span>
+        </div>
+        <% }) %>
+      </div>
+
+      <div class="summary-breakdown">
+        <div class="sum-row">
+          <span>Tạm tính</span>
+          <strong><%= summary.subtotal.toLocaleString('vi-VN') %>đ</strong>
+        </div>
+
+        <% if (summary.discountApplied > 0) { %>
+        <div class="sum-row success">
+          <span>Giảm giá (<%= summary.appliedDiscountCode %>)</span>
+          <strong>-<%= summary.discountApplied.toLocaleString('vi-VN') %>đ</strong>
+        </div>
+        <% } %>
+
+        <div class="sum-row">
+          <span>Vận chuyển</span>
+          <strong><%= summary.shippingFee.toLocaleString('vi-VN') %>đ</strong>
+        </div>
+        <div class="sum-row">
+          <span>Thuế (VAT 8%)</span>
+          <strong><%= summary.tax.toLocaleString('vi-VN') %>đ</strong>
+        </div>
+
+        <div class="sum-row total">
+          <span>Tổng cộng</span>
+          <span class="amount"><%= summary.total.toLocaleString('vi-VN') %>đ</span>
+        </div>
+      </div>
+
+      <% if (loyaltyPoints > 0) { %>
+      <div class="loyalty-box">
+        <label for="use-loyalty">
+          <input type="checkbox" id="use-loyalty" name="useLoyalty">
+          Sử dụng <%= loyaltyPoints.toLocaleString('vi-VN') %> điểm thưởng
+          (Tương đương giảm <%= loyaltyPoints.toLocaleString('vi-VN') %>đ)
+        </label>
+      </div>
+      <% } %>
+
+      <button type="submit" form="checkout-form" class="btn-place-order">
+        ĐẶT HÀNG
+      </button>
+    </aside>
+
+  </div>
+</section>
+
+<script src="/javascripts/checkout.js" defer></script>
