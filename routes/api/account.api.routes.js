@@ -58,4 +58,10 @@ router.patch("/addresses/:idx", ctrl.updateAddressByIndex);
 router.delete("/addresses/:idx", ctrl.removeAddressByIndex);
 router.post("/addresses/:idx/default", ctrl.setDefaultAddressByIndex);
 
+// GET /api/account/orders
+router.get("/orders", ctrl.getOrderHistory);
+
+// GET /api/account/orders/:code (Phải có :code)
+router.get("/orders/:code", ctrl.getOrderDetail);
+
 module.exports = router;

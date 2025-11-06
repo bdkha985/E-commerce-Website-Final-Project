@@ -81,6 +81,10 @@ async function sendOrderConfirmationEmail(toEmail, order) {
         </tr>
     `).join('');
 
+    const paymentMethodText = (order.paymentMethod === 'COD') 
+        ? 'Thanh toán khi nhận hàng (COD)' 
+        : 'Đã thanh toán qua VNPAY';
+
     const html = `
     <div style="font-family: Arial, sans-serif; line-height: 1.6;">
         <h2>Cảm ơn bạn đã đặt hàng tại K Shopping!</h2>
@@ -142,6 +146,11 @@ async function sendOrderConfirmationEmail(toEmail, order) {
             ${order.shippingAddress.phone}<br>
             ${order.shippingAddress.street}, ${order.shippingAddress.ward}, ${order.shippingAddress.city}
         </p>
+
+        <p>
+            <strong>Phương thức thanh toán:</strong> ${paymentMethodText}
+        </p>
+        
         <p>Cảm ơn bạn đã tin tưởng K Shopping!</p>
     </div>
   `;

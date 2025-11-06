@@ -76,8 +76,29 @@
 
             <!-- Orders (stub) -->
             <div class="tab-panel d-none" id="tab-orders">
-                <h3>Đơn hàng của tôi</h3>
-                <p>(Sẽ kết nối API Orders sau)</p>
+                <div id="order-list-view">
+                    <h3 class="d-flex justify-content-between align-items-center">
+                        Lịch sử đơn hàng
+                        <button id="btn-refresh-orders" class="btn btn-sm btn-outline-secondary">
+                            <i class="fa-solid fa-arrows-rotate" style="color: #ffffff;"></i>
+                        </button>
+                    </h3>
+                    <div id="order-list-container">
+                        <div class="loading-overlay" style="display: flex;">
+                             <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="order-detail-view" class="d-none">
+                    <p>
+                        <a href="#" id="btn-back-to-list" class="btn btn-sm btn-outline-dark">
+                            <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách
+                        </a>
+                    </p>
+                    <div id="order-detail-container">
+                        </div>
+                </div>
             </div>
 
             <!-- Loyalty -->

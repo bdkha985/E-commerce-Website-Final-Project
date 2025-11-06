@@ -3,6 +3,7 @@
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const User = require("../../models/user.model");
+const Order = require('../../models/order.model');
 
 // Helper get id
 function getUserId(req) {
@@ -261,6 +262,33 @@ const setDefaultAddressByIndex = async (req, res) => {
         addresses: user.addresses,
     });
 };
+
+// GET /api/account/orders
+const getOrderHistory = async (req, res) => {
+    const id = getUserId(req);
+    // Sắp xếp theo ngày tạo mới nhất
+    const orders = await Order.find({ userId: id })
+        .sort({ createdAt: -1 })
+        .select('code createdAt total status paymentMethod') // Chỉ lấy các trường cần
+        .lean();
+    
+    res.json({ ok: true, orders });
+};
+
+// GET /api/account/orders/:code
+const getOrderDetail = async (req, res) => {
+    const id = getUserId(req);
+    const { code } = req.params;
+
+    const order = await Order.findOne({ userId: id, code: code }).lean();
+    
+    if (!order) {
+        return res.status(404).json({ ok: false, message: "Không tìm thấy đơn hàng" });
+    }
+
+    res.json({ ok: true, order });
+};
+
 module.exports = {
     getMe,
     updateProfile,
@@ -270,4 +298,7 @@ module.exports = {
     updateAddressByIndex,
     removeAddressByIndex,
     setDefaultAddressByIndex,
+    getOrderHistory,
+    getOrderDetail,
+    
 };
