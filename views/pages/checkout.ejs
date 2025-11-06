@@ -76,7 +76,7 @@
       </form>
     </div>
 
-    <aside class="checkout-summary">
+    <aside class="checkout-summary" id="checkout-summary-box" data-total="<%= summary.total %>" data-points-available="<%= loyaltyPoints %>">
       <h3>Đơn Hàng Của Bạn</h3>
 
       <div class="summary-items-list">
@@ -98,13 +98,6 @@
           <strong><%= summary.subtotal.toLocaleString('vi-VN') %>đ</strong>
         </div>
 
-        <% if (summary.discountApplied > 0) { %>
-        <div class="sum-row success">
-          <span>Giảm giá (<%= summary.appliedDiscountCode %>)</span>
-          <strong>-<%= summary.discountApplied.toLocaleString('vi-VN') %>đ</strong>
-        </div>
-        <% } %>
-
         <div class="sum-row">
           <span>Vận chuyển</span>
           <strong><%= summary.shippingFee.toLocaleString('vi-VN') %>đ</strong>
@@ -114,25 +107,55 @@
           <strong><%= summary.tax.toLocaleString('vi-VN') %>đ</strong>
         </div>
 
+        <% if (summary.discountApplied > 0) { %>
+        <div class="sum-row success">
+          <span>Giảm giá (<%= summary.appliedDiscountCode %>)</span>
+          <strong>-<%= summary.discountApplied.toLocaleString('vi-VN') %>đ</strong>
+        </div>
+        <% } %>
+
+        <div class="sum-row loyalty" id="loyalty-row" style="display: none; color: #16a34a; font-weight: 600;">
+          <span>Sử dụng điểm thưởng</span>
+          <strong id="summary-loyalty">-0đ</strong>
+        </div>
+
         <div class="sum-row total">
           <span>Tổng cộng</span>
-          <span class="amount"><%= summary.total.toLocaleString('vi-VN') %>đ</span>
+          <span class="amount" id="summary-total">
+            <%= summary.total.toLocaleString('vi-VN') %>đ
+          </span>
         </div>
-      </div>
 
-      <% if (loyaltyPoints > 0) { %>
-      <div class="loyalty-box">
-        <label for="use-loyalty">
-          <input type="checkbox" id="use-loyalty" name="useLoyalty">
-          Sử dụng <%= loyaltyPoints.toLocaleString('vi-VN') %> điểm thưởng
-          (Tương đương giảm <%= loyaltyPoints.toLocaleString('vi-VN') %>đ)
-        </label>
-      </div>
-      <% } %>
+        <% if (loyaltyPoints > 0) { %>
+        <div class="loyalty-box">
+          <label for="use-loyalty">
+            <input type="checkbox" id="use-loyalty" name="useLoyalty">
+            Sử dụng <%= loyaltyPoints.toLocaleString('vi-VN') %> điểm thưởng
+            (Tương đương giảm <%= loyaltyPoints.toLocaleString('vi-VN') %>đ)
+          </label>
+        </div>
+        <% } %>
 
-      <button type="submit" form="checkout-form" class="btn-place-order">
-        ĐẶT HÀNG
-      </button>
+        <div class="payment-methods">
+          <h4>Phương thức thanh toán</h4>
+          <div class="payment-option">
+            <input type="radio" id="payment-cod" name="paymentMethod" value="COD" checked>
+            <label for="payment-cod">
+              <i class="fa-solid fa-truck-fast"></i>
+              Thanh toán khi nhận hàng (COD)
+            </label>
+          </div>
+          <div class="payment-option">
+            <input type="radio" id="payment-vnpay" name="paymentMethod" value="VNPAY">
+            <label for="payment-vnpay">
+              <i class="fa-solid fa-credit-card"></i>
+              Thanh toán qua VNPAY (ATM, Visa...)
+            </label>
+          </div>
+        </div>
+        <button type="submit" form="checkout-form" class="btn-place-order">
+          ĐẶT HÀNG
+        </button>
     </aside>
 
   </div>

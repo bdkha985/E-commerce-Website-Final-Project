@@ -82,6 +82,12 @@ router.get("/cart", cartController.getCartPage);
 // Checkout
 router.get("/checkout", checkoutController.getCheckoutPage);
 
+// Trang mà VNPAY sẽ trả về
+router.get("/checkout/vnpay_return", checkoutController.handleVnpayReturn);
+
+// Trang hiển thị kết quả (Thành công/Thất bại)
+router.get("/order/result/:orderCode", checkoutController.getOrderResultPage);
+
 // ========== CATALOG ==========
 router.get('/c/:slug', catalog.categoryPage);  
 router.get('/products/all', catalog.allProductsPage);

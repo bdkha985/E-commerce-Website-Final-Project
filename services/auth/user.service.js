@@ -71,7 +71,7 @@ async function createUserAndSendPassword({ email, fullName, address }) {
         throw new Error("Đăng ký thành công nhưng không thể gửi email mật khẩu.");
     }
 
-    return user;
+    return {user,  tempPassword};
 }
 
 async function findUserByEmail(email) {

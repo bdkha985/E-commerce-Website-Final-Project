@@ -195,6 +195,116 @@
     font-weight: 500;
 }
 
+/* (THÊM VÀO CUỐI FILE checkout.css) */
+.payment-methods {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 2px solid #f1f5f9;
+}
+.payment-methods h4 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+.payment-option {
+    display: flex;
+    padding: 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+}
+.payment-option:has(input:checked) {
+    border-color: var(--primary-color);
+    background: #f0f9ff;
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+.payment-option label {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.payment-option input {
+    margin-right: 5px;
+    accent-color: var(--primary-color);
+}
+.payment-option i {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    width: 20px;
+    text-align: center;
+}
+
+.order-result-container {
+    max-width: 800px; /* Rộng hơn để chứa chi tiết */
+    margin: 48px auto 72px;
+    padding: 40px;
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+}
+.order-result-header {
+    text-align: center;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+}
+.order-result-icon {
+    font-size: 5rem;
+    margin-bottom: 24px;
+}
+.icon-success {
+    color: #10b981;
+}
+.icon-fail {
+    color: #ef4444;
+}
+.order-result-header h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+.order-result-header p {
+    font-size: 1.6rem;
+    color: #475569;
+}
+.order-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    text-align: left;
+    margin-bottom: 24px;
+}
+.order-details-col h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+.order-details-col p {
+    font-size: 1.5rem;
+    color: #334155;
+    line-height: 1.6;
+}
+
+/* Tái sử dụng .checkout-summary từ checkout.css */
+.order-result-summary {
+    padding: 24px;
+    border-radius: 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+}
+
+.sum-row.loyalty {
+    color: #16a34a; /* Màu xanh lá */
+    font-weight: 600;
+}
+
 /* Responsive */
 @media (max-width: 991px) {
     .checkout-layout {
@@ -206,8 +316,13 @@
     }
 }
 @media (max-width: 576px) {
-    .checkout-main { padding: 20px; }
-    .checkout-summary { padding: 20px; }
-    .form-row { grid-template-columns: 1fr; }
+    .checkout-main {
+        padding: 20px;
+    }
+    .checkout-summary {
+        padding: 20px;
+    }
+    .form-row {
+        grid-template-columns: 1fr;
+    }
 }
-
