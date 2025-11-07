@@ -177,11 +177,25 @@
         </div>
 
         <div class="review-list-container">
-          <h4 id="review-list-title">Tất cả đánh giá (<span id="review-total-count"><%= product.ratingCount || 0 %></span>)</h4>
-          <div id="review-list">
-            </div>
-          <nav id="review-pagination-container" class="pagination-wrap mt-4" style="border: none; padding: 0;"></nav>
-        </div>
+  
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 id="review-list-title" class="mb-0">
+      Tất cả đánh giá (<span id="review-total-count"><%= product.ratingCount || 0 %></span>)
+    </h4>
+    <div class="form-group" style="min-width: 180px;">
+      <label for="review-sort-select" class="form-label" style="font-size: 1.3rem; margin-bottom: 2px;">Sắp xếp theo:</label>
+      <select class="form-control" id="review-sort-select" style="padding: 5px 8px; font-size: 1.4rem; height: auto;">
+        <option value="newest">Mới nhất</option>
+        <option value="oldest">Cũ nhất</option>
+        <option value="highest">Nhiều sao nhất</option>
+        <option value="lowest">Ít sao nhất</option>
+      </select>
+    </div>
+  </div>
+  <div id="review-list">
+    </div>
+  <nav id="review-pagination-container" class="pagination-wrap mt-4" style="border: none; padding: 0;"></nav>
+</div>
       </div>
     </section>
   </div>

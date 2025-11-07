@@ -1,4 +1,6 @@
+// controllers/web/home.controller.js
 const Product = require("../../models/product.model");
+const Category = require("../../models/category.model");
 
 function render(res, viewPath, locals = {}) {
     res.render("layouts/main", { body: viewPath, ...locals });
@@ -23,12 +25,41 @@ function getDisplayPrice(p) {
 
 const getHomePage = async (req, res, next) => {
     try {
-        const [bestSellers, newCollection] = await Promise.all([
+        // Lấy ID 3 danh mục chúng ta muốn hiển thị
+        const [catAoNam, catDamNu, catSneaker] = await Promise.all([
+            Category.findOne({ slug: 'ao-nam' }).select('_id').lean(),
+            Category.findOne({ slug: 'dam-nu' }).select('_id').lean(),
+            Category.findOne({ slug: 'sneaker' }).select('_id').lean()
+        ]);
+
+        // Tải tất cả 5 nhóm sản phẩm cùng lúc
+        const [
+            bestSellersData, 
+            newCollectionData, 
+            aoNamProductsData, 
+            damNuProductsData, 
+            sneakerProductsData
+        ] = await Promise.all([
+            // 1. Best Sellers (Giữ nguyên)
             Product.find()
                 .sort({ ratingCount: -1, ratingAvg: -1, createdAt: -1 })
-                .limit(5)
+                .limit(12)
                 .lean(),
-            Product.find().sort({ createdAt: -1 }).limit(5).lean(),
+            // 2. New Collection (Giữ nguyên)
+            Product.find().sort({ createdAt: -1 }).limit(12).lean(),
+            
+            // 3. Category "Áo Nam"
+            catAoNam 
+                ? Product.find({ categoryIds: catAoNam._id }).limit(12).lean() 
+                : Promise.resolve([]),
+            // 4. Category "Đầm Nữ"
+            catDamNu 
+                ? Product.find({ categoryIds: catDamNu._id }).limit(12).lean() 
+                : Promise.resolve([]),
+            // 5. Category "Sneaker"
+            catSneaker 
+                ? Product.find({ categoryIds: catSneaker._id }).limit(12).lean() 
+                : Promise.resolve([])
         ]);
 
         const mapView = (arr) =>
@@ -41,8 +72,12 @@ const getHomePage = async (req, res, next) => {
         return res.render("layouts/main", {
             title: "Trang chủ",
             body: "pages/index",
-            bestSellers: mapView(bestSellers),
-            newCollection: mapView(newCollection),
+            bestSellers: mapView(bestSellersData),
+            newCollection: mapView(newCollectionData),
+            // Truyền 3 danh mục mới ra view
+            aoNamProducts: mapView(aoNamProductsData),
+            damNuProducts: mapView(damNuProductsData),
+            sneakerProducts: mapView(sneakerProductsData),
         });
     } catch (err) {
         next(err);

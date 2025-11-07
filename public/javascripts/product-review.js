@@ -14,11 +14,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const reviewListEl = document.getElementById('review-list');
     const paginationContainer = document.getElementById('review-pagination-container');
     const totalCountEl = document.getElementById('review-total-count');
+    const sortSelect = document.getElementById('review-sort-select'); // <-- MỚI
 
     async function fetchReviews(page = 1) {
+        const sortOrder = sortSelect.value; // <-- Lấy giá trị sort
         reviewListEl.innerHTML = '<p>Đang tải đánh giá...</p>';
         try {
-            const res = await fetch(`/api/reviews/${productId}?page=${page}`);
+            const res = await fetch(`/api/reviews/${productId}?page=${page}&sort=${sortOrder}`);
             const data = await res.json();
             if (!data.ok) throw new Error('Không thể tải đánh giá');
 
@@ -71,10 +73,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.matches('.page-link')) {
             e.preventDefault();
             const page = parseInt(e.target.dataset.page, 10);
-            fetchReviews(page);
+            fetchReviews(page); // fetchReviews giờ đã tự động lấy sort
         }
     });
 
+    sortSelect.addEventListener('change', () => {
+        fetchReviews(1); // Khi đổi sort, luôn quay về trang 1
+    });
+    
     // === 2. Xử lý Form 1: Gửi Rating (Đã đăng nhập) ===
     const ratingForm = document.getElementById('rating-form');
     const ratingAlert = document.getElementById('rating-alert');
