@@ -7,5 +7,6 @@ router.use('/account', require('./account.api.routes'));
 router.use('/cart', require('./cart.api.routes'));
 router.use('/checkout', require('./checkout.api.routes'));
 router.use('/search', require('./search.api.routes.js'));
+router.use('/reviews', require('./review.api.routes.js'));
 
 module.exports = router;
