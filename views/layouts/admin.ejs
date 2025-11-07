@@ -38,25 +38,25 @@
                 </a>
             </div>
             <nav class="admin-nav">
-                <a href="/admin" class="nav-link active">
+                <a href="/admin" class="nav-link">
                     <i class="fa-solid fa-chart-line"></i> Dashboard
                 </a>
                 <a href="/admin/orders" class="nav-link">
-                    <i class="fa-solid fa-box-archive"></i> Quản lý Đơn hàng
+                    <i class="fa-solid fa-box-archive"></i> Quản lý đơn hàng
                 </a>
                 <a href="/admin/products" class="nav-link">
-                    <i class="fa-solid fa-tag"></i> Quản lý Sản phẩm
+                    <i class="fa-solid fa-tag"></i> Quản lý sản phẩm
                 </a>
                 <a href="/admin/users" class="nav-link">
-                    <i class="fa-solid fa-users"></i> Quản lý Người dùng
+                    <i class="fa-solid fa-users"></i> Quản lý người dùng
                 </a>
                 <a href="/admin/discounts" class="nav-link">
-                    <i class="fa-solid fa-percent"></i> Quản lý Giảm giá
+                    <i class="fa-solid fa-percent"></i> Quản lý giảm giá
                 </a>
             </nav>
             <div class="sidebar-footer">
                 <a href="/homepage" class="nav-link">
-                    <i class="fa-solid fa-arrow-left"></i> Về trang Web
+                    <i class="fa-solid fa-arrow-left"></i> Về trang web
                 </a>
                 <a href="/logout" class="nav-link">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất
@@ -80,5 +80,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/javascripts/admin/admin.js"></script>
+    <% if (body.includes('pages/admin/orders')) { %>
+        <script src="/javascripts/admin/admin-orders.js" defer></script>
+    <% } %>
 </body>
 </html>
