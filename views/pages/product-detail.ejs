@@ -1,4 +1,3 @@
-<!--views/pages/product-detail.ejs  -->
 <section class="product-detail container">
   <nav class="pd-breadcrumb" style="margin-top: 2rem;">
     <a href="/homepage">Home</a> <span>/</span>
@@ -48,7 +47,7 @@
         <% } %>
       </div>
 
-      <div class_id="pd-meta-row" style="margin-top: 8px;">
+      <div class="pd-meta-row" style="margin-top: 8px;">
         <span class="sku">SKU: <span id="pdSku"><%= (product?.variants && product.variants[0]?.sku) || 'N/A' %></span></span>
       </div>
 
@@ -86,10 +85,8 @@
              images: v.images || []
            })));
       %>
-<div class="pd-variants" 
-     data-variants="<%= variantsJson %>"
-     data-product-id="<%= product._id %>">
-             <% if (colors.length) { %>
+      <div class="pd-variants" data-variants="<%= variantsJson %>" data-product-id="<%= product._id %>">
+        <% if (colors.length) { %>
         <div class="variant-group" id="group-color">
           <label class="variant-label">Màu sắc: <strong id="selectedColorText"></strong></label>
           <div class="variant-list">
@@ -117,30 +114,85 @@
       <% } %>
 
       <div class="pd-actions">
-        <button class="btn-add-cart" id="btnAddToCart" disabled>
+        <button class="btn-add-cart" id="btnAddToCart" data-product-id="<%= product._id %>" disabled>
           <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ hàng
         </button>
         <button class="btn-wishlist"><i class="fa-regular fa-heart"></i></button>
       </div>
-
-      <% if (product?.longDesc) { %>
-      <div class="pd-description">
-        <h3>Chi tiết sản phẩm</h3>
-        <p><%= product.longDesc %></p>
-      </div>
-      <% } %>
     </div>
+  </div> 
+
+<div class="pd-full-details">
+    
+    <section id="details-description" class="detail-section">
+      <h3>Mô Tả Chi Tiết</h3>
+      <div class="pd-description">
+        <p><%= product?.longDesc || product?.shortDesc || 'Chưa có mô tả chi tiết.' %></p>
+        </div>
+    </section>
+
+    <section id="details-reviews" class="detail-section">
+      <h3>Đánh Giá Sản Phẩm</h3>
+      
+      <div class="review-layout">
+        <div class="review-form-wrapper">
+          <% if (isAuthenticated) { %>
+            <form id="rating-form" class="review-form-box">
+              <h4>Viết đánh giá của bạn</h4>
+              <div id="rating-alert" class="alert" style="display:none;"></div>
+              <div class="mb-3">
+                <label>1. Chọn số sao (*):</label>
+                <div class="star-rating-input">
+                  <input type="radio" id="star5" name="rating" value="5" required><label for="star5">★</label>
+                  <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+                  <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
+                  <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+                  <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="rating-comment">2. Viết bình luận (Tùy chọn):</label>
+                <textarea id="rating-comment" class="form-control" rows="3"></textarea>
+              </div>
+              <button type="submit" id="btn-submit-rating" class="btn">Gửi đánh giá</button>
+            </form>
+          <% } else { %>
+            <form id="comment-form" class="review-form-box">
+              <h4>Gửi bình luận của bạn</h4>
+              <div id="comment-alert" class="alert" style="display:none;"></div>
+              <div class="mb-3">
+                <label for="comment-name">Tên của bạn (*):</label>
+                <input type="text" id="comment-name" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label for="comment-text">Bình luận (*):</label>
+                <textarea id="comment-text" class="form-control" rows="3" required></textarea>
+              </div>
+              <button type="submit" id="btn-submit-comment" class="btn">Gửi bình luận</button>
+              <div class="alert alert-info mt-3">
+                Bạn phải <a href="/signin?redirect=/products/<%= product.slug %>">đăng nhập</a> để có thể chấm sao (rating).
+              </div>
+            </form>
+          <% } %>
+        </div>
+
+        <div class="review-list-container">
+          <h4 id="review-list-title">Tất cả đánh giá (<span id="review-total-count"><%= product.ratingCount || 0 %></span>)</h4>
+          <div id="review-list">
+            </div>
+          <nav id="review-pagination-container" class="pagination-wrap mt-4" style="border: none; padding: 0;"></nav>
+        </div>
+      </div>
+    </section>
   </div>
-
-
   <% if (related?.length) { %>
   <div class="related">
     <h3 class="mb-3">Sản phẩm liên quan</h3>
     <div class="product-grid">
       <% related.forEach(r => {
-             const img = (r.images && r.images[0]) || 'https://placehold.co/600x600?text=No+Image';
-             const price = (r.basePrice || 0).toLocaleString('vi-VN') + 'đ';
-        %>
+           const img = (r.images && r.images[0]) || 'https://placehold.co/600x600?text=No+Image';
+           const price = (r.basePrice || 0).toLocaleString('vi-VN') + 'đ';
+      %>
       <article class="product-card">
         <a href="/products/<%= r.slug %>" class="thumb">
           <img src="<%= img %>" alt="<%= r.name %>">
@@ -157,3 +209,4 @@
 </section>
 
 <script src="/javascripts/product-detail.js" defer></script>
+<script src="/javascripts/product-review.js" defer></script>
