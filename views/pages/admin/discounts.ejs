@@ -1,0 +1,58 @@
+<div class="card shadow-sm mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 fw-bold text-primary">Danh sách Mã giảm giá</h6>
+        <a href="/admin/discounts/new" class="btn btn-primary">
+            <i class="fas fa-plus fa-sm"></i> Tạo Mã Mới
+        </a>
+    </div>
+    
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Mã (Code)</th>
+                        <th>Giá trị (VND)</th>
+                        <th>Đã dùng / Giới hạn</th>
+                        <th>Ngày tạo</th>
+                        <th>Các Đơn đã áp dụng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (discounts.length === 0) { %>
+                        <tr><td colspan="5" class="text-center">Chưa có mã giảm giá nào.</td></tr>
+                    <% } %>
+                    <% discounts.forEach(d => { %>
+                        <% const isExpired = d.usageCount >= d.usageLimit; %>
+                        <tr class="align-middle <%= isExpired ? 'bg-light text-muted' : '' %>">
+                            <td>
+                                <strong style="font-family: 'Courier New', monospace; font-size: 1.2rem;"><%= d.code %></strong>
+                                <% if (isExpired) { %>
+                                    <span class="badge bg-danger ms-2">Hết lượt</span>
+                                <% } %>
+                            </td>
+                            <td class="text-end fw-bold text-success">
+                                -<%= (d.discountValue || 0).toLocaleString('vi-VN') %>đ
+                            </td>
+                            <td class="text-center">
+                                <strong><%= d.usageCount %> / <%= d.usageLimit %></strong>
+                            </td>
+                            <td><%= new Date(d.createdAt).toLocaleDateString('vi-VN') %></td>
+                            <td>
+                                <% if (d.orderIds && d.orderIds.length > 0) { %>
+                                    <% d.orderIds.forEach(order => { %>
+                                        <a href="/admin/orders/<%= order._id %>" class="badge bg-info text-dark text-decoration-none">
+                                            #<%= order.code %>
+                                        </a>
+                                    <% }) %>
+                                <% } else { %>
+                                    <small>Chưa dùng</small>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
