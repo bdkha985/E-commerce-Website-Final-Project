@@ -102,15 +102,20 @@ req.login(user, (err) => {
         
         // (Chúng ta vẫn gán session phụ cho middleware app.js)
         req.session.fullName = user.fullName;
-        req.session.role = (user.roles || []).includes("admin")
+        const role = (user.roles || []).includes("admin")
             ? "admin"
             : "customer";
+        req.session.role = role;
+        
+        // Quyết định URL chuyển hướng
+        const redirectUrl = (role === 'admin') ? '/admin' : '/homepage';
         req.session.avatarUrl = user.avatarUrl || "";
 
         req.flash("success", "Đăng nhập thành công");
         return res.status(200).json({
             ok: true,
             message: "Đăng nhập thành công",
+            redirectUrl: redirectUrl,
             user: {
                 id: user._id,
                 email: user.email,
