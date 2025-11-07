@@ -12,6 +12,7 @@ const requireLoginPage = require("../middlewares/requireLoginPage");
 const catalog  = require('../controllers/catalog/catalog.controller');
 const cartController = require('../controllers/cart/cart.controller');
 const checkoutController = require('../controllers/checkout/checkout.controller');
+const searchController = require('../controllers/web/search.controller');
 
 // ========== Trang tĩnh / auth ==========
 // router.get("/homepage", (req, res) =>
@@ -87,6 +88,9 @@ router.get("/checkout/vnpay_return", checkoutController.handleVnpayReturn);
 
 // Trang hiển thị kết quả (Thành công/Thất bại)
 router.get("/order/result/:orderCode", checkoutController.getOrderResultPage);
+
+// Search
+// router.get('/search', searchController.getResults);
 
 // ========== CATALOG ==========
 router.get('/c/:slug', catalog.categoryPage);  

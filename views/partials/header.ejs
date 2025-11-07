@@ -1,101 +1,98 @@
 <!-- Header -->
 <header class="fixed-header">
-    <div class="container">
-        <nav class="navbar">
-            <!-- Logo -->
-            <a href="/homepage" class="navbar__logo">
-                <img class="logo" src="/images/K.svg" alt="K Shopping" />
-                <span>K Shopping</span>
-            </a>
+  <div class="container">
+    <nav class="navbar">
+      <!-- Logo -->
+      <a href="/homepage" class="navbar__logo">
+        <img class="logo" src="/images/K.svg" alt="K Shopping" />
+        <span>K Shopping</span>
+      </a>
 
-            <!-- Navigation -->
-            <ul id="pc-nav">
-                <li><a href="/homepage">Home</a></li>
-                <li><a href="/products/all">Products</a></li>
+      <!-- Navigation -->
+      <ul id="pc-nav">
+        <li><a href="/homepage">Home</a></li>
+        <li><a href="/products/all">Products</a></li>
 
-                <li class="dropdown">
-                    <a href="#!">Categories</a>
-                    <ul class="dropdown-menu">
-                        <% (navCategories || []).forEach(c => { %>
-                        <li><a href="/c/<%= c.slug %>"><%= c.name %></a></li>
-                        <% }) %>
-                    </ul>
-                </li>
-                <li><a href="/blog">Blog</a></li>
-                <li><a href="/contact">Contact us</a></li>
-                <li><a href="/about">About us</a></li>
-            </ul>
+        <li class="dropdown">
+          <a href="#!">Categories</a>
+          <ul class="dropdown-menu">
+            <% (navCategories || []).forEach(c => { %>
+            <li><a href="/c/<%= c.slug %>"><%= c.name %></a></li>
+            <% }) %>
+          </ul>
+        </li>
+        <li><a href="/blog">Blog</a></li>
+        <li><a href="/contact">Contact us</a></li>
+        <li><a href="/about">About us</a></li>
+      </ul>
 
-            <!-- Search bar -->
-            <div class="searchbar">
-                <input type="text" placeholder="Tìm kiếm sản phẩm..." />
+      <!-- Search bar -->
+      <form class="searchbar" id="headerSearchForm" method="GET" action="/search">
+                <input type="text" name="q" id="headerSearchInput" placeholder="Tìm kiếm sản phẩm..." autocomplete="off" />
                 <button type="submit"><i class="fa fa-search"></i></button>
-            </div>
+                
+                <div id="search-suggestions"></div> 
+            </form>
 
-            <div class="actions">
-                <!-- Cart hover -->
-                <div class="cart-hover">
-                    <a href="/cart" class="cart-btn" aria-label="Cart">
-                        <i class="fa-solid fa-cart-shopping"></i>
-                        <% if (locals.cartCount && cartCount > 0) { %>
-                        <span class="cart-badge"><%= cartCount %></span>
-                        <% } else { 
-                            %> <span class="cart-badge">0</span> %>
-                        <% } %>
-                    </a>
+      <div class="actions">
+        <!-- Cart hover -->
+        <div class="cart-hover">
+          <a href="/cart" class="cart-btn" aria-label="Cart">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <% if (locals.cartCount && cartCount > 0) { %>
+            <span class="cart-badge"><%= cartCount %></span>
+            <% } else { %>
+            <span class="cart-badge">0</span>
+            <% } %>
+          </a>
 
-                    <!-- Mini cart panel -->
-                    <div class="mini-cart">
-                        <div class="mini-cart__title">🛍️ Giỏ Hàng Của Bạn</div>
-                        <div class="mini-cart__list">
-                            <% if (locals.cartItems && cartItems.length > 0) { %> 
-                            <% cartItems.slice(0, 5).forEach(item => { %>
-                            <div class="mini-cart__item">
-                                <img
-                                    src="<%= item.image || 'https://placehold.co/80x80?text=No+Img' %>"
-                                    alt="<%= item.name %>" />
-                                <div class="mini-cart__info">
-                                    <a
-                                        class="mini-cart__name"
-                                        href="/products/<%= item.slug %>">
-                                        <%= item.name %>
-                                    </a>
-                                    <div class="mini-cart__meta">
-                                        <span>x<%= item.qty %></span>
-                                        <span class="price"><%= (item.price || 0).toLocaleString('vi-VN') %>đ</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <% }) %> <% } else { %>
-                            <p
-                                style="
+          <!-- Mini cart panel -->
+          <div class="mini-cart">
+            <div class="mini-cart__title">🛍️ Giỏ Hàng Của Bạn</div>
+            <div class="mini-cart__list">
+              <% if (locals.cartItems && cartItems.length > 0) { %>
+              <% cartItems.slice(0, 5).forEach(item => { %>
+              <div class="mini-cart__item">
+                <img src="<%= item.image || 'https://placehold.co/80x80?text=No+Img' %>" alt="<%= item.name %>" />
+                <div class="mini-cart__info">
+                  <a class="mini-cart__name" href="/products/<%= item.slug %>">
+                    <%= item.name %>
+                  </a>
+                  <div class="mini-cart__meta">
+                    <span>x<%= item.qty %></span>
+                    <span class="price"><%= (item.price || 0).toLocaleString('vi-VN') %>đ</span>
+                  </div>
+                </div>
+              </div>
+              <% }) %> <% } else { %>
+              <p style="
                                     padding: 15px;
                                     text-align: center;
                                     color: #6c757d;
                                 ">
-                                Giỏ hàng của bạn đang trống.
-                            </p>
-                            <% } %>
-                        </div>
-                        <div class="mini-cart__footer">
-                            <span><%= (locals.cartItems && cartItems.length) ? cartItems.length : 0 %> sản phẩm</span>
-                            <a class="btn btn--view-cart" href="/cart">Xem Giỏ Hàng</a>
-                        </div>
-                        <span class="mini-cart__arrow"></span>
-                    </div>
-                </div>
-
-                <% if (currentUser && currentUser.fullName) { %>
-                <a href="/account" class="me-3 user-name">
-                    Xin chào, <strong><%= currentUser.fullName %></strong>
-                </a>
-                <a href="/logout" class="ic__logout">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                </a>
-                <% } else { %>
-                <a href="/signin" class="btn action-link">Sign in</a>
-                <% } %>
+                Giỏ hàng của bạn đang trống.
+              </p>
+              <% } %>
             </div>
-        </nav>
-    </div>
+            <div class="mini-cart__footer">
+              <span><%= (locals.cartItems && cartItems.length) ? cartItems.length : 0 %> sản phẩm</span>
+              <a class="btn btn--view-cart" href="/cart">Xem Giỏ Hàng</a>
+            </div>
+            <span class="mini-cart__arrow"></span>
+          </div>
+        </div>
+
+        <% if (currentUser && currentUser.fullName) { %>
+        <a href="/account" class="me-3 user-name">
+          Xin chào, <strong><%= currentUser.fullName %></strong>
+        </a>
+        <a href="/logout" class="ic__logout">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </a>
+        <% } else { %>
+        <a href="/signin" class="btn action-link">Sign in</a>
+        <% } %>
+      </div>
+    </nav>
+  </div>
 </header>

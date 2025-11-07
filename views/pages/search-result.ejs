@@ -1,0 +1,40 @@
+<section class="catalog container">
+  <div class="cat-head">
+    <h1 class="cat-title">Kết quả tìm kiếm cho: "<%= q %>"</h1>
+    <nav class="cat-breadcrumb">
+      <a href="/homepage">Home</a> <span>/</span>
+      <span>Tìm kiếm</span>
+    </nav>
+  </div>
+
+  <div class="cat-main" style="grid-column: 1 / -1;"> 
+    <div class="products-header" style="background: #f9fafb; margin-bottom: 24px;">
+      <div class="result-count">
+        Tìm thấy <strong><%= pagination.total %></strong> sản phẩm.
+      </div>
+    </div>
+
+    <div class="p-grid">
+      <% if (!products.length) { %>
+        <div class="alert alert-info" style="grid-column: 1 / -1;">
+            Không tìm thấy sản phẩm nào phù hợp với từ khóa "<%= q %>".
+        </div>
+      <% } %>
+      <% products.forEach(p => { %>
+        <%- include('./catalog/_product-card', { p }) %>
+      <% }) %>
+    </div>
+
+    <% if (pagination.totalPages > 1) { %>
+      <nav class="pagination-wrap">
+        <ul class="pagination">
+          <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+            <li class="page-item <%= (i === pagination.page ? 'active' : '') %>">
+              <a class="page-link" href="?<%= new URLSearchParams({ q, page: i }).toString() %>"><%= i %></a>
+            </li>
+          <% } %>
+        </ul>
+      </nav>
+    <% } %>
+  </div>
+</section>
