@@ -90,7 +90,7 @@ router.get("/checkout/vnpay_return", checkoutController.handleVnpayReturn);
 router.get("/order/result/:orderCode", checkoutController.getOrderResultPage);
 
 // Search
-// router.get('/search', searchController.getResults);
+router.get('/search', searchController.getResults);
 
 // ========== CATALOG ==========
 router.get('/c/:slug', catalog.categoryPage);  
