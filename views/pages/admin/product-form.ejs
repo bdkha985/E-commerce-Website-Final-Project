@@ -1,0 +1,146 @@
+<style>
+    /* CSS tạm thời cho việc quản lý variant */
+    #variants-container .variant-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto;
+        gap: 10px;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    #variants-container .variant-row:first-child {
+        font-weight: bold;
+        padding-top: 0;
+    }
+</style>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header py-3">
+        <a href="/admin/products" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+    
+    <div class="card-body">
+        <form action="/admin/products/save" method="POST">
+            <% if (isEditing) { %>
+                <input type="hidden" name="id" value="<%= product._id %>">
+            <% } %>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Tên Sản phẩm (*)</label>
+                        <input type="text" class="form-control" id="name" name="name" value="<%= product?.name || '' %>" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="brandId" class="form-label">Thương hiệu (*)</label>
+                        <select class="form-select" id="brandId" name="brandId" required>
+                            <option value="">-- Chọn thương hiệu --</option>
+                            <% brands.forEach(brand => { %>
+                                <option value="<%= brand._id %>" <%= (product?.brandId?.toString() === brand._id.toString() ? 'selected' : '') %>>
+                                    <%= brand.name %>
+                                </option>
+                            <% }) %>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="categoryIds" class="form-label">Danh mục (*)</label>
+                <select class="form-select" id="categoryIds" name="categoryIds" multiple required size="5">
+                    <% const prodCats = (product?.categoryIds || []).map(c => c.toString()); %>
+                    <% categories.forEach(cat => { %>
+                        <option value="<%= cat._id %>" <%= (prodCats.includes(cat._id.toString()) ? 'selected' : '') %>>
+                            <%= cat.name %>
+                        </option>
+                    <% }) %>
+                </select>
+                <small class="form-text">Giữ Ctrl (hoặc Cmd) để chọn nhiều danh mục.</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="shortDesc" class="form-label">Mô tả ngắn (*)</label>
+                <textarea class="form-control" id="shortDesc" name="shortDesc" rows="3" required><%= product?.shortDesc || '' %></textarea>
+            </div>
+            
+            <div class="mb-3">
+                <label for="longDesc" class="form-label">Mô tả chi tiết</label>
+                <textarea class="form-control" id="longDesc" name="longDesc" rows="6"><%= product?.longDesc || '' %></textarea>
+            </div>
+
+            <hr class="my-4">
+
+            <h5>Biến thể Sản phẩm</h5>
+            <p class="text-muted">Định nghĩa các phiên bản khác nhau của sản phẩm (SKU, màu sắc, size, giá, kho).</p>
+
+            <div id="variants-container" style="max-height: 400px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 8px;">
+                <div class="variant-row d-none d-md-grid">
+                    <div>SKU (*)</div>
+                    <div>Màu sắc</div>
+                    <div>Size</div>
+                    <div>Giá (*)</div>
+                    <div>Tồn kho (*)</div>
+                    <div>Xóa</div>
+                </div>
+
+                <% if (product?.variants?.length) { %>
+                    <% product.variants.forEach((v, i) => { %>
+                        <div class="variant-row">
+                            <input type="text" name="sku[]" class="form-control" placeholder="SKU" value="<%= v.sku %>" required>
+                            <input type="text" name="color[]" class="form-control" placeholder="Màu" value="<%= v.color || '' %>">
+                            <input type="text" name="size[]" class="form-control" placeholder="Size" value="<%= v.size || '' %>">
+                            <input type="number" name="price[]" class="form-control" placeholder="Giá" value="<%= v.price || 0 %>" required>
+                            <input type="number" name="stock[]" class="form-control" placeholder="Kho" value="<%= v.stock || 0 %>" required>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeVariant(this)">Xóa</button>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+
+            <button type="button" id="btn-add-variant" class="btn btn-sm btn-secondary mt-2">
+                <i class="fas fa-plus"></i> Thêm biến thể
+            </button>
+
+            <hr class="my-4">
+
+            <div class="mb-3" style="max-width: 300px;">
+                <label for="basePrice" class="form-label">Giá Cơ bản (Base Price)</label>
+                <input type="number" class="form-control" id="basePrice" name="basePrice" value="<%= product?.basePrice || 0 %>">
+                <small class="form-text">Dùng khi sản phẩm không có biến thể.</small>
+            </div>
+            
+            <hr class="my-4">
+            
+            <button type="submit" class="btn btn-primary btn-lg">
+                <%= isEditing ? 'Cập nhật Sản phẩm' : 'Lưu Sản phẩm Mới' %>
+            </button>
+        </form>
+    </div>
+</div>
+
+<template id="variant-template">
+    <div class="variant-row">
+        <input type="text" name="sku[]" class="form-control" placeholder="SKU duy nhất" required>
+        <input type="text" name="color[]" class="form-control" placeholder="Màu (vd: Đen)">
+        <input type="text" name="size[]" class="form-control" placeholder="Size (vd: M)">
+        <input type="number" name="price[]" class="form-control" placeholder="Giá (VND)" required>
+        <input type="number" name="stock[]" class="form-control" placeholder="Số lượng" required>
+        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeVariant(this)">Xóa</button>
+    </div>
+</template>
+
+<script>
+    document.getElementById('btn-add-variant').addEventListener('click', () => {
+        const template = document.getElementById('variant-template');
+        const container = document.getElementById('variants-container');
+        const clone = template.content.cloneNode(true);
+        container.appendChild(clone);
+    });
+
+    function removeVariant(button) {
+        button.closest('.variant-row').remove();
+    }
+</script>
