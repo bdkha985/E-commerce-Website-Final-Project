@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const ctrl = require('../../controllers/admin/admin.product.controller');
+const upload = require('../../middlewares/upload');
 
 // GET /admin/products (Danh sách sản phẩm)
 router.get('/', ctrl.listProducts);
@@ -14,7 +15,7 @@ router.get('/new', ctrl.getProductForm);
 router.get('/:id', ctrl.getProductForm);
 
 // POST /admin/products/save (Xử lý lưu - cả thêm mới và cập nhật)
-router.post('/save', ctrl.saveProduct);
+router.post('/save', upload.array('images', 5), ctrl.saveProduct);
 
 // POST /admin/products/:id/delete (Xử lý xóa)
 router.post('/:id/delete', ctrl.deleteProduct);

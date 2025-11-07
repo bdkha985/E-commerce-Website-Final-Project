@@ -126,6 +126,17 @@ const saveProduct = async (req, res) => {
         }
     }
 
+    let imagePaths = [];
+    if (req.files && req.files.length > 0) {
+        // req.files là một mảng các file đã upload
+        // Chúng ta cần lấy 'path' và chuẩn hóa nó
+        imagePaths = req.files.map(file => {
+            // file.path trả về vd: "public/uploads/products/images-12345.jpg"
+            // Chúng ta lưu "uploads/products/images-12345.jpg"
+            return file.path.replace('public/', '');
+        });
+    }
+
     // Dữ liệu chung
     const payload = {
         name,
@@ -137,11 +148,16 @@ const saveProduct = async (req, res) => {
         basePrice: parseFloat(basePrice) || 0,
         variants,
         // (Chúng ta sẽ xử lý upload ảnh chính sau)
-        images: [] 
+        images: imagePaths,
     };
 
     try {
         if (id) {
+            if (imagePaths.length === 0) {
+                const oldProduct = await Product.findById(id).select('images').lean();
+                payload.images = oldProduct.images || [];
+            }
+            
             // Cập nhật
             await Product.findByIdAndUpdate(id, payload);
             req.flash('success', 'Cập nhật sản phẩm thành công.');
