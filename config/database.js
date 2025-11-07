@@ -1,4 +1,3 @@
-//config/database.js
 
 const mongoose = require("mongoose");
 
