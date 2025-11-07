@@ -1,0 +1,30 @@
+<div class="card shadow-sm mb-4" style="max-width: 700px;">
+    <div class="card-header py-3">
+        <a href="/admin/users" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại Danh sách
+        </a>
+    </div>
+    
+    <div class="card-body">
+        <form action="/admin/users/<%= user._id %>/save" method="POST">
+            <h5 class="mb-3">Email (Không thể thay đổi):</h5>
+            <p><strong><%= user.email %></strong></p>
+            
+            <hr class="my-3">
+
+            <div class="mb-3">
+                <label for="fullName" class="form-label">Họ tên (*)</label>
+                <input type="text" class="form-control" id="fullName" name="fullName" value="<%= user.fullName || '' %>" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="phone" class="form-label">Số điện thoại</label>
+                <input type="tel" class="form-control" id="phone" name="phone" value="<%= user.phone || '' %>">
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-lg mt-3">
+                Lưu Thay đổi
+            </button>
+        </form>
+    </div>
+</div>

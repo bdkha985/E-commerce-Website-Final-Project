@@ -38,6 +38,11 @@ const signin = async (req, res, next) => {
             return res.redirect("/signin");
         }
 
+        if (user.isBanned) {
+            req.flash("error", "Tài khoản của bạn đã bị khóa.");
+            return res.redirect("/signin");
+        }
+        
         req.session.userId = user._id.toString();
         req.session.fullName = user.fullName;
         req.session.role = (user.roles || []).includes("admin")

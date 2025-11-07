@@ -104,6 +104,11 @@ const UserSchema = new Schema(
             type: Boolean,
             default: false
         },
+        isBanned: {
+            type: Boolean,
+            default: false,
+            index: true,
+        },
         cart: {
             type: [CartItemSchema],
             default: []
