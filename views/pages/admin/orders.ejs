@@ -1,0 +1,92 @@
+<div class="card shadow-sm mb-4">
+  <form class="card-header py-3" id="order-filter-form">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+
+      <div class="input-group" style="max-width: 400px;">
+        <input type="text" name="q" id="order-search-input" class="form-control" placeholder="Tìm mã đơn, email, tên KH..." value="<%= q %>">
+        <button class="btn btn-primary" type="submit">
+          <i class="fas fa-search fa-sm"></i>
+        </button>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <span class="text-nowrap fw-bold text-primary" id="filter-title"><%= filterTitle %></span>
+        <div class="dropdown no-arrow">
+          <a class="dropdown-toggle btn btn-sm btn-outline-secondary" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="fas fa-filter fa-sm fa-fw"></i> Lọc theo
+          </a>
+          <div class="dropdown-menu dropdown-menu-end shadow">
+            <a class="dropdown-item filter-link" href="#" data-filter="all">Tất cả</a>
+            <a class="dropdown-item filter-link" href="#" data-filter="today">Hôm nay</a>
+            <a class="dropdown-item filter-link" href="#" data-filter="yesterday">Hôm qua</a>
+            <a class="dropdown-item filter-link" href="#" data-filter="this_week">Tuần này</a>
+            <a class="dropdown-item filter-link" href="#" data-filter="this_month">Tháng này</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+        <thead>
+          <tr>
+            <th>Mã Đơn</th>
+            <th>Thời gian</th>
+            <th>Khách hàng</th>
+            <th>Tổng tiền</th>
+            <th>Thanh toán</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="orders-table-body">
+          <% if (orders.length === 0) { %>
+          <tr>
+            <td colspan="7" class="text-center">Không tìm thấy đơn hàng nào.</td>
+          </tr>
+          <% } %>
+          <% orders.forEach(order => { %>
+          <tr>
+            <td><strong><%= order.code %></strong></td>
+            <td><%= new Date(order.createdAt).toLocaleString('vi-VN') %></td>
+            <td>
+              <%= order.shippingAddress.fullName %><br>
+              <small><%= order.email %></small>
+            </td>
+            <td class="text-end"><strong><%= (order.total || 0).toLocaleString('vi-VN') %>đ</strong></td>
+            <td class="text-center">
+              <% if (order.paymentStatus === 'Paid') { %>
+              <span class="badge bg-success">Đã thanh toán</span>
+              <% } else { %>
+              <span class="badge bg-warning text-dark"><%= order.paymentMethod %></span>
+              <% } %>
+            </td>
+            <td class="text-center">
+              <span class="badge bg-secondary"><%= order.status %></span>
+            </td>
+            <td class="text-center">
+              <a href="/admin/orders/<%= order._id %>" class="btn btn-sm btn-info" title="Xem chi tiết">
+                <i class="fas fa-eye"></i>
+              </a>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <nav class="pagination-wrap mt-4 d-flex justify-content-center" id="orders-pagination">
+      <% if (pagination.totalPages > 1) { %>
+      <ul class="pagination">
+        <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+        <li class="page-item <%= (i === pagination.page ? 'active' : '') %>">
+          <a class="page-link" href="#"><%= i %></a>
+        </li>
+        <% } %>
+      </ul>
+      <% } %>
+    </nav>
+  </div>
+</div>

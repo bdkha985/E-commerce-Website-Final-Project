@@ -7,7 +7,7 @@ const dashboardController = require('../../controllers/admin/dashboard.controlle
 router.get('/', dashboardController.getDashboard);
 
 // (Sau này chúng ta sẽ thêm các route khác vào đây)
-// router.use('/orders', require('./orders.routes'));
+router.use('/orders', require('./orders.routes'));
 // router.use('/products', require('./products.routes'));
 // router.use('/users', require('./users.routes'));
 // router.use('/discounts', require('./discounts.routes'));
