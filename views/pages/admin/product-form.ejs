@@ -21,7 +21,7 @@
     </div>
     
     <div class="card-body">
-        <form action="/admin/products/save" method="POST">
+        <form action="/admin/products/save" method="POST" enctype="multipart/form-data">
             <% if (isEditing) { %>
                 <input type="hidden" name="id" value="<%= product._id %>">
             <% } %>
@@ -71,10 +71,25 @@
                 <textarea class="form-control" id="longDesc" name="longDesc" rows="6"><%= product?.longDesc || '' %></textarea>
             </div>
 
+            <div class="mb-3">
+                <label for="images" class="form-label">Ảnh chính (Tối thiểu 3 ảnh)</label>
+                <input type="file" class="form-control" id="images" name="images" multiple accept="image/*">
+                
+                <% if (isEditing && product.images && product.images.length) { %>
+                    <div class="mt-2">
+                        <small>Ảnh hiện tại (Chọn ảnh mới sẽ thay thế toàn bộ):</small>
+                        <div class="d-flex gap-2" style="flex-wrap: wrap;">
+                        <% product.images.forEach(img => { %>
+                            <img src="/<%= img.replace('public/', '') %>" alt="preview" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;">
+                        <% }) %>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+
             <hr class="my-4">
 
-            <h5>Biến thể Sản phẩm</h5>
-            <p class="text-muted">Định nghĩa các phiên bản khác nhau của sản phẩm (SKU, màu sắc, size, giá, kho).</p>
+            <h5>Biến thể sản phẩm</h5>
 
             <div id="variants-container" style="max-height: 400px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 8px;">
                 <div class="variant-row d-none d-md-grid">
