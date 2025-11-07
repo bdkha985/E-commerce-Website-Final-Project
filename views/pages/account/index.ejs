@@ -1,238 +1,213 @@
 <section class="account container">
-    <div class="account-grid">
-        <!-- Sidebar -->
-        <aside class="account-aside">
-            <div class="account-user">
-                <div class="avatar" id="accAvatar">
-                    <%= (currentUser?.fullName||'U')[0] %>
-                </div>
-                <div>
-                    <div class="name" id="accName">
-                        <%= currentUser?.fullName %>
-                    </div>
-                    <div class="email" id="accEmail">
-                        <%= currentUser?.email || '' %>
-                    </div>
-                </div>
-            </div>
-
-            <nav class="account-menu">
-                <button class="active" data-tab="profile">
-                    Thông tin cá nhân
-                </button>
-                <button data-tab="addresses">Địa chỉ nhận hàng</button>
-                <button data-tab="orders">Đơn hàng của tôi</button>
-                <button data-tab="loyalty">Điểm thưởng</button>
-                <button data-tab="security">Bảo mật</button>
-            </nav>
-        </aside>
-
-        <!-- Main content -->
-        <div class="account-content">
-            <!-- Profile -->
-            <div class="tab-panel" id="tab-profile">
-                <h3>Thông tin cá nhân</h3>
-                <div id="profileAlert" class="alert d-none"></div>
-                <form id="formProfile" class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Họ tên</label>
-                        <input
-                            name="fullName"
-                            type="text"
-                            class="form-control"
-                            required
-                            minlength="2" />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Số điện thoại</label>
-                        <input
-                            name="phone"
-                            type="text"
-                            class="form-control"
-                            placeholder="" />
-                    </div>
-                    <div class="col-12">
-                        <button
-                            type="button"
-                            id="btnSaveProfile"
-                            class="btn btn-primary">
-                            Lưu thay đổi
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Addresses -->
-            <div class="tab-panel d-none" id="tab-addresses">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h3>Địa chỉ nhận hàng</h3>
-                    <button class="btn btn-outline-dark" id="btnAddAddress">
-                        + Thêm địa chỉ
-                    </button>
-                </div>
-                <div id="addrAlert" class="alert d-none"></div>
-                <div id="addrList" class="addr-list"></div>
-            </div>
-
-            <!-- Orders (stub) -->
-            <div class="tab-panel d-none" id="tab-orders">
-                <div id="order-list-view">
-                    <h3 class="d-flex justify-content-between align-items-center">
-                        Lịch sử đơn hàng
-                        <button id="btn-refresh-orders" class="btn btn-sm btn-outline-secondary">
-                            <i class="fa-solid fa-arrows-rotate" style="color: #ffffff;"></i>
-                        </button>
-                    </h3>
-                    <div id="order-list-container">
-                        <div class="loading-overlay" style="display: flex;">
-                             <div class="spinner"></div>
-                        </div>
-                    </div>
-                    <div id="order-pagination-container" class="pagination-wrap mt-4"></div>
-                </div>
-
-                <div id="order-detail-view" class="d-none">
-                    <p>
-                        <a href="#" id="btn-back-to-list" class="btn btn-sm btn-outline-dark">
-                            <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách
-                        </a>
-                    </p>
-                    <div id="order-detail-container">
-                        </div>
-                </div>
-            </div>
-
-            <!-- Loyalty -->
-            <div class="tab-panel d-none" id="tab-loyalty">
-                <h3>Điểm thưởng</h3>
-                <div id="loyaltyBox">Đang tải...</div>
-            </div>
-
-            <!-- Security -->
-            <div class="tab-panel d-none" id="tab-security">
-                <h3>Đổi mật khẩu</h3>
-                <div id="passAlert" class="alert d-none"></div>
-                <form id="formChangePass" class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label">Mật khẩu hiện tại</label>
-                        <input
-                            name="currentPassword"
-                            type="password"
-                            class="form-control"
-                            required
-                            minlength="6" />
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Mật khẩu mới</label>
-                        <input
-                            name="newPassword"
-                            type="password"
-                            class="form-control"
-                            required
-                            minlength="6" />
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Xác nhận</label>
-                        <input
-                            name="confirmPassword"
-                            type="password"
-                            class="form-control"
-                            required
-                            minlength="6" />
-                    </div>
-                    <div class="col-12">
-                        <button
-                            type="button"
-                            id="btnChangePass"
-                            class="btn btn-primary">
-                            Đổi mật khẩu
-                        </button>
-                    </div>
-                </form>
-            </div>
+  <div class="account-grid">
+    <!-- Sidebar -->
+    <aside class="account-aside">
+      <div class="account-user">
+        <div class="avatar" id="accAvatar">
+          <%= (currentUser?.fullName||'U')[0] %>
         </div>
-    </div>
-
-    <!-- Modal Add/Edit Address (DÙNG CHUNG) -->
-    <div class="modal fade" id="modalAddress" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="modalAddressTitle">
-                        Địa chỉ
-                    </h5>
-                    <button class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="addrMode" value="add" />
-                    <input type="hidden" id="addrIdx" value="-1" />
-
-                    <form id="formAddress" class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Nhãn</label>
-                            <input
-                                name="label"
-                                class="form-control"
-                                placeholder="Nhà / Công ty"
-                                required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Số nhà / Đường</label>
-                            <input
-                                name="street"
-                                class="form-control"
-                                required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Phường / Xã</label>
-                            <input name="ward" class="form-control" required />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Tỉnh / Thành phố</label>
-                            <input name="city" class="form-control" required />
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button
-                        class="btn btn-outline-secondary"
-                        data-bs-dismiss="modal">
-                        Hủy
-                    </button>
-                    <!-- Nút lưu DUY NHẤT cho cả add & edit -->
-                    <button id="btnSaveAddress" class="btn btn-primary">
-                        Lưu
-                    </button>
-                </div>
-            </div>
+        <div>
+          <div class="name" id="accName">
+            <%= currentUser?.fullName %>
+          </div>
+          <div class="email" id="accEmail">
+            <%= currentUser?.email || '' %>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- Modal Confirm Delete -->
-    <div class="modal fade" id="modalConfirmDelete" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Xóa địa chỉ</h5>
-                    <button class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    Bạn có chắc chắn muốn xóa địa chỉ này không?
-                    <input type="hidden" id="delIdx" value="-1" />
-                </div>
-                <div class="modal-footer">
-                    <button
-                        class="btn btn-outline-secondary"
-                        data-bs-dismiss="modal">
-                        Hủy
-                    </button>
-                    <button id="btnConfirmDelete" class="btn btn-danger">
-                        Xóa
-                    </button>
-                </div>
+      <nav class="account-menu">
+        <button class="active" data-tab="profile">
+          Thông tin cá nhân
+        </button>
+        <button data-tab="addresses">Địa chỉ nhận hàng</button>
+        <button data-tab="orders">Đơn hàng của tôi</button>
+        <button data-tab="loyalty">Điểm thưởng</button>
+        <button data-tab="security">Bảo mật</button>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <div class="account-content">
+      <!-- Profile -->
+      <div class="tab-panel" id="tab-profile">
+
+        <div class="row justify-content-between">
+          <div class="col-4">
+            <h3>Thông tin cá nhân</h3>
+          </div>
+          <div class="col-4">
+            <% if (currentUser && currentUser.roles && currentUser.roles.includes('admin')) { %>
+            <div class="mb-3">
+              <a href="/admin" class="btn btn-primary" style="background: #111827; border-color: #111827;">
+                <i class="fa-solid fa-shield-halved"></i>
+                Quay về trang Admin
+              </a>
             </div>
+            <% } %>
+          </div>
         </div>
+
+        <div id="profileAlert" class="alert d-none"></div>
+        <form id="formProfile" class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Họ tên</label>
+            <input name="fullName" type="text" class="form-control" required minlength="2" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Số điện thoại</label>
+            <input name="phone" type="text" class="form-control" placeholder="" />
+          </div>
+          <div class="col-12">
+            <button type="button" id="btnSaveProfile" class="btn btn-primary">
+              Lưu thay đổi
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Addresses -->
+      <div class="tab-panel d-none" id="tab-addresses">
+        <div class="d-flex justify-content-between align-items-center">
+          <h3>Địa chỉ nhận hàng</h3>
+          <button class="btn btn-outline-dark" id="btnAddAddress">
+            + Thêm địa chỉ
+          </button>
+        </div>
+        <div id="addrAlert" class="alert d-none"></div>
+        <div id="addrList" class="addr-list"></div>
+      </div>
+
+      <!-- Orders (stub) -->
+      <div class="tab-panel d-none" id="tab-orders">
+        <div id="order-list-view">
+          <h3 class="d-flex justify-content-between align-items-center">
+            Lịch sử đơn hàng
+            <button id="btn-refresh-orders" class="btn btn-sm btn-outline-secondary">
+              <i class="fa-solid fa-arrows-rotate" style="color: #ffffff;"></i>
+            </button>
+          </h3>
+          <div id="order-list-container">
+            <div class="loading-overlay" style="display: flex;">
+              <div class="spinner"></div>
+            </div>
+          </div>
+          <div id="order-pagination-container" class="pagination-wrap mt-4"></div>
+        </div>
+
+        <div id="order-detail-view" class="d-none">
+          <p>
+            <a href="#" id="btn-back-to-list" class="btn btn-sm btn-outline-dark">
+              <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách
+            </a>
+          </p>
+          <div id="order-detail-container">
+          </div>
+        </div>
+      </div>
+
+      <!-- Loyalty -->
+      <div class="tab-panel d-none" id="tab-loyalty">
+        <h3>Điểm thưởng</h3>
+        <div id="loyaltyBox">Đang tải...</div>
+      </div>
+
+      <!-- Security -->
+      <div class="tab-panel d-none" id="tab-security">
+        <h3>Đổi mật khẩu</h3>
+        <div id="passAlert" class="alert d-none"></div>
+        <form id="formChangePass" class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Mật khẩu hiện tại</label>
+            <input name="currentPassword" type="password" class="form-control" required minlength="6" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Mật khẩu mới</label>
+            <input name="newPassword" type="password" class="form-control" required minlength="6" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Xác nhận</label>
+            <input name="confirmPassword" type="password" class="form-control" required minlength="6" />
+          </div>
+          <div class="col-12">
+            <button type="button" id="btnChangePass" class="btn btn-primary">
+              Đổi mật khẩu
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
+
+  <!-- Modal Add/Edit Address (DÙNG CHUNG) -->
+  <div class="modal fade" id="modalAddress" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="modalAddressTitle">
+            Địa chỉ
+          </h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="addrMode" value="add" />
+          <input type="hidden" id="addrIdx" value="-1" />
+
+          <form id="formAddress" class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Nhãn</label>
+              <input name="label" class="form-control" placeholder="Nhà / Công ty" required />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Số nhà / Đường</label>
+              <input name="street" class="form-control" required />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Phường / Xã</label>
+              <input name="ward" class="form-control" required />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Tỉnh / Thành phố</label>
+              <input name="city" class="form-control" required />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Hủy
+          </button>
+          <!-- Nút lưu DUY NHẤT cho cả add & edit -->
+          <button id="btnSaveAddress" class="btn btn-primary">
+            Lưu
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Confirm Delete -->
+  <div class="modal fade" id="modalConfirmDelete" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">Xóa địa chỉ</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          Bạn có chắc chắn muốn xóa địa chỉ này không?
+          <input type="hidden" id="delIdx" value="-1" />
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Hủy
+          </button>
+          <button id="btnConfirmDelete" class="btn btn-danger">
+            Xóa
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <script src="/javascripts/account.js" defer></script>

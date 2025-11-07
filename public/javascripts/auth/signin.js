@@ -50,7 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (data.forcePasswordChange) {
           window.location.href = '/force-change-password';
       } else {
-          window.location.href = '/homepage';
+          const redirectUrl = data.redirectUrl || '/homepage';
+          window.location.href = redirectUrl;
       }    
     } catch (err) {
       console.error('[signin] fetch error:', err);

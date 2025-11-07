@@ -28,6 +28,8 @@ const Category = require('./models/category.model');
 const webRoutes = require("./routes/web.routes.js");
 const socialAuthRoutes = require("./routes/auth.social.routes.js");
 const apiRoutes = require("./routes/api");
+const requireAdmin = require('./middlewares/requireAdmin');
+const adminRoutes = require('./routes/admin/index');
 
 //Passport cấu hình
 require("./config/passport");
@@ -123,6 +125,7 @@ configViewEngine(app);
 app.use('/api', apiRoutes);
 app.use("/", socialAuthRoutes);
 app.use("/", webRoutes);
+app.use('/admin', requireAdmin, adminRoutes);
 
 // ================ DATABASE + SERVER ==================
 connectDB(process.env.MONGODB_URI)

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title || 'Admin Dashboard' %> - K Shopping</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap&subset=vietnamese" rel="stylesheet" />
+    <link rel="stylesheet" href="/stylesheets/admin.css" />
+</head>
+<body>
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080">
+        <% if (flashSuccess && flashSuccess.length) { %>
+            <div class="toast show align-items-center text-bg-success border-0" role="alert" aria-live="assertive">
+                <div class="d-flex">
+                    <div class="toast-body"><%= flashSuccess[0] %></div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        <% } %>
+        <% if (flashError && flashError.length) { %>
+            <div class="toast show align-items-center text-bg-danger border-0" role="alert" aria-live="assertive">
+                <div class="d-flex">
+                    <div class="toast-body"><%= flashError[0] %></div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        <% } %>
+    </div>
+
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <a href="/admin" class="admin-logo">
+                    <img src="/images/K.svg" alt="K" />
+                    <span>K Shopping Admin</span>
+                </a>
+            </div>
+            <nav class="admin-nav">
+                <a href="/admin" class="nav-link active">
+                    <i class="fa-solid fa-chart-line"></i> Dashboard
+                </a>
+                <a href="/admin/orders" class="nav-link">
+                    <i class="fa-solid fa-box-archive"></i> Quản lý Đơn hàng
+                </a>
+                <a href="/admin/products" class="nav-link">
+                    <i class="fa-solid fa-tag"></i> Quản lý Sản phẩm
+                </a>
+                <a href="/admin/users" class="nav-link">
+                    <i class="fa-solid fa-users"></i> Quản lý Người dùng
+                </a>
+                <a href="/admin/discounts" class="nav-link">
+                    <i class="fa-solid fa-percent"></i> Quản lý Giảm giá
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="/homepage" class="nav-link">
+                    <i class="fa-solid fa-arrow-left"></i> Về trang Web
+                </a>
+                <a href="/logout" class="nav-link">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất
+                </a>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h2><%= title %></h2>
+                <% if (currentUser) { %>
+                    <div class="admin-user">
+                        Xin chào, <strong><%= currentUser.fullName %></strong>
+                    </div>
+                <% } %>
+            </header>
+            <div class="admin-content">
+                <%- include('../' + body) %>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
