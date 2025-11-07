@@ -1,0 +1,85 @@
+<div class="card shadow-sm mb-4">
+  <form class="card-header py-3" id="user-filter-form">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <h6 class="m-0 fw-bold text-primary">Danh sách Người dùng (Customers)</h6>
+
+      <div class="input-group" style="max-width: 400px;">
+        <input type="text" name="q" id="user-search-input" class="form-control" placeholder="Tìm email, tên, SĐT..." value="<%= q %>">
+        <button class="btn btn-primary" type="submit">
+          <i class="fas fa-search fa-sm"></i>
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+        <thead>
+          <tr>
+            <th>Họ tên</th>
+            <th>Email / SĐT</th>
+            <th>Điểm Thưởng</th>
+            <th>Ngày tham gia</th>
+            <th>Trạng thái</th>
+            <th style="width: 120px;">Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="users-table-body">
+          <% if (users.length === 0) { %>
+          <tr>
+            <td colspan="6" class="text-center">Không tìm thấy người dùng.</td>
+          </tr>
+          <% } %>
+          <% users.forEach(user => { %>
+          <tr>
+            <td><strong><%= user.fullName %></strong></td>
+            <td>
+              <%= user.email %><br>
+              <small class="text-muted"><%= user.phone || 'N/A' %></small>
+            </td>
+            <td class="text-center"><%= user.loyaltyPoints?.balance || 0 %></td>
+            <td><%= new Date(user.createdAt).toLocaleDateString('vi-VN') %></td>
+            <td class="text-center">
+              <% if (user.isBanned) { %>
+              <span class="badge bg-danger">Đã Khóa</span>
+              <% } else { %>
+              <span class="badge bg-success">Hoạt động</span>
+              <% } %>
+            </td>
+            <td class="text-center">
+              <a href="/admin/users/<%= user._id %>" class="btn btn-sm btn-info me-1" title="Sửa thông tin">
+                <i class="fas fa-pencil-alt"></i>
+              </a>
+
+              <form action="/admin/users/<%= user._id %>/toggle-ban" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn thay đổi trạng thái tài khoản này?');">
+                <% if (user.isBanned) { %>
+                <button type="submit" class="btn btn-sm btn-success" title="Mở khóa">
+                  <i class="fas fa-check-circle"></i>
+                </button>
+                <% } else { %>
+                <button type="submit" class="btn btn-sm btn-danger" title="Khóa">
+                  <i class="fas fa-ban"></i>
+                </button>
+                <% } %>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <nav class="pagination-wrap mt-4 d-flex justify-content-center" id="users-pagination">
+      <% if (pagination.totalPages > 1) { %>
+      <ul class="pagination">
+        <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+        <li class="page-item <%= (i === pagination.page ? 'active' : '') %>">
+          <a class="page-link" href="#"><%= i %></a>
+        </li>
+        <% } %>
+      </ul>
+      <% } %>
+    </nav>
+  </div>
+</div>

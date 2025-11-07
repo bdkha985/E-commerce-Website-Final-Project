@@ -81,6 +81,12 @@ const apiSignin = async (req, res) => {
             .json({ ok: false, message: "Email hoặc mật khẩu sai" });
     }
 
+    if (user.isBanned) {
+        return res
+            .status(403) // 403 Forbidden
+            .json({ ok: false, message: "Tài khoản của bạn đã bị khóa." });
+    }
+    
     if (user.mustChangePassword) {
         req.session.tempUserId = user._id.toString();
         req.session.tempUserEmail = user.email;
