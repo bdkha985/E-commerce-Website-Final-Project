@@ -8,15 +8,33 @@ const getReviews = async (req, res) => {
     try {
         const { productId } = req.params;
         const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-        const limit = 5; // Hiển thị 5 review mỗi trang
+        const limit = 5; 
         const skip = (page - 1) * limit;
+
+        // === BỔ SUNG LOGIC SORT ===
+        const sortQuery = req.query.sort || 'newest';
+        let sort = {};
+        switch (sortQuery) {
+            case 'oldest':
+                sort = { createdAt: 1 };
+                break;
+            case 'highest': // Nhiều sao nhất
+                sort = { rating: -1, createdAt: -1 };
+                break;
+            case 'lowest': // Ít sao nhất
+                sort = { rating: 1, createdAt: 1 };
+                break;
+            default: // 'newest'
+                sort = { createdAt: -1 };
+        }
+        // === KẾT THÚC BỔ SUNG ===
 
         const [reviews, totalReviews] = await Promise.all([
             Review.find({ productId })
-                .sort({ createdAt: -1 })
+                .sort(sort) // <-- ÁP DỤNG SORT VÀO ĐÂY
                 .skip(skip)
                 .limit(limit)
-                .populate("userId", "fullName") // Lấy tên từ user (nếu có)
+                .populate("userId", "fullName")
                 .lean(),
             Review.countDocuments({ productId })
         ]);
@@ -26,7 +44,8 @@ const getReviews = async (req, res) => {
         res.json({
             ok: true,
             reviews,
-            pagination: { page, totalPages, totalReviews }
+            pagination: { page, totalPages, totalReviews },
+            sort: sortQuery // Trả về sort đang áp dụng
         });
 
     } catch (err) {
