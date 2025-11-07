@@ -10,6 +10,6 @@ router.get('/', dashboardController.getDashboard);
 router.use('/orders', require('./orders.routes'));
 router.use('/products', require('./products.routes'));
 router.use('/users', require('./users.routes'));
-// router.use('/discounts', require('./discounts.routes'));
+router.use('/discounts', require('./discounts.routes'));
 
 module.exports = router;

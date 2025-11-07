@@ -1,0 +1,37 @@
+<div class="card shadow-sm mb-4" style="max-width: 700px;">
+    <div class="card-header py-3">
+        <a href="/admin/discounts" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại Danh sách
+        </a>
+    </div>
+    
+    <div class="card-body">
+        <form action="/admin/discounts/create" method="POST">
+            
+            <div class="mb-3">
+                <label for="code" class="form-label">Mã Giảm giá (5 Ký tự)</label>
+                <input type="text" class="form-control" id="code" name="code" 
+                       placeholder="Để trống để tự động tạo" 
+                       style="text-transform: uppercase; font-family: 'Courier New', monospace; font-size: 1.2rem;"
+                       minlength="5" maxlength="5">
+                <small class="form-text">Chỉ A-Z, 0-9. Nếu để trống, hệ thống sẽ tự tạo mã 5 ký tự.</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="discountValue" class="form-label">Giá trị giảm (VND) (*)</label>
+                <input type="number" class="form-control" id="discountValue" name="discountValue" required min="1000">
+                <small class="form-text">Số tiền sẽ được trừ trực tiếp vào đơn hàng (ví dụ: 50000).</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="usageLimit" class="form-label">Giới hạn sử dụng (*)</label>
+                <input type="number" class="form-control" id="usageLimit" name="usageLimit" value="10" required min="1" max="10">
+                <small class="form-text">Số lần mã này có thể được sử dụng (Tối đa là 10). </small>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-lg mt-3">
+                Lưu Mã
+            </button>
+        </form>
+    </div>
+</div>
