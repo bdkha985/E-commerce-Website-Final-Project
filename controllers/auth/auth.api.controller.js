@@ -97,8 +97,10 @@ const apiSignin = async (req, res) => {
             message: "Đăng nhập thành công. Vui lòng đổi mật khẩu.",
         });
     }
-    
+
+// LOGIN USER 
 req.login(user, (err) => {
+        // Xử lý lỗi khi đăng nhập
         if (err) {
             console.error("Lỗi req.login:", err);
             return res.status(500).json({ ok: false, message: "Lỗi khi tạo phiên đăng nhập." });

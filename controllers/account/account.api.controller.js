@@ -66,6 +66,7 @@ const updateProfile = async (req, res) => {
     });
 };
 
+// Change password
 const changePassword = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty())
