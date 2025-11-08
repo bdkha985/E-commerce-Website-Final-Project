@@ -35,6 +35,8 @@
           <label class="f-label">Sắp xếp</label>
           <select name="sort" class="form-select">
             <option value="newest"     <%= query.sort==='newest'?'selected':'' %>>Mới nhất</option>
+            <option value="name_asc"  <%= query.sort==='name_asc'?'selected':'' %>>Tên: A-Z</option>
+            <option value="name_desc" <%= query.sort==='name_desc'?'selected':'' %>>Tên: Z-A</option>
             <option value="price_asc"  <%= query.sort==='price_asc'?'selected':'' %>>Giá tăng dần</option>
             <option value="price_desc" <%= query.sort==='price_desc'?'selected':'' %>>Giá giảm dần</option>
           </select>

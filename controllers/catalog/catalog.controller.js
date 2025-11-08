@@ -53,6 +53,9 @@ const categoryPage = async (req, res, next) => {
     if (sortQ === 'price_asc')  sort = { 'variants.price': 1, basePrice: 1 };
     if (sortQ === 'price_desc') sort = { 'variants.price': -1, basePrice: -1 };
 
+    if (sortQ === 'name_asc')  sort = { name: 1 };
+    if (sortQ === 'name_desc') sort = { name: -1 };
+
     const [items, total, brands] = await Promise.all([
       Product.find(where).populate('brandId','name slug').sort(sort).skip(skip).limit(limit).lean(),
       Product.countDocuments(where),
@@ -106,7 +109,8 @@ const allProductsPage = async (req, res, next) => {
     let sort = { createdAt: -1 };
     if (sortQ === 'price_asc')  sort = { 'variants.price': 1, basePrice: 1 };
     if (sortQ === 'price_desc') sort = { 'variants.price': -1, basePrice: -1 };
-
+    if (sortQ === 'name_asc')  sort = { name: 1 };
+    if (sortQ === 'name_desc') sort = { name: -1 };
     const [items, total, brands] = await Promise.all([
       Product.find(where).populate('brandId','name slug').sort(sort).skip(skip).limit(limit).lean(),
       Product.countDocuments(where),
