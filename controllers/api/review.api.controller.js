@@ -77,6 +77,12 @@ const postComment = async (req, res) => {
         });
 
         await newReview.save(); 
+
+        // === BỔ SUNG: Phát WebSocket ===
+        const io = req.app.get('io'); // Lấy io từ app
+        io.to(productId).emit('new_review', newReview); // Gửi review
+        // === KẾT THÚC BỔ SUNG ===
+
         res.status(201).json({ ok: true, message: "Đã gửi bình luận thành công", review: newReview });
 
     } catch (err) {
@@ -96,7 +102,7 @@ const postRating = async (req, res) => {
         const { productId } = req.params;
         const { rating, comment } = req.body;
 
-        const newReview = new Review({
+        let newReview = new Review({
             productId,
             userId: req.user.id, // Lấy từ requireLoginApi
             fullName: req.user.fullName, // Lấy từ requireLoginApi
@@ -105,6 +111,16 @@ const postRating = async (req, res) => {
         });
 
         await newReview.save(); 
+
+        // === BỔ SUNG: Phát WebSocket ===
+        // Chúng ta cần 'populate' thủ công trước khi gửi đi
+        newReview = newReview.toObject();
+        newReview.userId = { fullName: req.user.fullName }; // Thêm thông tin user
+        
+        const io = req.app.get('io'); // Lấy io từ app
+        io.to(productId).emit('new_review', newReview); // Gửi review
+        // === KẾT THÚC BỔ SUNG ===
+
         res.status(201).json({ ok: true, message: "Đã gửi đánh giá thành công", review: newReview });
 
     } catch (err) {

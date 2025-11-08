@@ -1,26 +1,47 @@
 // public/javascripts/admin-orders.js
 document.addEventListener('DOMContentLoaded', () => {
+    // Lấy tất cả elements
     const searchInput = document.getElementById('order-search-input');
     const tableBody = document.getElementById('orders-table-body');
     const paginationContainer = document.getElementById('orders-pagination');
     const filterTitle = document.getElementById('filter-title');
     const filterLinks = document.querySelectorAll('.filter-link');
     const form = document.getElementById('order-filter-form');
+    
+    // BỔ SUNG: Lấy các select mới
+    const sortSelect = document.getElementById('order-sort-select');
+    const statusSelect = document.getElementById('order-status-select');
+    const paymentSelect = document.getElementById('payment-status-select');
 
     let debounceTimer;
-    let currentFilter = 'all';
+    // Lấy trạng thái ban đầu từ EJS (nếu có)
+    let currentFilter = filterLinks[0]?.dataset.filter || 'all'; 
     let currentQuery = searchInput ? searchInput.value : '';
+    let currentSort = sortSelect ? sortSelect.value : 'newest';
+    let currentOStatus = statusSelect ? statusSelect.value : 'all';
+    let currentPStatus = paymentSelect ? paymentSelect.value : 'all';
 
     // Hàm chính: Gọi API và cập nhật UI
     async function fetchOrders(page = 1) {
-        const q = currentQuery;
-        const filter = currentFilter;
+        // Lấy giá trị mới nhất từ các select
+        currentQuery = searchInput.value;
+        currentSort = sortSelect.value;
+        currentOStatus = statusSelect.value;
+        currentPStatus = paymentSelect.value;
 
-        // Thêm hiệu ứng loading
         if (tableBody) tableBody.style.opacity = '0.5';
 
         try {
-            const params = new URLSearchParams({ page, q, filter });
+            // Thêm tất cả tham số vào URL
+            const params = new URLSearchParams({
+                page,
+                q: currentQuery,
+                filter: currentFilter,
+                sort: currentSort,
+                o_status: currentOStatus,
+                p_status: currentPStatus
+            });
+            
             const res = await fetch(`/admin/orders?${params.toString()}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
@@ -30,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Cập nhật UI
             renderTableBody(data.orders);
-            renderPagination(data.pagination, data.filter, data.q);
+            renderPagination(data.pagination);
             if (filterTitle) filterTitle.textContent = data.filterTitle;
             
         } catch (err) {
@@ -41,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Helper: Vẽ lại bảng
+    // (Hàm renderTableBody giữ nguyên)
     function renderTableBody(orders) {
         if (!tableBody) return;
         if (orders.length === 0) {
@@ -75,8 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     }
 
-    // Helper: Vẽ lại phân trang
-    function renderPagination(pagination, filter, q) {
+    // (Hàm renderPagination giữ nguyên)
+    function renderPagination(pagination) {
         if (!paginationContainer) return;
         if (pagination.totalPages <= 1) {
             paginationContainer.innerHTML = '';
@@ -95,21 +116,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === Lắng nghe sự kiện ===
 
-    // 1. Gõ phím (Debounced)
+    // 1. Gõ phím
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
-            currentQuery = e.target.value;
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
                 fetchOrders(1); // Luôn về trang 1 khi tìm kiếm
-            }, 350); // Chờ 350ms
+            }, 350); 
         });
     }
 
     // 2. Chặn form submit
     if (form) {
         form.addEventListener('submit', (e) => {
-            e.preventDefault(); // Ngăn tải lại trang
+            e.preventDefault(); 
             fetchOrders(1);
         });
     }
@@ -126,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Click link bộ lọc
+    // 4. Click link bộ lọc (Thời gian)
     filterLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -134,5 +154,15 @@ document.addEventListener('DOMContentLoaded', () => {
             fetchOrders(1); // Về trang 1 khi đổi bộ lọc
         });
     });
+    
+    // 5. BỔ SUNG: Lắng nghe 3 dropdown mới
+    [sortSelect, statusSelect, paymentSelect].forEach(select => {
+        if (select) {
+            select.addEventListener('change', () => {
+                fetchOrders(1); // Về trang 1 khi đổi bộ lọc
+            });
+        }
+    });
 
+    fetchOrders(1);
 });

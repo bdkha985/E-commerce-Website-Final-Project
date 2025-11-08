@@ -24,9 +24,16 @@
     } catch {}
   }, true);
 
+  // document.addEventListener('submit', (e) => {
+  //   show();
+  // }, true);
+  
   document.addEventListener('submit', (e) => {
-    show();
-  }, true);
+  const form = e.target;
+  // Form AJAX sẽ gắn data-ajax => KHÔNG bật loader
+  if (form && form.hasAttribute('data-ajax')) return;
+  show();
+}, true);
 
   window.addEventListener('pageshow', (e) => {
     if (e.persisted) hide();

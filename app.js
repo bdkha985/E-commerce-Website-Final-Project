@@ -9,6 +9,7 @@ const logger = require("morgan");
 const flash = require("connect-flash");
 const createError = require("http-errors");
 const passport = require("passport");
+const http = require('http');
 
 const { createClient } = require("redis");
 const CR = require("connect-redis");
@@ -46,6 +47,7 @@ const store = new RedisStore({
 });
 
 const app = express();
+const server = http.createServer(app);
 const port = process.env.PORT || 8888;
 const hostname = process.env.HOST_NAME || "localhost";
 
@@ -59,21 +61,45 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // Session
-app.use(
-  session({
+const sessionMiddleware = session({
     store,
     secret: "kshop-secret",
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 1000 * 60 * 60 },
-  })
-);
+});
+app.use(sessionMiddleware);
 
 // Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(flash());
+
+// === BỔ SUNG: Cấu hình Socket.io ===
+const { Server } = require("socket.io");
+const io = new Server(server); // 4. Khởi tạo Socket.io với http server
+
+// Cho phép Socket.io truy cập session
+io.engine.use(sessionMiddleware); 
+
+io.on("connection", (socket) => {
+  console.log("✅ Một người dùng đã kết nối Socket.io");
+
+  // Lắng nghe sự kiện "join_room" từ client
+  socket.on("join_room", (productId) => {
+    socket.join(productId); // Cho socket này vào "phòng" của sản phẩm
+    console.log(`Socket ${socket.id} đã tham gia phòng ${productId}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("❌ Người dùng đã ngắt kết nối");
+  });
+});
+
+// 5. Gắn 'io' vào app để controller có thể dùng
+app.set('io', io);
+// === KẾT THÚC BỔ SUNG ===
 
 app.use(async (req, res, next) => {
     try {
@@ -123,21 +149,22 @@ configViewEngine(app);
 
 // ============ ROUTES ===========
 app.use('/api', apiRoutes);
+app.use('/admin', requireAdmin, adminRoutes);
 app.use("/", socialAuthRoutes);
 app.use("/", webRoutes);
-app.use('/admin', requireAdmin, adminRoutes);
 
 // ================ DATABASE + SERVER ==================
 connectDB(process.env.MONGODB_URI)
-    .then(() => {
-        app.listen(port, hostname, () => {
-            console.log(`✅ Server running at http://${hostname}:${port}`);
-        });
-    })
-    .catch((err) => {
-        console.error("❌ Failed to connect to MongoDB:", err.message);
-        process.exit(1);
+  .then(() => {
+    // ĐÚNG: chạy server.listen để Socket.io hook vào đúng server
+    server.listen(port, () => {
+      console.log(`✅ Server running at http://0.0.0.0:${port}`);
     });
+  })
+  .catch((err) => {
+    console.error("❌ Failed to connect to MongoDB:", err.message);
+    process.exit(1);
+  });
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

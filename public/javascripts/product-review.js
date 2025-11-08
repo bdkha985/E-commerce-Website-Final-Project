@@ -1,180 +1,254 @@
+// public/javascripts/product-review.js
+// Reviews section – no page reload, auto refresh after submit
+
 document.addEventListener('DOMContentLoaded', () => {
+  // ---- Helpers ----
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+  const fmtDate = (d) => new Date(d).toLocaleDateString('vi-VN');
+  const escapeHtml = (s = '') =>
+    s.replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
 
-    // === Lấy các DOM element ===
-    const reviewSection = document.getElementById('details-reviews');
-    if (!reviewSection) return; // Không phải trang product-detail, thoát
+  // ---- DOM targets ----
+  const productId =
+    $('#reviews-meta')?.dataset.productId ||
+    $('#pd-variants')?.dataset.productId ||
+    $('#btnAddToCart')?.dataset.productId;
 
-    const productId = document.getElementById('btnAddToCart')?.dataset.productId;
-    if (!productId) {
-        console.error("Không tìm thấy Product ID");
-        return;
+  if (!productId) return; // Không phải trang product detail
+
+  const reviewListEl = $('#review-list');
+  const paginationContainer = $('#review-pagination-container');
+  const totalCountEl = $('#review-total-count');
+
+  const ratingForm = $('#rating-form');
+  const ratingAlert = $('#rating-alert');
+  const ratingComment = $('#rating-comment');
+  const btnSubmitRating = $('#btn-submit-rating');
+
+  const commentForm = $('#comment-form');
+  const commentAlert = $('#comment-alert');
+  const commentName = $('#comment-name');
+  const commentText = $('#comment-text');
+  const btnSubmitComment = $('#btn-submit-comment');
+
+  // ---- Fetch & render ----
+  async function fetchReviews(page = 1) {
+    if (reviewListEl) reviewListEl.innerHTML = '<p>Đang tải đánh giá...</p>';
+    try {
+      const res = await fetch(`/api/reviews/${productId}?page=${page}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+      const data = await res.json();
+      if (!res.ok || !data?.ok) throw new Error(data?.message || 'Không thể tải đánh giá');
+
+      renderReviewList(data.reviews || []);
+      renderReviewPagination(data.pagination || { page: 1, totalPages: 1 });
+      if (totalCountEl) totalCountEl.textContent = data.pagination?.totalReviews ?? 0;
+    } catch (err) {
+      if (reviewListEl) reviewListEl.innerHTML = `<p class="alert alert-danger">${escapeHtml(err.message)}</p>`;
+      if (paginationContainer) paginationContainer.innerHTML = '';
     }
-    
-    // === 1. Logic gọi API và Render Review ===
-    const reviewListEl = document.getElementById('review-list');
-    const paginationContainer = document.getElementById('review-pagination-container');
-    const totalCountEl = document.getElementById('review-total-count');
-    const sortSelect = document.getElementById('review-sort-select'); // <-- MỚI
+  }
 
-    async function fetchReviews(page = 1) {
-        const sortOrder = sortSelect.value; // <-- Lấy giá trị sort
-        reviewListEl.innerHTML = '<p>Đang tải đánh giá...</p>';
-        try {
-            const res = await fetch(`/api/reviews/${productId}?page=${page}&sort=${sortOrder}`);
-            const data = await res.json();
-            if (!data.ok) throw new Error('Không thể tải đánh giá');
-
-            renderReviewList(data.reviews);
-            renderReviewPagination(data.pagination);
-            totalCountEl.textContent = data.pagination.totalReviews || 0;
-
-        } catch (err) {
-            reviewListEl.innerHTML = `<p class="alert alert-danger">${err.message}</p>`;
-        }
+  function renderReviewList(reviews) {
+    if (!reviewListEl) return;
+    if (!reviews.length) {
+      reviewListEl.innerHTML = '<p>Chưa có đánh giá nào cho sản phẩm này.</p>';
+      return;
     }
-
-    function renderReviewList(reviews) {
-        if (reviews.length === 0) {
-            reviewListEl.innerHTML = '<p>Chưa có đánh giá nào cho sản phẩm này.</p>';
-            return;
-        }
-        reviewListEl.innerHTML = reviews.map(r => `
-            <div class="review-item">
-                <div class="review-header">
-                    <span class="review-author">${r.fullName} ${r.userId ? '' : '(Khách)'}</span>
-                    ${r.rating ? `<span class="review-stars">${'★'.repeat(r.rating)}</span>` : ''}
-                    <span class="review-date">${new Date(r.createdAt).toLocaleDateString('vi-VN')}</span>
-                </div>
-                <p class="review-comment">${r.comment || '<i>(Không có bình luận)</i>'}</p>
+    reviewListEl.innerHTML = reviews
+      .map((r) => {
+        const author = escapeHtml(r.fullName || r.userId?.fullName || 'Người dùng');
+        const badge = r.userId ? '(Đã mua)' : '(Khách)';
+        const stars = r.rating ? `<span class="review-stars">${'★'.repeat(r.rating)}</span>` : '';
+        const date = r.createdAt ? fmtDate(r.createdAt) : '';
+        const comment = r.comment ? escapeHtml(r.comment) : '<i>Không có bình luận</i>';
+        return `
+          <div class="review-item">
+            <div class="review-header">
+              <span class="review-author">${author} ${badge}</span>
+              ${stars}
+              <span class="review-date">${date}</span>
             </div>
-        `).join('');
+            <p class="review-comment">${comment}</p>
+          </div>
+        `;
+      })
+      .join('');
+  }
+
+  function renderReviewPagination(pagination) {
+    if (!paginationContainer) return;
+    const { page = 1, totalPages = 1 } = pagination || {};
+    if (totalPages <= 1) {
+      paginationContainer.innerHTML = '';
+      return;
     }
-
-    function renderReviewPagination(pagination) {
-        // Yêu cầu PDF: Luôn hiển thị phân trang
-        if (pagination.totalPages < 1) {
-             paginationContainer.innerHTML = '';
-             return;
-        }
-
-        let html = '<ul class="pagination">';
-        for (let i = 1; i <= pagination.totalPages; i++) {
-            html += `
-                <li class="page-item ${i === pagination.page ? 'active' : ''}">
-                    <span class="page-link" data-page="${i}" style="cursor:pointer;">${i}</span>
-                </li>`;
-        }
-        html += '</ul>';
-        paginationContainer.innerHTML = html;
+    let html = '<ul class="pagination">';
+    // Prev
+    html += `
+      <li class="page-item ${page <= 1 ? 'disabled' : ''}">
+        <a href="#" class="page-link" data-page="${page - 1}">«</a>
+      </li>`;
+    // Numbers
+    for (let i = 1; i <= totalPages; i++) {
+      html += `
+        <li class="page-item ${i === page ? 'active' : ''}">
+          <a href="#" class="page-link" data-page="${i}">${i}</a>
+        </li>`;
     }
+    // Next
+    html += `
+      <li class="page-item ${page >= totalPages ? 'disabled' : ''}">
+        <a href="#" class="page-link" data-page="${page + 1}">»</a>
+      </li>`;
+    html += '</ul>';
+    paginationContainer.innerHTML = html;
+  }
 
-    // Xử lý click pagination
-    paginationContainer.addEventListener('click', e => {
-        if (e.target.matches('.page-link')) {
-            e.preventDefault();
-            const page = parseInt(e.target.dataset.page, 10);
-            fetchReviews(page); // fetchReviews giờ đã tự động lấy sort
-        }
+  // ---- Events ----
+  if (paginationContainer) {
+    paginationContainer.addEventListener('click', (e) => {
+      const link = e.target.closest('.page-link');
+      if (!link) return;
+      e.preventDefault();
+      const p = parseInt(link.dataset.page, 10);
+      if (Number.isFinite(p)) fetchReviews(p);
     });
+  }
 
-    sortSelect.addEventListener('change', () => {
-        fetchReviews(1); // Khi đổi sort, luôn quay về trang 1
+  if (ratingForm && btnSubmitRating) {
+    ratingForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const rating = ratingForm.querySelector('input[name="rating"]:checked')?.value;
+      const comment = ratingComment?.value || '';
+
+      if (!rating) {
+        showAlert(ratingAlert, 'danger', 'Vui lòng chọn số sao.');
+        return;
+      }
+
+      try {
+        btnSubmitRating.disabled = true;
+        btnSubmitRating.textContent = 'Đang gửi...';
+
+        const res = await fetch(`/api/reviews/${productId}/rate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+          body: JSON.stringify({ rating, comment })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.message || 'Gửi đánh giá thất bại');
+
+        showAlert(ratingAlert, 'success', 'Gửi đánh giá thành công!');
+        ratingForm.reset();
+
+        // Cập nhật đếm tại chỗ + reload list
+        bumpCounter();
+        fetchReviews(1);
+      } catch (err) {
+        showAlert(ratingAlert, 'danger', err.message);
+      } finally {
+        btnSubmitRating.disabled = false;
+        btnSubmitRating.textContent = 'Gửi đánh giá';
+      }
     });
-    
-    // === 2. Xử lý Form 1: Gửi Rating (Đã đăng nhập) ===
-    const ratingForm = document.getElementById('rating-form');
-    const ratingAlert = document.getElementById('rating-alert');
-    if (ratingForm) {
-        ratingForm.addEventListener('submit', async e => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-submit-rating');
-            btn.disabled = true;
-            btn.textContent = 'Đang gửi...';
+  }
 
-            const payload = {
-                rating: ratingForm.querySelector('input[name="rating"]:checked')?.value,
-                comment: document.getElementById('rating-comment').value
-            };
+  if (commentForm && btnSubmitComment) {
+    commentForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-            if (!payload.rating) {
-                showAlert(ratingAlert, 'danger', 'Vui lòng chọn số sao.');
-                btn.disabled = false;
-                btn.textContent = 'Gửi đánh giá';
-                return;
-            }
+      const fullName = commentName?.value?.trim();
+      const comment = commentText?.value?.trim();
 
-            try {
-                const res = await fetch(`/api/reviews/${productId}/rate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.message);
+      if (!fullName || !comment) {
+        showAlert(commentAlert, 'danger', 'Vui lòng nhập tên và bình luận.');
+        return;
+      }
 
-                // showAlert(ratingAlert, 'success', 'Gửi đánh giá thành công!');
-                // ratingForm.reset();
-                // fetchReviews(1); // Tải lại danh sách review
-                location.reload();
-            } catch (err) {
-                showAlert(ratingAlert, 'danger', err.message);
-                btn.disabled = false;
-                btn.textContent = 'Gửi đánh giá';
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Gửi đánh giá';
-            }
+      try {
+        btnSubmitComment.disabled = true;
+        btnSubmitComment.textContent = 'Đang gửi...';
+
+        const res = await fetch(`/api/reviews/${productId}/comment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+          body: JSON.stringify({ fullName, comment })
         });
-    }
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.message || 'Gửi bình luận thất bại');
 
-    // === 3. Xử lý Form 2: Gửi Comment (Khách) ===
-    const commentForm = document.getElementById('comment-form');
-    const commentAlert = document.getElementById('comment-alert');
-    if (commentForm) {
-        commentForm.addEventListener('submit', async e => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-submit-comment');
-            btn.disabled = true;
-            btn.textContent = 'Đang gửi...';
+        showAlert(commentAlert, 'success', 'Gửi bình luận thành công!');
+        commentForm.reset();
 
-            const payload = {
-                fullName: document.getElementById('comment-name').value,
-                comment: document.getElementById('comment-text').value
-            };
-            
-            try {
-                const res = await fetch(`/api/reviews/${productId}/comment`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.message);
+        // Cập nhật đếm tại chỗ + reload list
+        bumpCounter();
+        fetchReviews(1);
+      } catch (err) {
+        showAlert(commentAlert, 'danger', err.message);
+      } finally {
+        btnSubmitComment.disabled = false;
+        btnSubmitComment.textContent = 'Gửi bình luận';
+      }
+    });
+  }
 
-                // showAlert(commentAlert, 'success', 'Gửi bình luận thành công!');
-                // commentForm.reset();
-                // fetchReviews(1); // Tải lại danh sách review
-                location.reload();
-            } catch (err) {
-                showAlert(commentAlert, 'danger', err.message);
-                // Mở khóa nút nếu có lỗi
-                btn.disabled = false;
-                btn.textContent = 'Gửi bình luận';
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Gửi bình luận';
-            }
-        });
-    }
+  function showAlert(el, type, msg) {
+    if (!el) return;
+    el.className = `alert alert-${type}`;
+    el.textContent = msg;
+    el.style.display = 'block';
+    // auto hide sau 3s
+    setTimeout(() => {
+      el.style.display = 'none';
+    }, 3000);
+  }
 
-    // === 4. Helper hiển thị thông báo ===
-    function showAlert(alertEl, type, message) {
-        alertEl.className = `alert alert-${type}`;
-        alertEl.textContent = message;
-        alertEl.style.display = 'block';
-    }
+  function bumpCounter() {
+    if (!totalCountEl) return;
+    const n = parseInt(totalCountEl.textContent || '0', 10) + 1;
+    totalCountEl.textContent = String(n);
+    const tabLabel = document.querySelector('.tab-link[data-tab="reviews"]');
+    if (tabLabel) tabLabel.innerHTML = `Đánh Giá (${n})`;
+  }
 
-    // === 5. Tải review lần đầu tiên khi trang load ===
-    fetchReviews(1);
-    
+  // ---- Optional: nếu có tabs thì gắn logic, nhưng KHÔNG chặn script khi không có tabs ----
+  const tabsContainer = document.querySelector('.pd-tabs');
+  const tabLinks = tabsContainer ? $$('.tab-link', tabsContainer) : [];
+  const tabPanes = tabsContainer ? $$('.tab-pane', tabsContainer) : [];
+  if (tabsContainer) {
+    tabLinks.forEach((link) => {
+      link.addEventListener('click', () => {
+        const tabName = link.dataset.tab;
+        tabLinks.forEach((l) => l.classList.remove('active'));
+        tabPanes.forEach((p) => p.classList.remove('active'));
+        link.classList.add('active');
+        $('#tab-' + tabName)?.classList.add('active');
+        if (tabName === 'reviews' && !reviewListEl?.hasChildNodes()) {
+          fetchReviews(1);
+        }
+      });
+    });
+  }
+
+  // ---- Load lần đầu ----
+  fetchReviews(1);
+
+  // ---- Optional: auto-refresh khi có socket.io (nếu layout đã nạp /socket.io/socket.io.js) ----
+  if (window.io) {
+  const socket = io({
+    transports: ['websocket', 'polling'], // thử websocket trước
+    // path: '/socket.io',                 // mặc định đã là /socket.io
+  });
+  // (khuyến nghị) join theo productId để chỉ nhận review của sản phẩm hiện tại
+  socket.emit('join_room', productId);
+  socket.on('new_review', (payload) => {
+    if (payload?.productId === productId) fetchReviews(1);
+  });
+}
 });

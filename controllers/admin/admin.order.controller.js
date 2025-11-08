@@ -17,11 +17,11 @@ const listOrders = async (req, res) => {
         const limit = 20; // 20 item mỗi trang [cite: 179]
         const skip = (page - 1) * limit;
 
-        const q = (req.query.q || "").trim();
-
-        const filter = req.query.filter || "all";
-        const startDate = req.query.start;
-        const endDate = req.query.end;
+        const q = (req.query.q || '').trim();
+        const filter = req.query.filter || 'all'; // Lọc thời gian (Hôm nay,...)
+        const sortQuery = req.query.sort || 'newest'; // Sắp xếp
+        const orderStatus = req.query.o_status || 'all'; // Lọc Trạng thái Đơn hàng
+        const paymentStatus = req.query.p_status || 'all';
 
         let where = {}; // Điều kiện lọc
         let filterTitle = "Tất cả đơn hàng";
@@ -78,9 +78,37 @@ const listOrders = async (req, res) => {
             filterTitle = `Kết quả cho "${q}"`;
         }
 
+        // === 3. BỔ SUNG: Lọc Trạng thái & Thanh toán ===
+        if (orderStatus !== 'all') {
+            where.status = orderStatus; // vd: "Confirmed", "Shipping"...
+        }
+        if (paymentStatus === 'paid') {
+            where.paymentStatus = 'Paid'; // Đã thanh toán
+        }
+        if (paymentStatus === 'pending') {
+            where.paymentStatus = 'Pending'; // Chờ thanh toán
+        }
+        if (paymentStatus === 'cod') {
+            where.paymentMethod = 'COD'; // Là đơn COD
+        }
+        // === KẾT THÚC BỔ SUNG ===
+
+        // === 4. BỔ SUNG: Logic Sắp xếp ===
+        let sort = { createdAt: -1 }; // Mặc định: Mới nhất
+        if (sortQuery === 'oldest') {
+            sort = { createdAt: 1 }; // Cũ nhất
+        }
+        if (sortQuery === 'total_asc') {
+            sort = { total: 1 }; // Giá trị thấp
+        }
+        if (sortQuery === 'total_desc') {
+            sort = { total: -1 }; // Giá trị cao
+        }
+        // === KẾT THÚC BỔ SUNG ===
+
         const [orders, totalOrders] = await Promise.all([
             Order.find(where)
-                .sort({ createdAt: -1 }) // Sắp xếp mới nhất trước [cite: 179]
+                .sort(sort)
                 .skip(skip)
                 .limit(limit)
                 .lean(),
@@ -93,22 +121,16 @@ const listOrders = async (req, res) => {
         //check ajax
         if (req.xhr) {
             return res.json({
-                ok: true,
-                orders,
-                pagination,
-                filter,
-                filterTitle,
-                q,
+                ok: true, orders, pagination, filter, filterTitle, q,
+                sort: sortQuery, o_status: orderStatus, p_status: paymentStatus // Gửi lại các filter
             });
         }
 
-        render(res, "orders", {
-            title: "Quản lý đơn hàng",
-            orders,
-            pagination,
-            filter: filter,
-            filterTitle: filterTitle,
-            q: q,
+        // Render HTML nếu tải trang
+        render(res, 'orders', {
+            title: 'Quản lý Đơn hàng',
+            orders, pagination, filter, filterTitle, q,
+            sort: sortQuery, o_status: orderStatus, p_status: paymentStatus
         });
     } catch (err) {
         // Bắt lỗi cho cả 2 trường hợp
