@@ -132,7 +132,7 @@
       <div class="review-layout">
         <div class="review-form-wrapper">
           <% if (isAuthenticated) { %>
-            <form id="rating-form" class="review-form-box">
+            <form id="rating-form" class="review-form-box" data-ajax>
               <h4>Viết đánh giá của bạn</h4>
               <div id="rating-alert" class="alert" style="display:none;"></div>
               <div class="mb-3">
@@ -152,7 +152,7 @@
               <button type="submit" id="btn-submit-rating" class="btn">Gửi đánh giá</button>
             </form>
           <% } else { %>
-            <form id="comment-form" class="review-form-box">
+            <form id="comment-form" class="review-form-box" data-ajax>
               <h4>Gửi bình luận của bạn</h4>
               <div id="comment-alert" class="alert" style="display:none;"></div>
               <div class="mb-3">
@@ -217,5 +217,6 @@
   <% } %>
 </section>
 
+<script src="/socket.io/socket.io.js"></script>
 <script src="/javascripts/product-detail.js" defer></script>
 <script src="/javascripts/product-review.js" defer></script>

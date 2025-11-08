@@ -689,6 +689,15 @@ body {
     color: #991b1b;
 }
 
+.border-left-primary { border-left: 4px solid #3b82f6; }
+.border-left-success { border-left: 4px solid #16a34a; }
+.border-left-info { border-left: 4px solid #0ea5e9; }
+.border-left-warning { border-left: 4px solid #f59e0b; }
+
+.text-xs { 
+    font-size: 0.85rem; /* 1.2rem hoặc 1.3rem */
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 1400px) {
     .stats-grid {
