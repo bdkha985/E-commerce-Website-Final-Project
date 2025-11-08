@@ -91,7 +91,8 @@ const apiSignin = async (req, res) => {
             message: "Đăng nhập thành công. Vui lòng đổi mật khẩu.",
         });
     }
-    
+
+// LOGIN USER
 req.login(user, (err) => {
         if (err) {
             console.error("Lỗi req.login:", err);
