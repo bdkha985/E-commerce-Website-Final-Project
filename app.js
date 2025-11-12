@@ -56,9 +56,9 @@ const port = process.env.PORT || 8888;
 const hostname = process.env.HOST_NAME || "localhost";
 
 // ======== MIDDLEWARES =======
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: 'cross-origin' },
-}));
+// app.use(helmet({
+//   crossOriginResourcePolicy: { policy: 'cross-origin' },
+// }));
 
 // Logger
 app.use(logger("dev"));
