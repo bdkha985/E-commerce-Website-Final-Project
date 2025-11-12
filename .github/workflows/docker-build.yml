@@ -24,7 +24,7 @@ jobs:
       - name: Build and push kshop-app
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ../../Dockerfile
+          context: ./web_nodejs  # <-- SỬA LẠI: Build context là thư mục src
+          file: ./web_nodejs/Dockerfile  # <-- SỬA LẠI: Đường dẫn từ gốc repo
           push: true
           tags: duykh4/kshop-app:latest # THAY BẰNG TÊN BẠN/tên-app:latest
