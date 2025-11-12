@@ -10,6 +10,9 @@ const flash = require("connect-flash");
 const createError = require("http-errors");
 const passport = require("passport");
 const http = require('http');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const csrf = require('csurf');
 
 const { createClient } = require("redis");
 const CR = require("connect-redis");
@@ -52,6 +55,10 @@ const port = process.env.PORT || 8888;
 const hostname = process.env.HOST_NAME || "localhost";
 
 // ======== MIDDLEWARES =======
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
+
 // Logger
 app.use(logger("dev"));
 
@@ -75,6 +82,22 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(flash());
+
+// --- Rate Limits ---
+const authLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+const otpLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/auth', authLimiter);
+app.use('/api/password-recovery', otpLimiter);
 
 // === BỔ SUNG: Cấu hình Socket.io ===
 const { Server } = require("socket.io");

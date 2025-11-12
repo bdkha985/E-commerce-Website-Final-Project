@@ -1,0 +1,30 @@
+name: Build and Push Docker Image
+
+# Chạy khi push code lên nhánh 'main'
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      # Lấy code về
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # Đăng nhập vào Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Build và Push ảnh
+      - name: Build and push kshop-app
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile  # Đường dẫn đến Dockerfile của bạn
+          push: true
+          tags: dinhten/kshop-app:latest # THAY BẰNG TÊN BẠN/tên-app:latest
