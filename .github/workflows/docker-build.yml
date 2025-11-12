@@ -25,6 +25,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile  # Đường dẫn đến Dockerfile của bạn
+          file: ../../Dockerfile
           push: true
-          tags: dinhten/kshop-app:latest # THAY BẰNG TÊN BẠN/tên-app:latest
+          tags: duykh4/kshop-app:latest # THAY BẰNG TÊN BẠN/tên-app:latest
