@@ -74,10 +74,12 @@ async function createUserAndSendPassword({ email, fullName, address }) {
     return {user,  tempPassword};
 }
 
+// Tìm user theo email
 async function findUserByEmail(email) {
     return await User.findOne({ email: normalize(email) });
 }
 
+// Kiểm tra password với hash
 async function validatePassword(user, password) {
     if (!user?.passwordHash) return false;
     try {
