@@ -11,10 +11,10 @@ services:
       replicas: 1
 
   app:
-    image: kshop-app:latest
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+    image: duykh4/kshop-app:latest
+    # volumes:
+    #   - .:/usr/src/app
+    #   - /usr/src/app/node_modules
     environment:
       - MONGODB_URI=mongodb://db:27017/web_nodejs
       - HOST_NAME=0.0.0.0
