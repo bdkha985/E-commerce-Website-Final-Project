@@ -1,5 +1,6 @@
 // controllers/api/search.api.controller.js
 const Product = require('../../models/product.model');
+const { searchProducts } = require('../../services/search/elastic.service');
 
 // === Sao chép 2 hàm helper từ home.controller.js [cite: 327-329] ===
 function getDisplayImage(p) {
@@ -19,39 +20,59 @@ function getDisplayPrice(p) {
 }
 // === Hết 2 hàm helper ===
 
+// const getSuggestions = async (req, res) => {
+//     try {
+//         const q = (req.query.q || '').trim();
+//         // Nếu query rỗng hoặc quá ngắn, trả về mảng rỗng
+//         if (q.length < 2) {
+//             return res.json({ ok: true, products: [] });
+//         }
+
+//         // Điều kiện tìm kiếm
+//         const cond = {
+//             $or: [
+//                 { name: { $regex: q, $options: 'i' } },
+//                 { tags: { $regex: q, $options: 'i' } },
+//             ]
+//         };
+
+//         // Tìm kiếm và giới hạn 5 kết quả
+//         const items = await Product.find(cond)
+//             .select('name slug images basePrice variants') // Chọn các trường cần thiết
+//             .sort({ name: 1 }) // Sắp xếp theo tên
+//             .limit(5) 
+//             .lean();
+
+//         // Map lại dữ liệu cho gọn
+//         const products = items.map(p => ({
+//             name: p.name,
+//             slug: p.slug,
+//             thumb: getDisplayImage(p),
+//             price: getDisplayPrice(p)
+//         }));
+        
+//         res.json({ ok: true, products });
+//     } catch (err) {
+//         res.status(500).json({ ok: false, message: "Lỗi máy chủ" });
+//     }
+// };
+
 const getSuggestions = async (req, res) => {
     try {
         const q = (req.query.q || '').trim();
-        // Nếu query rỗng hoặc quá ngắn, trả về mảng rỗng
         if (q.length < 2) {
             return res.json({ ok: true, products: [] });
         }
 
-        // Điều kiện tìm kiếm
-        const cond = {
-            $or: [
-                { name: { $regex: q, $options: 'i' } },
-                { tags: { $regex: q, $options: 'i' } },
-            ]
-        };
-
-        // Tìm kiếm và giới hạn 5 kết quả
-        const items = await Product.find(cond)
-            .select('name slug images basePrice variants') // Chọn các trường cần thiết
-            .sort({ name: 1 }) // Sắp xếp theo tên
-            .limit(5) 
-            .lean();
-
-        // Map lại dữ liệu cho gọn
-        const products = items.map(p => ({
-            name: p.name,
-            slug: p.slug,
-            thumb: getDisplayImage(p),
-            price: getDisplayPrice(p)
-        }));
+        // === THAY ĐỔI: Gọi ElasticSearch ===
+        // Thay vì Product.find(), chúng ta gọi service mới
+        const products = await searchProducts(q);
+        // Dữ liệu trả về (name, slug, thumb, price) đã được format sẵn
+        // === KẾT THÚC THAY ĐỔI ===
         
-        res.json({ ok: true, products });
+        res.json({ ok: true, products: products.slice(0, 5) }); // Giới hạn 5 kết quả
     } catch (err) {
+        console.error("Lỗi getSuggestions (ES):", err);
         res.status(500).json({ ok: false, message: "Lỗi máy chủ" });
     }
 };

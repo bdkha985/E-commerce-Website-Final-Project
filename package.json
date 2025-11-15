@@ -8,6 +8,7 @@
     "seed:users": "node seeders/seed-users.js"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "^9.2.0",
     "bcrypt": "^6.0.0",
     "connect-flash": "^0.1.1",
     "connect-redis": "^7.1.1",
