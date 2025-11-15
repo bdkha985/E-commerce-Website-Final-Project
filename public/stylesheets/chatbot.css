@@ -1,0 +1,198 @@
+/* public/stylesheets/chatbot.css */
+
+:root {
+    --chatbot-primary: #005461; /* Màu chính (từ header) */
+    --chatbot-bg: #f8fafc;
+    --chatbot-border: #e2e8f0;
+}
+
+/* 1. Nút Bong bóng Chat */
+.chatbot-bubble {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: var(--chatbot-primary);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    z-index: 1050;
+}
+.chatbot-bubble:hover {
+    transform: scale(1.1) translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 84, 97, 0.3);
+}
+
+/* 2. Cửa sổ Chat */
+.chatbot-window {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 360px;
+    max-width: calc(100% - 40px);
+    height: 500px;
+    background: #fff;
+    border: 1px solid var(--chatbot-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1049;
+
+    /* Ẩn mặc định */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+.chatbot-window.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* 3. Header Cửa sổ Chat */
+.chatbot-header {
+    padding: 16px;
+    background: var(--chatbot-primary);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.chatbot-header h5 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+#chatbot-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.8rem;
+    opacity: 0.8;
+    cursor: pointer;
+}
+#chatbot-close:hover {
+    opacity: 1;
+}
+
+/* 4. Khung tin nhắn */
+.chatbot-messages {
+    flex-grow: 1;
+    padding: 16px;
+    overflow-y: auto;
+    background: var(--chatbot-bg);
+}
+.chat-message {
+    display: flex;
+    margin-bottom: 12px;
+}
+.chat-message .bubble {
+    padding: 10px 14px;
+    border-radius: 12px;
+    max-width: 80%;
+    line-height: 1.5;
+    font-size: 1.4rem;
+}
+/* Tin nhắn của Bot (AI) */
+.chat-message.bot {
+    justify-content: flex-start;
+}
+.chat-message.bot .bubble {
+    background: #fff;
+    border: 1px solid var(--chatbot-border);
+    color: #334155;
+    border-top-left-radius: 0;
+}
+/* Tin nhắn của Người dùng */
+.chat-message.user {
+    justify-content: flex-end;
+}
+.chat-message.user .bubble {
+    background: var(--chatbot-primary);
+    color: #fff;
+    border-bottom-right-radius: 0;
+}
+
+/* Tin nhắn đang tải (loading) */
+.chat-message.bot.loading .bubble {
+    padding: 12px 16px;
+}
+.typing-indicator span {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #94a3b8;
+    animation: typing 1s infinite;
+    margin: 0 1px;
+}
+.typing-indicator span:nth-child(2) { animation-delay: 0.1s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.2s; }
+@keyframes typing {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+/* 5. Khung nhập liệu */
+.chatbot-input {
+    padding: 12px;
+    border-top: 1px solid var(--chatbot-border);
+    display: flex;
+    gap: 10px;
+}
+.chatbot-input input {
+    flex-grow: 1;
+    border: 1px solid var(--chatbot-border);
+    border-radius: 20px;
+    padding: 10px 14px;
+    font-size: 1.4rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.chatbot-input input:focus {
+    border-color: var(--chatbot-primary);
+}
+.chatbot-input button {
+    border: none;
+    background: var(--chatbot-primary);
+    color: #fff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.chatbot-input button:hover {
+    opacity: 0.8;
+}
+.chatbot-input button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 420px) {
+    .chatbot-window {
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        border-radius: 0;
+    }
+    .chatbot-bubble {
+        bottom: 20px;
+        right: 20px;
+    }
+}
