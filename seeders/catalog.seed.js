@@ -6,6 +6,7 @@ const slugify = require('slugify');
 const Brand = require('../models/brand.model');
 const Category = require('../models/category.model');
 const Product = require('../models/product.model');
+const { syncProductsToES } = require('../services/search/elastic.service'); // <-- BỔ SUNG DÒNG NÀY
 
 function s(str) {
   return slugify(str, { lower: true, strict: true });
@@ -262,6 +263,10 @@ async function main() {
   await Product.insertMany(products);
   console.log(`✅ Seeded ${products.length} products`);
 
+  // === BỔ SUNG: GỌI ĐỒNG BỘ SANG ES ===
+    await syncProductsToES();
+    // === KẾT THÚC BỔ SUNG ===
+    
   await mongoose.disconnect();
   console.log('👋 Done!');
 }

@@ -1,5 +1,6 @@
 // controllers/web/search.controller.js
 const Product = require('../../models/product.model');
+const { searchProducts } = require('../../services/search/elastic.service'); // <-- THAY ĐỔI: Import ES
 
 const escapeRegex = (s = '') => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -20,45 +21,88 @@ function getDisplayPrice(p) {
     return typeof p.basePrice === "number" ? p.basePrice : 0;
 }
 
+// const getResults = async (req, res, next) => {
+//     try {
+//         const q = (req.query.q || '').trim();
+//         const page = Math.max(1, parseInt(req.query.page || '1', 10));
+//         const limit = 16; // 16 sản phẩm mỗi trang
+//         const skip = (page - 1) * limit;
+
+//         const cond = {};
+//         if (q) {
+//             cond.$or = [
+//                 { name: { $regex: q, $options: 'i' } },
+//                 { slug: { $regex: q, $options: 'i' } },
+//                 { tags: { $regex: q, $options: 'i' } },
+//             ];
+//         }
+
+//         const [items, total] = await Promise.all([
+//             Product.find(cond)
+//                 .populate('brandId', 'name') // Populate brand để _product-card hiển thị
+//                 .sort({ createdAt: -1 })
+//                 .skip(skip)
+//                 .limit(limit)
+//                 .lean(),
+//             Product.countDocuments(cond)
+//         ]);
+        
+//         const totalPages = Math.max(1, Math.ceil(total / limit));
+        
+//         // Map lại dữ liệu để partial _product-card có thể đọc
+//         const products = (items || []).map((p) => ({
+//             ...p,
+//             _thumb: getDisplayImage(p),
+//             _price: getDisplayPrice(p),
+//         }));
+
+//         res.render('layouts/main', {
+//             title: `Tìm kiếm: "${q}"`,
+//             body: 'pages/search-results', // View mới sắp tạo
+//             products: products,
+//             q: q,
+//             pagination: { page, totalPages, total, q }
+//         });
+
+//     } catch (err) {
+//         next(err);
+//     }
+// };
+
 const getResults = async (req, res, next) => {
     try {
         const q = (req.query.q || '').trim();
         const page = Math.max(1, parseInt(req.query.page || '1', 10));
-        const limit = 16; // 16 sản phẩm mỗi trang
-        const skip = (page - 1) * limit;
+        const limit = 16;
+        
+        let items = [];
+        let total = 0;
 
-        const cond = {};
         if (q) {
-            cond.$or = [
-                { name: { $regex: q, $options: 'i' } },
-                { slug: { $regex: q, $options: 'i' } },
-                { tags: { $regex: q, $options: 'i' } },
-            ];
+            // === THAY ĐỔI: Gọi ElasticSearch ===
+            const allResults = await searchProducts(q);
+            // === KẾT THÚC THAY ĐỔI ===
+
+            // Phân trang thủ công (vì ES trả về tất cả)
+            total = allResults.length;
+            const skip = (page - 1) * limit;
+            items = allResults.slice(skip, skip + limit);
         }
 
-        const [items, total] = await Promise.all([
-            Product.find(cond)
-                .populate('brandId', 'name') // Populate brand để _product-card hiển thị
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(limit)
-                .lean(),
-            Product.countDocuments(cond)
-        ]);
-        
         const totalPages = Math.max(1, Math.ceil(total / limit));
         
-        // Map lại dữ liệu để partial _product-card có thể đọc
-        const products = (items || []).map((p) => ({
+        // Dữ liệu từ ES đã được format sẵn (có 'thumb' và 'price')
+        // Chúng ta chỉ cần đổi tên biến để view EJS hiểu
+        const products = items.map(p => ({
             ...p,
-            _thumb: getDisplayImage(p),
-            _price: getDisplayPrice(p),
+            _thumb: p.thumb,
+            _price: p.price
         }));
 
         res.render('layouts/main', {
             title: `Tìm kiếm: "${q}"`,
-            body: 'pages/search-results', // View mới sắp tạo
-            products: products,
+            body: 'pages/search-results',
+            products: products, // Truyền sản phẩm đã format
             q: q,
             pagination: { page, totalPages, total, q }
         });

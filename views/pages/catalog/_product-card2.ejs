@@ -1,23 +1,14 @@
 <%
 function pickImage(p) {
-  // Ưu tiên _thumb (từ ES)
-  if (p._thumb) return p._thumb; 
   if (p.images?.length) return p.images[0];
   if (p.variants?.length && p.variants[0].images?.length) return p.variants[0].images[0];
   return 'https://picsum.photos/seed/placeholder/500/500';
 }
 function displayPrice(p) {
-  // Ưu tiên _price (từ ES)
-  if (p._price) return (p._price || 0).toLocaleString('vi-VN') + 'đ'; 
-  
   let price = p.basePrice || 0;
   if (Array.isArray(p.variants) && p.variants.length) {
-    const prices = p.variants
-      .map((v) => v.price)
-      .filter((n) => typeof n === "number");
-    if (prices.length) {
-      price = Math.min(...prices);
-    }
+    const min = p.variants.reduce((acc, v) => Math.min(acc, v.price), Infinity);
+    if (isFinite(min)) price = min;
   }
   return (price || 0).toLocaleString('vi-VN') + 'đ';
 }
@@ -31,8 +22,8 @@ function displayPrice(p) {
     <h3 class="name line-clamp"><a href="/products/<%= p.slug %>"><%= p.name %></a></h3>
     <div class="meta">
       <span class="price"><%= displayPrice(p) %></span>
-      <% if (p.brandId?.name || p.brandName) { %>
-        <span class="brand"><%= p.brandName || p.brandId.name %></span>
+      <% if (p.brandId?.name) { %>
+        <span class="brand"><%= p.brandId.name %></span>
       <% } %>
     </div>
   </div>

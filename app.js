@@ -25,6 +25,7 @@ const RedisStore =
 
 const configViewEngine = require("./config/viewEngine");
 const { connectDB } = require("./config/database");
+const { setupElasticsearch } = require('./services/search/elastic.service');
 
 //Routes
 const cartService = require('./services/cart/cart.service.js');
@@ -179,6 +180,9 @@ app.use("/", webRoutes);
 
 // ================ DATABASE + SERVER ==================
 connectDB(process.env.MONGODB_URI)
+  .then(() => {
+      return setupElasticsearch(); // Chạy setup ES sau khi connect Mongo
+  })
   .then(() => {
     // ĐÚNG: chạy server.listen để Socket.io hook vào đúng server
     server.listen(port, () => {

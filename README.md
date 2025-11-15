@@ -22,7 +22,7 @@ Tài liệu này cung cấp hướng dẫn để triển khai và chạy ứng d
     Build image cho ứng dụng bằng `Dockerfile` đã cung cấp. Image này chứa cả ứng dụng web (`app`) và tiến trình xử lý email (`worker`).
 
     ```bash
-    docker build -t kshop-app:latest .
+    docker build -t duykh4/kshop-app:latest .
     ```
     * `-t kshop-app:latest`: Đặt tên (tag) cho image là `kshop-app` với phiên bản `latest`.
     * `.`: Chỉ định thư mục hiện tại là ngữ cảnh build.
