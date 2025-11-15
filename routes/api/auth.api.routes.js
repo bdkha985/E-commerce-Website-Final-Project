@@ -7,9 +7,12 @@ const { signupRules, signinRules, handleApiValidation } = require("../../middlew
 
 const router = express.Router();
 
+// POST /api/auth/signup
 router.post("/signup", signupRules, handleApiValidation, apiSignup);
+// POST /api/auth/signin
 router.post("/signin", signinRules, handleApiValidation, apiSignin);
 
+// POST /api/auth/force-change-password
 router.post(
     "/force-change-password",
     [
