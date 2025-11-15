@@ -31,6 +31,7 @@
         <link rel="stylesheet" href="/stylesheets/about.css" />
         <link rel="stylesheet" href="/stylesheets/cart.css" />
         <link rel="stylesheet" href="/stylesheets/product-detail-variants.css" />
+        <link rel="stylesheet" href="/stylesheets/chatbot.css" />
         <link rel="stylesheet" href="/stylesheets/footer.css" />
         
         <title>K Shopping</title>
@@ -102,8 +103,30 @@
 
         <%- include('../partials/footer') %>
 
+        <div class="chatbot-window" id="chatbot-window">
+            <div class="chatbot-header">
+                <h5>K Shopping Assistant</h5>
+                <button id="chatbot-close" aria-label="Đóng chat">&times;</button>
+            </div>
+            <div class="chatbot-messages" id="chatbot-messages">
+                <div class="chat-message bot">
+                    <div class="bubble">
+                        Xin chào! Bạn cần tôi tìm sản phẩm gì? (ví dụ: "áo thun nam")
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbot-input-text" placeholder="Nhập tin nhắn...">
+                <button id="chatbot-send" aria-label="Gửi"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <div class="chatbot-bubble" id="chatbot-bubble">
+            <i class="fa-regular fa-comments"></i>
+        </div>
+
         <script src="/javascripts/loader.js"></script>
         <script src="/javascripts/search.js" defer></script>
+        <script src="/javascripts/chatbot.js" defer></script>
         <script src="/javascripts/cart.js" defer></script>
         <script src="/socket.io/socket.io.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>

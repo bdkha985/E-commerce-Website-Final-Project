@@ -8,5 +8,6 @@ router.use('/cart', require('./cart.api.routes'));
 router.use('/checkout', require('./checkout.api.routes'));
 router.use('/search', require('./search.api.routes.js'));
 router.use('/reviews', require('./review.api.routes.js'));
+router.use('/chatbot', require('./chatbot.api.routes.js')); // <-- THÊM DÒNG NÀY
 
 module.exports = router;
