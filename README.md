@@ -26,6 +26,9 @@ Tài liệu này cung cấp hướng dẫn để triển khai và chạy ứng d
     ```
     * `-t kshop-app:latest`: Đặt tên (tag) cho image là `kshop-app` với phiên bản `latest`.
     * `.`: Chỉ định thư mục hiện tại là ngữ cảnh build.
+    
+    # 2. Push lên Hub (Nếu dùng CI/CD, chỉ cần git push)
+    # docker push duykh4/kshop-app:latest
 
 3.  **Khởi Tạo Docker Swarm (Nếu chưa có):**
     Nếu đây là lần đầu bạn sử dụng Swarm mode trên máy, bạn cần khởi tạo nó. Nếu đã khởi tạo rồi, bạn có thể bỏ qua bước này.
