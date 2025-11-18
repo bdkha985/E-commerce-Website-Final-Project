@@ -1,38 +1,53 @@
 <%
 function pickImage(p) {
-  // Ưu tiên _thumb (từ ES)
   if (p._thumb) return p._thumb; 
   if (p.images?.length) return p.images[0];
   if (p.variants?.length && p.variants[0].images?.length) return p.variants[0].images[0];
   return 'https://picsum.photos/seed/placeholder/500/500';
 }
 function displayPrice(p) {
-  // Ưu tiên _price (từ ES)
   if (p._price) return (p._price || 0).toLocaleString('vi-VN') + 'đ'; 
-  
   let price = p.basePrice || 0;
   if (Array.isArray(p.variants) && p.variants.length) {
-    const prices = p.variants
-      .map((v) => v.price)
-      .filter((n) => typeof n === "number");
-    if (prices.length) {
-      price = Math.min(...prices);
-    }
+    const prices = p.variants.map((v) => v.price).filter((n) => typeof n === "number");
+    if (prices.length) price = Math.min(...prices);
   }
   return (price || 0).toLocaleString('vi-VN') + 'đ';
 }
+
+// Lấy SKU mặc định (lấy biến thể đầu tiên còn hàng)
+let defaultSku = '';
+let hasStock = false;
+if (p.variants && p.variants.length > 0) {
+    const v = p.variants.find(v => v.stock > 0) || p.variants[0];
+    defaultSku = v.sku;
+    hasStock = v.stock > 0;
+}
 %>
 
-<article class="p-card">
-  <a class="thumb" href="/products/<%= p.slug %>">
-    <img src="<%= pickImage(p) %>" alt="<%= p.name %>">
-  </a>
+<article class="product-card p-card">
+  <div class="thumb">
+    <img src="<%= pickImage(p) %>" alt="<%= p.name %>" loading="lazy">
+
+    <div class="card-overlay" role="group" aria-label="Quick actions">
+      <a href="/products/<%= p.slug %>" class="overlay-btn btn-quick-view" title="Xem ngay" aria-label="Xem ngay sản phẩm <%= p.name %>">
+        Xem ngay
+      </a>
+
+      <% if (defaultSku && hasStock) { %>
+      <button class="overlay-btn btn-quick-add" title="Thêm vào giỏ" aria-label="Thêm <%= p.name %> vào giỏ hàng" onclick="quickAddToCart(event, this, '<%= p._id %>', '<%= defaultSku %>')">
+        <i class="fa-solid fa-cart-plus" aria-hidden="true"></i>
+      </button>
+      <% } %>
+    </div>
+  </div>
+
   <div class="info">
     <h3 class="name line-clamp"><a href="/products/<%= p.slug %>"><%= p.name %></a></h3>
     <div class="meta">
       <span class="price"><%= displayPrice(p) %></span>
       <% if (p.brandId?.name || p.brandName) { %>
-        <span class="brand"><%= p.brandName || p.brandId.name %></span>
+      <span class="brand"><%= p.brandName || p.brandId.name %></span>
       <% } %>
     </div>
   </div>

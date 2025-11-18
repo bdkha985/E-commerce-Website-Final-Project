@@ -480,3 +480,82 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* === CARD OVERLAY (HOVER EFFECT) === */
+.product-card .thumb {
+    position: relative;
+    overflow: hidden; /* Đảm bảo overlay không tràn ra ngoài */
+}
+
+/* Lớp phủ đen mờ */
+.card-overlay {
+    position: absolute;
+    inset: 0; /* Full kích thước cha */
+    background: rgba(0, 0, 0, 0.4); /* Đen mờ 40% */
+    backdrop-filter: blur(2px); /* Làm mờ nhẹ ảnh nền */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    opacity: 0; /* Ẩn mặc định */
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 10;
+    transform: translateY(10px); /* Hiệu ứng trượt lên */
+}
+
+/* Hiện lên khi hover vào toàn bộ card */
+.product-card:hover .card-overlay {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Nút chung trong overlay */
+.overlay-btn {
+    border: none;
+    border-radius: 50px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    font-weight: 600;
+    font-size: 1.4rem;
+    text-decoration: none;
+}
+
+.overlay-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Nút Xem Ngay (Trắng) */
+.btn-quick-view {
+    background: #fff;
+    color: #0f172a;
+    padding: 0 20px; /* Nút dài */
+}
+.btn-quick-view:hover {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+/* Nút Giỏ Hàng (Icon tròn) */
+.btn-quick-add {
+    width: 44px;
+    background: #0f172a;
+    color: #fff;
+}
+.btn-quick-add:hover {
+    background: #ef4444; /* Màu đỏ khi hover */
+}
+
+/* Tắt hiệu ứng này trên Mobile (vì không có hover) */
+@media (max-width: 768px) {
+    .card-overlay {
+        display: none; /* Hoặc làm nó luôn hiện nếu muốn */
+    }
+}

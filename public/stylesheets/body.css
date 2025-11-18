@@ -774,6 +774,34 @@
     line-height: 1.6;
 }
 
+.toast {
+    /* 1. Tăng chiều rộng (Mặc định Bootstrap là 350px) */
+    --bs-toast-max-width: 500px; 
+    width: 500px; 
+    max-width: 90vw; /* Để không bị tràn trên điện thoại */
+
+    /* 2. Tăng cỡ chữ */
+    font-size: 1.6rem; 
+    font-weight: 500;
+    
+    /* 3. Bo góc tròn hơn (nếu thích) */
+    border-radius: 12px !important;
+    
+    /* 4. Đổ bóng đậm hơn cho nổi bật */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+}
+
+.toast-body {
+    /* 5. Tăng khoảng cách đệm bên trong */
+    padding: 16px 24px; 
+}
+
+/* Tùy chỉnh nút đóng cho to ra tương ứng */
+.toast .btn-close {
+    width: 1.2em;
+    height: 1.2em;
+}
+
 /* ===== Responsive Design ===== */
 @media (max-width: 992px) {
     .banner {

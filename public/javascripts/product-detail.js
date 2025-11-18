@@ -176,22 +176,30 @@ document.addEventListener('DOMContentLoaded', () => {
             // === KẾT THÚC GỬI SỰ KIỆN ===
 
             // Hiển thị toast (nếu dùng Bootstrap)
-            const toastEl = document.getElementById('toastSuccess');
-            if(toastEl) {
-                const toastBody = toastEl.querySelector('.toast-body');
-                toastBody.textContent = data.message || "Thêm vào giỏ thành công!";
-                new bootstrap.Toast(toastEl).show();
-            } else {
-                alert(data.message || 'Thêm vào giỏ hàng thành công!');
+            const liveToast = document.getElementById('liveToast');
+            const toastMsg = document.getElementById('liveToastMsg');
+            
+            if (liveToast && toastMsg && window.bootstrap) {
+                // Cập nhật nội dung và màu sắc (Xanh cho thành công)
+                liveToast.className = 'toast align-items-center text-bg-success border-0';
+                toastMsg.textContent = data.message || "Thêm vào giỏ thành công!";
+                
+                // Hiển thị
+                const toast = new bootstrap.Toast(liveToast);
+                toast.show();
             }
 
         } catch (err) {
             console.error('Lỗi khi thêm vào giỏ:', err);
-            const toastEl = document.getElementById('toastError');
-            if(toastEl) {
-                const toastBody = toastEl.querySelector('.toast-body');
-                toastBody.textContent = err.message;
-                new bootstrap.Toast(toastEl).show();
+            
+            const liveToast = document.getElementById('liveToast');
+            const toastMsg = document.getElementById('liveToastMsg');
+            
+            if (liveToast && toastMsg && window.bootstrap) {
+                // Đổi màu đỏ cho lỗi
+                liveToast.className = 'toast align-items-center text-bg-danger border-0';
+                toastMsg.textContent = err.message;
+                new bootstrap.Toast(liveToast).show();
             } else {
                 alert(`Lỗi: ${err.message}`);
             }

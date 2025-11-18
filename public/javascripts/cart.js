@@ -217,15 +217,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Xóa toàn bộ giỏ hàng
     const btnClearAll = document.getElementById('btn-clear-all');
+    const btnConfirmClear = document.getElementById('btnConfirmClear');
+
+    // Sự kiện click nút "Xóa toàn bộ" -> Hiện Modal
     if (btnClearAll) {
-        btnClearAll.addEventListener('click', async () => {
-            if (!confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?')) return;
-            const data = await sendCartRequest('/api/cart/clear', 'DELETE');
-            if (data) {
-                updateCartPageView(data); 
-                updateMiniCart(data.cart, data.totalItems);
+        btnClearAll.addEventListener('click', () => {
+            // Thay vì confirm(), hiển thị Modal Bootstrap
+            const modalEl = document.getElementById('modalClearCart');
+            if (modalEl && window.bootstrap) {
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            } else {
+                // Fallback nếu lỗi thư viện
+                if (confirm('Bạn có chắc chắn muốn xóa toàn bộ giỏ hàng?')) {
+                    // Gọi hàm xóa trực tiếp nếu không hiện được modal
+                    handleClearCart(); 
+                }
             }
         });
+    }
+
+    // Sự kiện click nút "Đồng ý" trong Modal -> Gọi API Xóa
+    if (btnConfirmClear) {
+        btnConfirmClear.addEventListener('click', async () => {
+            await handleClearCart();
+            
+            // Ẩn Modal sau khi xóa xong
+            const modalEl = document.getElementById('modalClearCart');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        });
+    }
+
+    // Hàm xử lý logic gọi API xóa
+    async function handleClearCart() {
+        const data = await sendCartRequest('/api/cart/clear', 'DELETE');
+        if (data) {
+            updateCartPageView(data); 
+            updateMiniCart(data.cart, data.totalItems);
+            
+            // Hiện Toast thông báo thành công (nếu có Live Toast)
+            const liveToast = document.getElementById('liveToast');
+            const toastMsg = document.getElementById('liveToastMsg');
+            if (liveToast && toastMsg && window.bootstrap) {
+                liveToast.className = 'toast align-items-center text-bg-success border-0';
+                toastMsg.textContent = "Đã xóa sạch giỏ hàng!";
+                new bootstrap.Toast(liveToast).show();
+            }
+        }
     }
 
     // 4. Xử lý Mã giảm giá
