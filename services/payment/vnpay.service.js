@@ -1,90 +1,124 @@
-// services/payment/vnpay.service.js
-const crypto = require('crypto');
-const moment = require('moment');
-const qs = require('qs'); // <-- Import qs
+const crypto = require("crypto");
+const moment = require("moment");
+const qs = require("qs");
 
-function sortObject(obj) {
-	let sorted = {};
-	let str = [];
-	let key;
-	for (key in obj){
-		if (obj.hasOwnProperty(key)) {
-		str.push(encodeURIComponent(key));
-		}
-	}
-	str.sort();
-    for (key = 0; key < str.length; key++) {
-        sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, "+");
-    }
-    return sorted;
+function normalizeValue(v) {
+    if (v === null || v === undefined) return "";
+    // ensure string, trim, no thousands separators
+    let s = String(v).trim();
+    // remove comma separators if any (e.g. "1,000")
+    s = s.replace(/,/g, "");
+    return s;
 }
 
-/**
- * Tạo URL thanh toán VNPAY (Giữ nguyên)
- */
+function buildSignString(params) {
+    // Build exactly: key1=value1&key2=value2 ... with values encoded by encodeURIComponent then %20 -> +
+    const pairs = [];
+    const keys = Object.keys(params).sort();
+    for (const k of keys) {
+        const v = normalizeValue(params[k]);
+        // encode value the same way VNPAY expects
+        const ev = encodeURIComponent(v).replace(/%20/g, "+");
+        pairs.push(`${k}=${ev}`);
+    }
+    return pairs.join("&");
+}
+
 function createPaymentUrl(req, order) {
     const tmnCode = process.env.VNP_TMNCODE;
     const secretKey = process.env.VNP_HASHSECRET;
     let vnpUrl = process.env.VNP_URL;
     const returnUrl = process.env.VNP_RETURN_URL;
 
-    const createDate = moment(new Date()).format('YYYYMMDDHHmmss');
-    const orderId = order.code; 
-    const amount = order.total;
+    const createDate = moment().format("YYYYMMDDHHmmss");
+    const orderId = String(order.code);
+
+    // Ensure total is a Number and round to integer of VND*100
+    const totalNumber = Number(order.total);
+    if (Number.isNaN(totalNumber)) {
+        throw new Error("order.total is not a number");
+    }
+    const amount = Math.round(totalNumber * 100);
+
     const orderInfo = `Thanh toan don hang ${orderId}`;
-    
-    let vnp_Params = {};
-    vnp_Params['vnp_Version'] = '2.1.0';
-    vnp_Params['vnp_Command'] = 'pay';
-    vnp_Params['vnp_TmnCode'] = tmnCode;
-    vnp_Params['vnp_Locale'] = 'vn';
-    vnp_Params['vnp_CurrCode'] = 'VND';
-    vnp_Params['vnp_TxnRef'] = orderId;
-    vnp_Params['vnp_OrderInfo'] = orderInfo;
-    vnp_Params['vnp_OrderType'] = 'other';
-    vnp_Params['vnp_Amount'] = amount * 100;
-    vnp_Params['vnp_ReturnUrl'] = returnUrl;
-    vnp_Params['vnp_IpAddr'] = req.ip.replace('::ffff:', '');
-    vnp_Params['vnp_CreateDate'] = createDate;
-    
-    vnp_Params = sortObject(vnp_Params);
-    
-    const signData = qs.stringify(vnp_Params, { encode: false }); // <-- Dùng qs
+
+    const vnp_Params = {
+        vnp_Version: "2.1.0",
+        vnp_Command: "pay",
+        vnp_TmnCode: tmnCode,
+        vnp_Locale: "vn",
+        vnp_CurrCode: "VND",
+        vnp_TxnRef: orderId,
+        vnp_OrderInfo: orderInfo,
+        vnp_OrderType: "other",
+        vnp_Amount: String(amount),
+        vnp_ReturnUrl: returnUrl,
+        vnp_IpAddr: (req.ip || "").replace("::ffff:", ""),
+        vnp_CreateDate: createDate,
+    };
+
+    // Build sign string using deterministic encoding
+    const signData = buildSignString(vnp_Params);
+
+    // Logging for debug (remove/comment in production)
+    // console.log("VNPAY signData:", signData);
+    // console.log("VNPAY amount (vnp_Amount):", vnp_Params.vnp_Amount);
+
     const hmac = crypto.createHmac("sha512", secretKey);
-    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest("hex"); 
-    
-    vnp_Params['vnp_SecureHash'] = signed;
-    vnpUrl += '?' + qs.stringify(vnp_Params, { encode: false }); // <-- Dùng qs
-    
-    return vnpUrl;
+    const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
+
+    vnp_Params["vnp_SecureHash"] = signed;
+
+    // Build URL: use same encoding for query string as in sign (encodeURIComponent with %20->+)
+    const qsPairs = [];
+    Object.keys(vnp_Params)
+        .sort()
+        .forEach((k) => {
+            const ev = encodeURIComponent(String(vnp_Params[k] || "")).replace(
+                /%20/g,
+                "+"
+            );
+            qsPairs.push(`${k}=${ev}`);
+        });
+    const queryString = qsPairs.join("&");
+
+    const finalUrl = `${vnpUrl}?${queryString}`;
+    // console.log(
+    //     "VNPAY finalUrl (first 200 chars):",
+    //     finalUrl.substring(0, 200)
+    // );
+    return finalUrl;
 }
 
-// === THÊM HÀM MỚI NÀY VÀO ===
-/**
- * Xác thực chữ ký VNPAY trả về
- */
-function verifyReturnUrl(vnp_Params) {
+function verifyReturnUrl(vnp_ParamsIn) {
     const secretKey = process.env.VNP_HASHSECRET;
-    const secureHash = vnp_Params['vnp_SecureHash'];
+    // Make a shallow copy so we don't mutate original
+    const vnp_Params = Object.assign({}, vnp_ParamsIn);
 
-    // Xóa 2 trường hash ra khỏi params
-    delete vnp_Params['vnp_SecureHash'];
-    delete vnp_Params['vnp_SecureHashType'];
+    const secureHash =
+        vnp_Params["vnp_SecureHash"] ||
+        vnp_Params["vnp_SecureHash".toLowerCase()];
+    // delete hash fields
+    delete vnp_Params["vnp_SecureHash"];
+    delete vnp_Params["vnp_SecureHashType"];
 
-    // Sắp xếp và stringify
-    const sortedParams = sortObject(vnp_Params);
-    const signData = qs.stringify(sortedParams, { encode: false });
-    
-    // Tạo hash
+    // Build signData in same deterministic way
+    const signData = buildSignString(vnp_Params);
+
+    // Logging for debug
+    // console.log("VNPAY verify signData:", signData);
+    // console.log("VNPAY incoming secureHash:", secureHash);
+
     const hmac = crypto.createHmac("sha512", secretKey);
-    const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest("hex"); 
+    const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
 
-    // So sánh
-    return secureHash === signed;
+    // console.log("VNPAY computed signed:", signed);
+
+    // compare ignoring case
+    return (secureHash || "").toLowerCase() === (signed || "").toLowerCase();
 }
-// === KẾT THÚC HÀM MỚI ===
 
 module.exports = {
     createPaymentUrl,
-    verifyReturnUrl // <-- Export hàm mới
+    verifyReturnUrl,
 };
