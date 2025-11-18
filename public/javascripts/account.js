@@ -85,18 +85,83 @@
         renderLoyalty(u.loyaltyPoints);
     }
     function renderLoyalty(lp) {
-        const box = $("#loyaltyBox");
-        if (!lp) return (box.textContent = "Chưa có điểm thưởng");
+    const box = document.getElementById("loyaltyBox");
+    
+    // Empty state
+    if (!lp || !lp.balance) {
         box.innerHTML = `
-      <div class="p-3 border rounded-3">
-        <div><b>Số điểm:</b> ${lp.balance ?? 0}</div>
-        <div><b>Cập nhật:</b> ${
-            lp.lastUpdatedAt ? new Date(lp.lastUpdatedAt).toLocaleString() : "—"
-        }</div>
-        <small class="text-muted">Bạn nhận ~10% điểm theo giá trị đơn hàng, dùng cho đơn sau.</small>
-      </div>
-    `;
+            <div class="loyalty-empty">
+                <div class="loyalty-empty-icon">🎁</div>
+                <div class="loyalty-empty-text">Chưa có điểm thưởng</div>
+                <div class="loyalty-empty-desc">Mua sắm để tích điểm và nhận ưu đãi!</div>
+            </div>
+        `;
+        return;
     }
+    
+    // Format date
+    const lastUpdated = lp.lastUpdatedAt 
+        ? new Date(lp.lastUpdatedAt).toLocaleString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+        : "Chưa có hoạt động";
+    
+    // Calculate tier progress (optional - adjust based on your tier system)
+    const nextTier = 1000; // Example: next tier at 1000 points
+    const progress = Math.min((lp.balance / nextTier) * 100, 100);
+    
+    // Render loyalty card
+    box.innerHTML = `
+        <div class="loyalty-card">
+            <!-- Header -->
+            <div class="loyalty-header">
+                <div class="loyalty-icon">⭐</div>
+                <div class="loyalty-badge">Thành viên VIP</div>
+            </div>
+            
+            <!-- Balance Display -->
+            <div class="loyalty-balance">
+                <div class="loyalty-label">Điểm tích lũy của bạn</div>
+                <div class="loyalty-points">
+                    ${lp.balance.toLocaleString('vi-VN')}
+                    <span class="loyalty-currency">điểm</span>
+                </div>
+            </div>
+            
+            <!-- Info Grid -->
+            <div class="loyalty-info">
+                <div class="loyalty-info-item">
+                    <div class="loyalty-info-label">
+                        <i class="fas fa-clock"></i>
+                        Cập nhật lần cuối
+                    </div>
+                    <div class="loyalty-info-value">${lastUpdated}</div>
+                </div>
+                
+                <div class="loyalty-info-item">
+                    <div class="loyalty-info-label">
+                        <i class="fas fa-gift"></i>
+                        Giá trị quy đổi
+                    </div>
+                    <div class="loyalty-info-value">${(lp.balance).toLocaleString('vi-VN')}đ</div>
+                </div>
+            </div>
+            
+            
+            <!-- Note -->
+            <div class="loyalty-note">
+                <i class="fas fa-info-circle"></i>
+                <strong>Cách tích điểm:</strong> Bạn nhận 10% điểm theo giá trị đơn hàng. 
+                Sử dụng điểm để giảm giá cho đơn hàng tiếp theo!
+            </div>
+        </div>
+    `;
+}
+
     $("#btnSaveProfile")?.addEventListener("click", async () => {
         const alert = $("#profileAlert");
         hideAlert(alert);

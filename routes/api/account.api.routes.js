@@ -4,7 +4,10 @@ const express = require("express");
 const { body } = require("express-validator");
 const requireLoginApi = require("../../middlewares/requireLogin.api.js");
 const ctrl = require("../../controllers/account/account.api.controller.js");
-
+const { updateProfileRules, 
+    changePasswordRules, 
+    addAddressRules, 
+    handleApiValidation } = require("../../middlewares/authValidator");
 const router = express.Router();
 
 // Require login
@@ -16,29 +19,16 @@ router.get("/me", ctrl.getMe);
 // Update profile
 router.patch(
     "/profile",
-    [
-        body("fullName")
-            .optional()
-            .isLength({ min: 2 })
-            .withMessage("Tên quá ngắn"),
-        body("phone")
-            .optional()
-            .matches(/^0\d{9,10}$/)
-            .withMessage("Số điện thoại không hợp lệ!"),
-    ],
+    updateProfileRules, // Sử dụng rules
+    handleApiValidation,
     ctrl.updateProfile
 );
 
-//Change password
+// Change password
 router.post(
     "/change-password",
-    [
-        body("currentPassword").isLength({ min: 6 }),
-        body("newPassword").isLength({ min: 6 }),
-        body("confirmPassword")
-            .custom((v, { req }) => v === req.body.newPassword)
-            .withMessage("Xác nhận mật khẩu không khớp"),
-    ],
+    changePasswordRules, // Sử dụng bộ luật đầy đủ (có check confirmPassword)
+    handleApiValidation,
     ctrl.changePassword
 );
 
@@ -46,14 +36,11 @@ router.post(
 router.get("/addresses", ctrl.listAddresses);
 router.post(
     "/addresses",
-    [
-        body("label").notEmpty(),
-        body("street").notEmpty(),
-        body("ward").notEmpty(),
-        body("city").notEmpty(),
-    ],
+    addAddressRules, // Sử dụng rules
+    handleApiValidation,
     ctrl.addAddress
 );
+
 router.patch("/addresses/:idx", ctrl.updateAddressByIndex);
 router.delete("/addresses/:idx", ctrl.removeAddressByIndex);
 router.post("/addresses/:idx/default", ctrl.setDefaultAddressByIndex);
