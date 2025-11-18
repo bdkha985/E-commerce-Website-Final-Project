@@ -16,10 +16,13 @@ const {
 
 const router = express.Router();
 
+// POST /api/auth/signup
 router.post("/signup", signupRules, handleApiValidation, apiSignup);
+// POST /api/auth/signin
 router.post("/signin", signinRules, handleApiValidation, apiSignin);
 
 // Đổi mật khẩu bắt buộc
+// POST /api/auth/force-change-password
 router.post(
     "/force-change-password",
     forceChangePasswordRules, // Sử dụng rule đã tách ra
