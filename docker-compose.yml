@@ -12,7 +12,8 @@ services:
 
   app:
     image: duykh4/kshop-app:latest
-    # volumes:
+    volumes:
+      - ./public/uploads:/usr/src/app/public/uploads
     #   - .:/usr/src/app
     #   - /usr/src/app/node_modules
     environment:
@@ -53,7 +54,8 @@ services:
 
   worker:
     image: duykh4/kshop-app:latest
-    # volumes:
+    volumes:
+      - ./public/uploads:/usr/src/app/public/uploads
     #   - .:/usr/src/app
     #   - /usr/src/app/node_modules
     environment:

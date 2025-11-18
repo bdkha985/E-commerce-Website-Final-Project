@@ -1,10 +1,18 @@
 <%
 function pickImage(p) {
-  if (p._thumb) return p._thumb; 
-  if (p.images?.length) return p.images[0];
-  if (p.variants?.length && p.variants[0].images?.length) return p.variants[0].images[0];
-  return 'https://picsum.photos/seed/placeholder/500/500';
+  let img = '';
+  if (p._thumb) img = p._thumb; 
+  else if (p.images?.length) img = p.images[0];
+  else if (p.variants?.length && p.variants[0].images?.length) img = p.variants[0].images[0];
+  else return 'https://placehold.co/500x500?text=No+Image';
+
+  // === FIX LỖI: Nếu là ảnh nội bộ (không chứa http), thêm dấu / vào đầu ===
+  if (img && !img.startsWith('http') && !img.startsWith('/')) {
+      return '/' + img;
+  }
+  return img;
 }
+
 function displayPrice(p) {
   if (p._price) return (p._price || 0).toLocaleString('vi-VN') + 'đ'; 
   let price = p.basePrice || 0;

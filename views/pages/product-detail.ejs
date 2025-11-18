@@ -8,7 +8,15 @@
   <div class="pd-wrap">
     <div class="pd-gallery">
       <% 
-        const imgs = (product?.images?.length ? product.images : ['https://placehold.co/800x600?text=No+Image']);
+        let imgs = (product?.images?.length ? product.images : ['https://placehold.co/800x600?text=No+Image']);
+        
+        // === FIX LỖI: Thêm dấu / cho tất cả ảnh nội bộ ===
+        imgs = imgs.map(img => {
+            if (img && !img.startsWith('http') && !img.startsWith('/')) {
+                return '/' + img;
+            }
+            return img;
+        });
       %>
       <div class="pd-main">
         <img id="pdMainImg" src="<%= imgs[0] %>" alt="<%= product?.name %>">
