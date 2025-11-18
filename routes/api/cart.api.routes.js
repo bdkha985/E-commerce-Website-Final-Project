@@ -3,22 +3,26 @@ const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
 const cartApiController = require('../../controllers/cart/cart.api.controller');
+const { handleApiValidation } = require('../../middlewares/authValidator'); // Tái sử dụng hàm xử lý lỗi
+const { 
+    addToCartRules, 
+    updateCartItemRules, 
+    applyDiscountRules 
+} = require('../../middlewares/cartValidator');
 
 // POST /api/cart/add
 router.post(
     '/add',
-    [
-        body('productId').notEmpty().withMessage('Thiếu ID sản phẩm'),
-        body('sku').notEmpty().withMessage('Thiếu SKU biến thể'),
-        body('quantity').isInt({ min: 1 }).withMessage('Số lượng không hợp lệ')
-    ],
+    addToCartRules,
+    handleApiValidation,
     cartApiController.addToCart
 );
 
 // PATCH /api/cart/update/:sku
 router.patch(
     '/update/:sku',
-    [ body('quantity').isInt().withMessage('Số lượng không hợp lệ') ],
+    updateCartItemRules,
+    handleApiValidation,
     cartApiController.updateItem
 );
 
@@ -37,7 +41,8 @@ router.delete(
 // POST /api/cart/apply-discount
 router.post(
     '/apply-discount',
-    [ body('code').notEmpty().withMessage('Vui lòng nhập mã') ],
+    applyDiscountRules,
+    handleApiValidation,
     cartApiController.applyDiscount
 );
 

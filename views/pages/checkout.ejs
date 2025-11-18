@@ -6,7 +6,9 @@
     <div class="checkout-main">
       <h1>Thông tin Thanh toán</h1>
 
-      <form id="checkout-form">
+      <div id="checkoutError" class="alert alert-danger d-none" role="alert"></div>
+      
+      <form id="checkout-form" data-ajax="true">
 
         <% if (userInfo) { %>
         <p class="checkout-greeting">

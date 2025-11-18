@@ -3,24 +3,11 @@ const router = express.Router();
 
 const { render, getHomePage } = require("../controllers/web/home.controller");
 const products = require("../controllers/catalog/product.controller");
-const {
-    signupRules,
-    signinRules,
-    handleValidation,
-} = require("../middlewares/authValidator");
 const requireLoginPage = require("../middlewares/requireLoginPage");
 const catalog  = require('../controllers/catalog/catalog.controller');
 const cartController = require('../controllers/cart/cart.controller');
 const checkoutController = require('../controllers/checkout/checkout.controller');
 const searchController = require('../controllers/web/search.controller');
-
-// ========== Trang tĩnh / auth ==========
-// router.get("/homepage", (req, res) =>
-//     render(res, "pages/index.ejs", { title: "Trang chủ" })
-// );
-// router.get("/", (req, res) =>
-//     render(res, "pages/index.ejs", { title: "Trang chủ" })
-// );
 
 router.get('/', getHomePage);   
 router.get('/homepage', getHomePage);  

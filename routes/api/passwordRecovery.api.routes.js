@@ -1,34 +1,36 @@
 // routes/passwordRecovery.api.js
 const express = require("express");
-const { body } = require("express-validator");
 const ctrl = require("../../controllers/auth/password.api.controller");
+const { 
+    forgotPasswordRules, 
+    verifyOtpRules, 
+    resetPasswordRules, 
+    handleApiValidation 
+} = require("../../middlewares/authValidator");
 
 const router = express.Router();
 
+// Quên mật khẩu
 router.post(
     "/forgot",
-    [body("email").isEmail().withMessage("Email không hợp lệ")],
+    forgotPasswordRules,
+    handleApiValidation,
     ctrl.forgot
 );
 
+// Xác thực OTP
 router.post(
     "/verify-otp",
-    [
-        body("email").isEmail().withMessage("Email không hợp lệ"),
-        body("otp").isLength({ min: 4 }).withMessage("OTP không hợp lệ"),
-    ],
+    verifyOtpRules,
+    handleApiValidation,
     ctrl.verify
 );
 
+// Đặt lại mật khẩu
 router.post(
     "/reset-password",
-    [
-        body("email").isEmail().withMessage("Email không hợp lệ"),
-        body("resetToken").notEmpty().withMessage("Thiếu reset token"),
-        body("newPassword")
-            .isLength({ min: 6 })
-            .withMessage("Mật khẩu >= 6 ký tự"),
-    ],
+    resetPasswordRules,
+    handleApiValidation,
     ctrl.reset
 );
 

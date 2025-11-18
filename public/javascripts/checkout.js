@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutForm = document.getElementById('checkout-form');
     const placeOrderBtn = document.querySelector('.btn-place-order');
 
+    const errorBox = document.getElementById('checkoutError');
+
     // === DOM Elements (Summary Box) ===
     const summaryBox = document.getElementById('checkout-summary-box');
     const loyaltyRow = document.getElementById('loyalty-row');
@@ -24,6 +26,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === Helper ===
     const formatCurrency = (amount) => (amount || 0).toLocaleString('vi-VN') + 'đ';
+
+    // Hàm hiển thị lỗi (Thay thế alert)
+    function showError(msg) {
+        if (errorBox) {
+            errorBox.textContent = msg;
+            errorBox.classList.remove('d-none');
+            // Cuộn lên để user thấy lỗi
+            errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            // Fallback nếu không tìm thấy box
+            alert(msg);
+        }
+    }
 
     // === 1. LOGIC DROPDOWN ĐỊA CHỈ ===
     if (addressSelector) {
@@ -72,6 +87,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (checkoutForm && placeOrderBtn) {
         checkoutForm.addEventListener('submit', async (e) => {
             e.preventDefault(); 
+
+            if (errorBox) errorBox.classList.add('d-none');
             placeOrderBtn.disabled = true;
             placeOrderBtn.textContent = 'ĐANG XỬ LÝ...';
 
@@ -111,14 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } catch (err) {
                 console.error('Lỗi khi đặt hàng:', err);
-                const toastEl = document.getElementById('toastError');
-                if(toastEl) {
-                    const toastBody = toastEl.querySelector('.toast-body');
-                    toastBody.textContent = err.message;
-                    new bootstrap.Toast(toastEl).show();
-                } else {
-                    alert(`Lỗi: ${err.message}`);
-                }
+                showError(err.message);
                 placeOrderBtn.disabled = false;
                 placeOrderBtn.textContent = 'ĐẶT HÀNG';
             }

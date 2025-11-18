@@ -4,6 +4,10 @@ const router = express.Router();
 const ctrl = require('../../controllers/admin/admin.product.controller');
 const upload = require('../../middlewares/upload');
 
+// Import Validator
+const { productRules } = require('../../middlewares/adminValidator');
+const { handleValidation } = require('../../middlewares/authValidator'); // Tái sử dụng hàm xử lý lỗi redirect
+
 // GET /admin/products (Danh sách sản phẩm)
 router.get('/', ctrl.listProducts);
 
@@ -15,7 +19,13 @@ router.get('/new', ctrl.getProductForm);
 router.get('/:id', ctrl.getProductForm);
 
 // POST /admin/products/save (Xử lý lưu - cả thêm mới và cập nhật)
-router.post('/save', upload.array('images', 5), ctrl.saveProduct);
+router.post(
+    '/save', 
+    upload.array('images', 5),
+    productRules, 
+    handleValidation, 
+    ctrl.saveProduct
+);
 
 // POST /admin/products/:id/delete (Xử lý xóa)
 router.post('/:id/delete', ctrl.deleteProduct);
