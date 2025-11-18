@@ -70,6 +70,10 @@ const updateProfileRules = [
         .optional()
         .trim()
         .matches(/^0\d{9}$/).withMessage("Số điện thoại không hợp lệ (10 số bắt đầu bằng 0)"),
+    body("email")
+        .optional()
+        .trim()
+        .isEmail().withMessage("Email không hợp lệ"),
 ];
 
 // 9. Thêm địa chỉ (Address)
