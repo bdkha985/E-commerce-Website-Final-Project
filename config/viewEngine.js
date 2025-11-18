@@ -2,6 +2,7 @@
 
 const path = require("path");
 const express = require("express");
+const ejs = require('ejs');
 
 const configViewEngine = (app) => {
     // view engine setup
