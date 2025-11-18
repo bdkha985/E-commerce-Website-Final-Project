@@ -81,6 +81,7 @@
         if ($("#accEmail")) $("#accEmail").textContent = u.email || "";
         const prof = $("#formProfile");
         prof.fullName.value = u.fullName || "";
+        prof.email.value = u.email || "";
         prof.phone.value = u.phone || "";
         renderLoyalty(u.loyaltyPoints);
     }
@@ -167,6 +168,7 @@
         hideAlert(alert);
         const body = {
             fullName: $("#formProfile").fullName.value.trim(),
+            email: $("#formProfile").email.value.trim(),
             phone: $("#formProfile").phone.value.trim(),
         };
         const r = await fetch("/api/account/profile", {

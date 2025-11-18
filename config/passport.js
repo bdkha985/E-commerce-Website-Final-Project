@@ -1,18 +1,24 @@
-//config/passport.js
+// config/passport.js
 
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const FacebookStrategy = require("passport-facebook").Strategy;
 const User = require("../models/user.model");
 
-// serialize / deserialize
+// Serialize / Deserialize
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
-    const user = await User.findById(id);
-    done(null, user);
+    try {
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (err) {
+        done(err, null);
+    }
 });
 
-// Google strategy
+// =========================================================================
+// GOOGLE STRATEGY
+// =========================================================================
 passport.use(
     new GoogleStrategy(
         {
@@ -22,94 +28,110 @@ passport.use(
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                let user = await User.findOne({ "oauth.googleId": profile.id });
-                if (!user) {
-                    user = await User.create({
-                        fullName: profile.displayName,
-                        email: profile.emails[0].value,
-                        oauth: { googleId: profile.id },
-                        roles: ["customer"],
-                    });
+                const googleId = profile.id;
+                const email = profile.emails?.[0]?.value?.toLowerCase();
+                const displayName = profile.displayName;
+
+                // 1. Tìm xem Google ID này đã có trong DB chưa
+                let user = await User.findOne({ "oauth.googleId": googleId });
+
+                if (user) {
+                    // Case A: Đã từng đăng nhập bằng Google này -> OK
+                    return done(null, user);
                 }
+
+                // 2. Nếu chưa có Google ID, thử tìm theo Email
+                if (email) {
+                    user = await User.findOne({ email: email });
+                    
+                    if (user) {
+                        // Case B: Email đã tồn tại (do đăng ký thủ công hoặc FB trước đó)
+                        // => THỰC HIỆN LIÊN KẾT (LINKING)
+                        if (!user.oauth) user.oauth = {};
+                        user.oauth.googleId = googleId;
+                        await user.save();
+                        return done(null, user);
+                    }
+                }
+
+                // 3. Case C: Chưa có ID, chưa có Email => Tạo User mới hoàn toàn
+                user = await User.create({
+                    fullName: displayName,
+                    email: email, // Lưu ý: Nếu Google không trả về email, chỗ này có thể null (cần handle ở Model)
+                    roles: ["customer"],
+                    oauth: { googleId: googleId },
+                    passwordHash: null, // Không có mật khẩu
+                    phone: ""
+                });
+
                 return done(null, user);
+
             } catch (err) {
+                console.error("[Passport Google Error]", err);
                 return done(err, null);
             }
         }
     )
 );
 
+// =========================================================================
+// FACEBOOK STRATEGY
+// =========================================================================
 passport.use(
     new FacebookStrategy(
         {
             clientID: process.env.FB_APP_ID,
             clientSecret: process.env.FB_APP_SECRET,
-            callbackURL:
-                process.env.FB_CALLBACK_URL ||
-                "http://localhost:8081/auth/facebook/callback",
+            callbackURL: process.env.FB_CALLBACK_URL || "http://localhost:8081/auth/facebook/callback",
             profileFields: ["id", "emails", "name", "displayName"],
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-
                 const facebookId = profile.id;
-                const email = profile.emails?.[0]?.value?.toLowerCase() || null;
-                const displayName =
-                    profile.displayName ||
-                    [profile.name?.givenName, profile.name?.familyName]
-                        .filter(Boolean)
-                        .join(" ") ||
+                const email = profile.emails?.[0]?.value?.toLowerCase();
+                
+                // Xử lý tên hiển thị
+                const displayName = profile.displayName || 
+                    [profile.name?.givenName, profile.name?.familyName].filter(Boolean).join(" ") || 
                     "Facebook User";
 
-                // 1) Tìm theo facebookId
-                let user = await User.findOne({
-                    "oauth.facebookId": facebookId,
-                });
+                // 1. Tìm theo Facebook ID
+                let user = await User.findOne({ "oauth.facebookId": facebookId });
 
-                // 2) Nếu chưa có, thử khớp theo email
-                if (!user && email) {
-                    user = await User.findOne({ email });
+                if (user) {
+                    return done(null, user);
+                }
+
+                // 2. Nếu chưa, tìm theo Email để liên kết
+                if (email) {
+                    user = await User.findOne({ email: email });
                     if (user) {
-                        user.oauth = { ...(user.oauth || {}), facebookId };
+                        // => LIÊN KẾT TÀI KHOẢN
+                        if (!user.oauth) user.oauth = {};
+                        user.oauth.facebookId = facebookId;
                         await user.save();
+                        return done(null, user);
                     }
                 }
 
-                // 3) Nếu vẫn chưa có, tạo mới
-                if (!user) {
-                    try {
-                        user = await User.create({
-                            fullName: displayName,
-                            email: email || `fb-${facebookId}@example.local`,
-                            passwordHash: null,
-                            phone: "",
-                            roles: ["customer"],
-                            oauth: { facebookId },
-                        });
-                    } catch (e) {
-                        // Trường hợp email trùng (E11000) -> link tài khoản
-                        if (e?.code === 11000 && email) {
-                            user = await User.findOneAndUpdate(
-                                { email },
-                                { $set: { "oauth.facebookId": facebookId } },
-                                { new: true }
-                            );
-                        } else {
-                            console.error("[FB create user error]", e);
-                            return done(null, false, {
-                                message:
-                                    "Không thể tạo/lấy tài khoản Facebook.",
-                            });
-                        }
-                    }
-                }
+                // 3. Tạo mới
+                // (Lưu ý: Facebook đôi khi không trả về email nếu user đăng ký bằng SĐT)
+                const finalEmail = email || `fb-${facebookId}@no-email.com`; 
+
+                user = await User.create({
+                    fullName: displayName,
+                    email: finalEmail,
+                    roles: ["customer"],
+                    oauth: { facebookId: facebookId },
+                    passwordHash: null,
+                    phone: ""
+                });
 
                 return done(null, user);
+
             } catch (err) {
-                console.error("[FacebookStrategy ERROR]", err);
-                return done(null, false, {
-                    message: "Xác thực Facebook thất bại.",
-                });
+                console.error("[Passport Facebook Error]", err);
+                return done(err, null);
             }
         }
     )

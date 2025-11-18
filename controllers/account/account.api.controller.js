@@ -36,12 +36,31 @@ const updateProfile = async (req, res) => {
         });
 
     const id = getUserId(req);
-    const { fullName, phone, avatarUrl } = req.body;
+    const { fullName, phone, avatarUrl, email } = req.body;
 
     const toSet = {};
     if (fullName !== undefined) toSet.fullName = fullName;
     if (phone !== undefined) toSet.phone = phone;
     if (avatarUrl !== undefined) toSet.avatarUrl = avatarUrl;
+
+    // === BẮT ĐẦU LOGIC CẬP NHẬT EMAIL ===
+    if (email !== undefined) {
+        // 1. Kiểm tra xem email có bị trùng với người khác không
+        // (Tìm user có cùng email NHƯNG khác ID với user hiện tại)
+        const existingUser = await User.findOne({ 
+            email: email.toLowerCase().trim(), 
+            _id: { $ne: id } 
+        });
+        
+        if (existingUser) {
+            return res.status(400).json({
+                ok: false,
+                message: "Email này đã được sử dụng bởi tài khoản khác.",
+            });
+        }
+        
+        toSet.email = email.toLowerCase().trim();
+    }
 
     const user = await User.findByIdAndUpdate(
         id,
@@ -53,6 +72,10 @@ const updateProfile = async (req, res) => {
             ok: false,
             message: "Không tìm thấy user",
         });
+
+    if (req.session) {
+        req.session.fullName = user.fullName;
+    }
 
     res.json({
         ok: true,

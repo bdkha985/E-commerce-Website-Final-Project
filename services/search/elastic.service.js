@@ -1,5 +1,6 @@
 // services/search/elastic.service.js
 
+// Polyfill cho lỗi "File is not defined" trên Node 18
 if (!global.File) {
   global.File = class File extends Blob {
     constructor(fileBits, fileName, options) {
@@ -13,69 +14,84 @@ if (!global.File) {
 const { Client } = require('@elastic/elasticsearch');
 const Product = require('../../models/product.model');
 
-// Kết nối tới service 'elasticsearch' trong docker-compose
 const esClient = new Client({ node: 'http://elasticsearch:9200' });
-const INDEX_NAME = 'products'; // Tên index của chúng ta
+const INDEX_NAME = 'products';
+
+// Hàm chờ (sleep)
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Kiểm tra kết nối và tạo Index (nếu chưa có)
+ * Kiểm tra kết nối và tạo Index (CÓ CƠ CHẾ THỬ LẠI)
  */
 async function setupElasticsearch() {
-    try {
-        await esClient.ping();
-        console.log('✅ Đã kết nối ElasticSearch');
+    const maxRetries = 15; // Thử tối đa 15 lần
+    const delay = 5000;    // Mỗi lần cách nhau 5 giây
 
-        // Kiểm tra xem index 'products' đã tồn tại chưa
-        const indexExists = await esClient.indices.exists({ index: INDEX_NAME });
-        
-        if (!indexExists) {
-            console.log(`Index [${INDEX_NAME}] không tồn tại. Đang tạo...`);
-            // Tạo index mới với cấu hình phân tích tiếng Việt (cơ bản)
-            await esClient.indices.create({
-                index: INDEX_NAME,
-                body: {
-                    settings: {
-                        analysis: {
-                            analyzer: {
-                                default: {
-                                    type: "standard",
+    console.log('⏳ Đang kết nối ElasticSearch...');
+
+    for (let i = 1; i <= maxRetries; i++) {
+        try {
+            // 1. Thử Ping
+            await esClient.ping();
+            console.log(`✅ Đã kết nối ElasticSearch (Lần thử ${i})`);
+
+            // 2. Nếu kết nối OK, kiểm tra và tạo index
+            const indexExists = await esClient.indices.exists({ index: INDEX_NAME });
+            
+            if (!indexExists) {
+                console.log(`Index [${INDEX_NAME}] không tồn tại. Đang tạo...`);
+                await esClient.indices.create({
+                    index: INDEX_NAME,
+                    body: {
+                        settings: {
+                            analysis: {
+                                analyzer: {
+                                    default: { type: "standard" }
                                 }
                             }
-                        }
-                    },
-                    mappings: {
-                        properties: {
-                            name: { type: 'text' }, // Có thể tìm kiếm
-                            slug: { type: 'keyword' }, // Chỉ tìm chính xác
-                            tags: { type: 'text' },
-                            shortDesc: { type: 'text' },
-                            // Các trường khác chúng ta sẽ không tìm kiếm
-                            brandName: { type: 'keyword' },
-                            categoryNames: { type: 'keyword' },
-                            thumb: { type: 'keyword', index: false }, // Không cần tìm ảnh
-                            price: { type: 'double' }
+                        },
+                        mappings: {
+                            properties: {
+                                name: { type: 'text' },
+                                slug: { type: 'keyword' },
+                                tags: { type: 'text' },
+                                shortDesc: { type: 'text' },
+                                brandName: { type: 'keyword' },
+                                categoryNames: { type: 'keyword' },
+                                thumb: { type: 'keyword', index: false },
+                                price: { type: 'double' }
+                            }
                         }
                     }
-                }
-            });
-            console.log(`✅ Đã tạo Index [${INDEX_NAME}]`);
-        } else {
-            console.log(`Index [${INDEX_NAME}] đã tồn tại.`);
+                });
+                console.log(`✅ Đã tạo Index [${INDEX_NAME}]`);
+            } else {
+                console.log(`Index [${INDEX_NAME}] đã tồn tại.`);
+            }
+
+            return; // THÀNH CÔNG -> THOÁT HÀM
+
+        } catch (err) {
+            // Nếu lỗi, in cảnh báo và chờ
+            console.warn(`⚠️ Lần thử ${i}/${maxRetries}: ElasticSearch chưa sẵn sàng. Đang chờ ${delay/1000}s...`);
+            if (i < maxRetries) {
+                await sleep(delay);
+            } else {
+                // Đã hết số lần thử mà vẫn lỗi
+                console.error('❌ KHÔNG THỂ KẾT NỐI ELASTICSEARCH:', err.message);
+                // Không exit process để tránh crash loop liên tục, 
+                // chỉ log lỗi để app vẫn chạy (dù tính năng search sẽ hỏng)
+            }
         }
-    } catch (err) {
-        console.error('❌ Lỗi kết nối ElasticSearch:', err);
-        // Thoát nếu không kết nối được ES
-        process.exit(1); 
     }
 }
 
 /**
- * Lấy tất cả sản phẩm từ DB và đồng bộ sang ElasticSearch
+ * Đồng bộ dữ liệu
  */
 async function syncProductsToES() {
     console.log('Bắt đầu đồng bộ MongoDB -> ElasticSearch...');
     
-    // 1. Lấy tất cả sản phẩm từ MongoDB
     const products = await Product.find()
         .populate('brandId', 'name')
         .populate('categoryIds', 'name')
@@ -86,7 +102,6 @@ async function syncProductsToES() {
         return;
     }
 
-    // 2. Chuẩn bị "bulk" operations
     const getDisplayImage = (p) => (p.images?.length ? p.images[0] : (p.variants?.[0]?.images?.[0] || ''));
     const getDisplayPrice = (p) => (p.variants?.[0]?.price || p.basePrice || 0);
     
@@ -101,53 +116,32 @@ async function syncProductsToES() {
             thumb: getDisplayImage(doc).replace('public/', ''),
             price: getDisplayPrice(doc)
         };
-        
-        return [
-            { index: { _index: INDEX_NAME, _id: doc._id.toString() } },
-            esDoc
-        ];
+        return [ { index: { _index: INDEX_NAME, _id: doc._id.toString() } }, esDoc ];
     });
 
-    // 3. Xóa index cũ (để đảm bảo sạch)
-    console.log(`Đang xóa index [${INDEX_NAME}] cũ...`);
-    await esClient.indices.delete({ index: INDEX_NAME, ignore_unavailable: true });
-
-    // === BỔ SUNG: TẠO LẠI INDEX ===
-    // (Đảm bảo index tồn tại với mapping chính xác trước khi bulk)
-    await esClient.indices.create({
-        index: INDEX_NAME,
-        body: {
-            mappings: {
-                properties: {
-                    name: { type: 'text' },
-                    slug: { type: 'keyword' },
-                    tags: { type: 'text' },
-                    shortDesc: { type: 'text' },
-                    brandName: { type: 'keyword' },
-                    categoryNames: { type: 'keyword' },
-                    thumb: { type: 'keyword', index: false },
-                    price: { type: 'double' }
-                }
-            }
+    try {
+        // Xóa và tạo lại để đảm bảo sạch
+        const indexExists = await esClient.indices.exists({ index: INDEX_NAME });
+        if (indexExists) {
+            await esClient.indices.delete({ index: INDEX_NAME });
         }
-    });
-    console.log(`Đã tạo lại index [${INDEX_NAME}].`);
-    // === KẾT THÚC BỔ SUNG ===
-    
-    // 4. Thực hiện bulk insert
-    const bulkResponse = await esClient.bulk({ refresh: true, body: operations });
+        
+        // Setup lại mapping trước khi insert
+        await setupElasticsearch(); 
 
-    if (bulkResponse.errors) {
-        console.error('Lỗi khi bulk insert:', bulkResponse.items);
-    } else {
-        console.log(`✅ Đồng bộ thành công ${products.length} sản phẩm.`);
+        const bulkResponse = await esClient.bulk({ refresh: true, body: operations });
+        if (bulkResponse.errors) {
+            console.error('Lỗi khi bulk insert:', bulkResponse.items);
+        } else {
+            console.log(`✅ Đồng bộ thành công ${products.length} sản phẩm.`);
+        }
+    } catch (e) {
+        console.error("Lỗi đồng bộ ES:", e.message);
     }
 }
 
-// Hàm tìm kiếm (sẽ được controller gọi)
 async function searchProducts(query) {
     if (!query) return [];
-
     try {
         const { hits } = await esClient.search({
             index: INDEX_NAME,
@@ -155,21 +149,15 @@ async function searchProducts(query) {
                 query: {
                     multi_match: {
                         query: query,
-                        fields: ['name^3', 'tags^2', 'shortDesc'], // Ưu tiên 'name' (gấp 3 lần)
-                        fuzziness: "AUTO" // Cho phép gõ sai 1-2 ký tự
+                        fields: ['name^3', 'tags^2', 'shortDesc'],
+                        fuzziness: "AUTO"
                     }
                 }
             }
         });
-        
-        // Trả về kết quả đã được format
-        return hits.hits.map(hit => ({
-            _id: hit._id,
-            ...hit._source // Dữ liệu sản phẩm (name, slug, thumb, price...)
-        }));
-        
+        return hits.hits.map(hit => ({ _id: hit._id, ...hit._source }));
     } catch (err) {
-        console.error("Lỗi khi tìm kiếm ES:", err);
+        console.error("Lỗi tìm kiếm ES:", err.message);
         return [];
     }
 }
