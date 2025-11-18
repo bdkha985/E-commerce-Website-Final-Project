@@ -147,6 +147,12 @@ async function sendOrderConfirmationEmail(toEmail, order) {
             ${order.shippingAddress.street}, ${order.shippingAddress.ward}, ${order.shippingAddress.city}
         </p>
 
+        ${order.notes ? `
+        <p style="background: #f9f9f9; padding: 10px; border-left: 4px solid #ccc; font-style: italic;">
+            <strong>Ghi chú:</strong> ${order.notes}
+        </p>
+        ` : ''}
+        
         <p>
             <strong>Phương thức thanh toán:</strong> ${paymentMethodText}
         </p>

@@ -396,6 +396,13 @@
                         ${order.email}<br>
                         ${order.shippingAddress.street}, ${order.shippingAddress.ward}, ${order.shippingAddress.city}
                     </p>
+
+                    ${order.notes ? `
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #eee;">
+                            <strong>Ghi chú:</strong><br>
+                            <span style="color: #475569; font-style: italic;">"${order.notes}"</span>
+                        </div>
+                    ` : ''}
                 </div>
                 <div class="order-details-col">
                     <h3>Thanh toán & Trạng thái</h3>
