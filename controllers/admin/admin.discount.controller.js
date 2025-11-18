@@ -18,7 +18,7 @@ const listDiscounts = async (req, res, next) => {
             .lean();
 
         render(res, 'discounts', {
-            title: 'Quản lý Giảm giá',
+            title: 'Quản lý giảm giá',
             discounts: discounts
         });
     } catch (err) {
@@ -29,7 +29,7 @@ const listDiscounts = async (req, res, next) => {
 // 2. Hiển thị Form Tạo mới (GET /admin/discounts/new)
 const getDiscountForm = (req, res) => {
     render(res, 'discount-form', {
-        title: 'Tạo Mã Giảm giá Mới'
+        title: 'Tạo mã giảm giá mới'
     });
 };
 
@@ -86,8 +86,21 @@ const createDiscount = async (req, res) => {
     }
 };
 
+const deleteDiscount = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await Discount.findByIdAndDelete(id);
+        req.flash('success', 'Đã xóa mã giảm giá thành công.');
+    } catch (err) {
+        console.error("Lỗi xóa discount:", err);
+        req.flash('error', 'Lỗi khi xóa mã: ' + err.message);
+    }
+    res.redirect('/admin/discounts');
+};
+
 module.exports = {
     listDiscounts,
     getDiscountForm,
-    createDiscount
+    createDiscount,
+    deleteDiscount
 };

@@ -1,20 +1,37 @@
 // public/javascripts/admin-products.js
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('product-search-input');
+    const filterBrand = document.getElementById('filter-brand');     // <-- MỚI
+    const filterCategory = document.getElementById('filter-category'); // <-- MỚI
     const tableBody = document.getElementById('products-table-body');
     const paginationContainer = document.getElementById('products-pagination');
     const form = document.getElementById('product-filter-form');
 
     let debounceTimer;
+    
+    // Lấy giá trị hiện tại
     let currentQuery = searchInput ? searchInput.value : '';
+    let currentBrand = filterBrand ? filterBrand.value : '';
+    let currentCategory = filterCategory ? filterCategory.value : '';
 
     // Hàm chính: Gọi API và cập nhật UI
     async function fetchProducts(page = 1) {
-        const q = currentQuery;
+        // Cập nhật state mới nhất
+        currentQuery = searchInput.value;
+        currentBrand = filterBrand.value;
+        currentCategory = filterCategory.value;
+
         if (tableBody) tableBody.style.opacity = '0.5';
 
         try {
-            const params = new URLSearchParams({ page, q });
+            // Gửi kèm brand và category trong params
+            const params = new URLSearchParams({ 
+                page, 
+                q: currentQuery,
+                brand: currentBrand,
+                category: currentCategory
+            });
+            
             const res = await fetch(`/admin/products?${params.toString()}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
@@ -24,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Cập nhật UI
             renderTableBody(data.products);
-            renderPagination(data.pagination, data.q);
+            renderPagination(data.pagination, data.q, currentBrand, currentCategory);
             
         } catch (err) {
             console.error('Lỗi khi fetch sản phẩm:', err);
@@ -43,6 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         tableBody.innerHTML = products.map(p => {
             const totalStock = (p.variants || []).reduce((acc, v) => acc + v.stock, 0);
+            // Xử lý danh sách categories (mảng object)
+            const catNames = (p.categoryIds || []).map(c => c.name).join(', ');
+            
             return `
             <tr>
                 <td>
@@ -50,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <small class="text-muted">Slug: ${p.slug}</small>
                 </td>
                 <td>${p.brandId?.name || 'N/A'}</td>
-                <td>${(p.categoryIds || []).map(c => c.name).join(', ') || 'N/A'}</td>
+                <td>${catNames || 'N/A'}</td>
                 <td class="text-end">${(p.basePrice || 0).toLocaleString('vi-VN')}đ</td>
                 <td class="text-center">${totalStock}</td>
                 <td class="text-center">
@@ -68,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Helper: Vẽ lại phân trang
-    function renderPagination(pagination, q) {
+    function renderPagination(pagination, q, brand, category) {
         if (!paginationContainer) return;
         if (pagination.totalPages <= 1) {
             paginationContainer.innerHTML = '';
@@ -76,7 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         let html = '<ul class="pagination">';
         for (let i = 1; i <= pagination.totalPages; i++) {
-            const params = new URLSearchParams({ q, page: i });
+            // Tạo link giữ nguyên các filter
+            const params = new URLSearchParams({ q, brand, category, page: i });
             html += `
                 <li class="page-item ${i === pagination.page ? 'active' : ''}">
                     <a class="page-link" href="?${params.toString()}" data-page="${i}">${i}</a>
@@ -88,18 +109,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === Lắng nghe sự kiện ===
 
-    // 1. Gõ phím
+    // 1. Gõ phím tìm kiếm
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
-            currentQuery = e.target.value;
             clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                fetchProducts(1);
-            }, 350);
+            debounceTimer = setTimeout(() => fetchProducts(1), 350);
         });
     }
 
-    // 2. Chặn form submit
+    // 2. Thay đổi Dropdown (Thương hiệu & Danh mục)
+    if (filterBrand) {
+        filterBrand.addEventListener('change', () => fetchProducts(1));
+    }
+    if (filterCategory) {
+        filterCategory.addEventListener('change', () => fetchProducts(1));
+    }
+
+    // 3. Chặn form submit
     if (form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault(); 
@@ -107,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. Click link phân trang
+    // 4. Click phân trang
     if (paginationContainer) {
         paginationContainer.addEventListener('click', (e) => {
             e.preventDefault();

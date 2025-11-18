@@ -1,9 +1,8 @@
 // controllers/admin/admin.dashboard.api.controller.js
 const Order = require('../../models/order.model');
-const User = require('../../models/user.model'); // <-- BỔ SUNG
+const User = require('../../models/user.model');
 const moment = require('moment');
 
-// ... (Hàm getDateFormat và generateDateLabels giữ nguyên) ...
 const getDateFormat = (groupBy) => {
     switch (groupBy) {
         case 'week': return '%Y-%U';

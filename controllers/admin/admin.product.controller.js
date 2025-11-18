@@ -13,52 +13,83 @@ function render(res, view, data) {
 }
 
 // 1. Hiển thị Danh sách Sản phẩm (GET /admin/products)
-const listProducts = async (req, res) => {
+const listProducts = async (req, res, next) => {
     try {
-    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-    const limit = 15;
-    const skip = (page - 1) * limit;
-    const q = (req.query.q || '').trim();
+        const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+        const limit = 15;
+        const skip = (page - 1) * limit;
+        
+        // Lấy tham số từ query
+        const q = (req.query.q || '').trim();
+        const filterBrand = req.query.brand || '';
+        const filterCategory = req.query.category || '';
 
-    let where = {};
-    if (q) {
-        const searchRegex = new RegExp(q, 'i');
-        where.$or = [
-            { name: searchRegex },
-            { slug: searchRegex },
-            { 'variants.sku': searchRegex } // Tìm theo SKU
-        ];
-    }
+        let where = {};
+        
+        // 1. Lọc theo từ khóa (Search)
+        if (q) {
+            const searchRegex = new RegExp(q, 'i');
+            where.$or = [
+                { name: searchRegex },
+                { slug: searchRegex },
+                { 'variants.sku': searchRegex }
+            ];
+        }
 
-    const [products, totalProducts] = await Promise.all([
-        Product.find(where)
-            .populate('brandId', 'name')
-            .populate('categoryIds', 'name')
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit)
-            .lean(),
-        Product.countDocuments(where)
-    ]);
+        // 2. Lọc theo Thương hiệu
+        if (filterBrand) {
+            where.brandId = filterBrand;
+        }
 
-    const totalPages = Math.max(1, Math.ceil(totalProducts / limit));
-    const pagination = { page, totalPages, totalProducts, limit };
+        // 3. Lọc theo Danh mục
+        if (filterCategory) {
+            where.categoryIds = filterCategory;
+        }
 
-    if (req.xhr) {
+        // Thực hiện query song song
+        const [products, totalProducts, brands, categories] = await Promise.all([
+            Product.find(where)
+                .populate('brandId', 'name')
+                .populate('categoryIds', 'name')
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+            Product.countDocuments(where),
+            // Lấy danh sách để đổ vào dropdown (chỉ cần lấy 1 lần hoặc cache, nhưng ở đây lấy luôn cho đơn giản)
+            Brand.find().sort({ name: 1 }).lean(),
+            Category.find().sort({ name: 1 }).lean()
+        ]);
+
+        const totalPages = Math.max(1, Math.ceil(totalProducts / limit));
+        const pagination = { page, totalPages, totalProducts, limit };
+
+        // === TRẢ VỀ JSON NẾU LÀ AJAX (Live Search) ===
+        if (req.xhr) {
             return res.json({
                 ok: true,
                 products,
                 pagination,
-                q
+                q,
+                // Trả về các giá trị filter hiện tại để client biết (nếu cần)
+                filterBrand,
+                filterCategory
             });
         }
 
-    render(res, 'products', {
-        title: 'Quản lý sản phẩm',
-        products,
-        pagination,
-        q
-    });
+        // === RENDER HTML NẾU TẢI TRANG THƯỜNG ===
+        render(res, 'products', {
+            title: 'Quản lý sản phẩm',
+            products,
+            pagination,
+            q,
+            // Truyền dữ liệu cho Dropdown
+            brands, 
+            categories,
+            filterBrand,
+            filterCategory
+        });
+
     } catch (err) {
         if (req.xhr) {
             return res.status(500).json({ ok: false, message: "Lỗi máy chủ" });
@@ -90,7 +121,7 @@ const getProductForm = async (req, res) => {
     }
 
     render(res, 'product-form', {
-        title: isEditing ? `Sửa sản phẩm: ${product.name}` : 'Thêm Sản phẩm Mới',
+        title: isEditing ? `Sửa sản phẩm: ${product.name}` : 'Thêm sản phẩm mới',
         product: product,
         categories: categories,
         brands: brands,

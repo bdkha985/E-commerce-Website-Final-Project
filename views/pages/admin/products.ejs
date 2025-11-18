@@ -6,11 +6,32 @@
                 <i class="fas fa-plus fa-sm"></i> Thêm Sản phẩm Mới
             </a>
 
-            <div class="input-group" style="max-width: 400px;">
-                <input type="text" name="q" id="product-search-input" class="form-control" placeholder="Tìm tên, SKU, slug..." value="<%= q %>">
-                <button class="btn btn-primary" type="submit">
-                    <i class="fas fa-search fa-sm"></i>
-                </button>
+            <div class="d-flex gap-2" style="flex: 1; justify-content: flex-end;">
+                
+                <select class="form-select" id="filter-brand" name="brand" style="max-width: 180px;">
+                    <option value="">-- Thương hiệu --</option>
+                    <% (brands || []).forEach(b => { %>
+                        <option value="<%= b._id %>" <%= filterBrand == b._id ? 'selected' : '' %>>
+                            <%= b.name %>
+                        </option>
+                    <% }) %>
+                </select>
+
+                <select class="form-select" id="filter-category" name="category" style="max-width: 180px;">
+                    <option value="">-- Danh mục --</option>
+                    <% (categories || []).forEach(c => { %>
+                        <option value="<%= c._id %>" <%= filterCategory == c._id ? 'selected' : '' %>>
+                            <%= c.name %>
+                        </option>
+                    <% }) %>
+                </select>
+
+                <div class="input-group" style="max-width: 300px;">
+                    <input type="text" name="q" id="product-search-input" class="form-control" placeholder="Tìm tên, SKU..." value="<%= q %>">
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </form>
@@ -62,7 +83,7 @@
         </div>
 
         <nav class="pagination-wrap mt-4 d-flex justify-content-center" id="products-pagination">
-            <% if (pagination.totalPages > 1) { %>
+            <% if (pagination.totalPages > 0) { %>
                 <ul class="pagination">
                     <% for (let i = 1; i <= pagination.totalPages; i++) { %>
                         <li class="page-item <%= (i === pagination.page ? 'active' : '') %>">

@@ -3,7 +3,7 @@
         <div class="card text-primary border-primary h-100">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="card-title text-uppercase mb-1">Tổng Doanh Thu (Đã TT)</div>
+                    <div class="card-title text-uppercase mb-1">Tổng doanh thu (Đã thanh toán)</div>
                     <div class="h5 mb-0 fw-bold"><%= (stats.revenue || 0).toLocaleString('vi-VN') %>đ</div>
                 </div>
                 <i class="fas fa-dollar-sign fa-3x opacity-50"></i>
@@ -14,7 +14,7 @@
         <div class="card text-success border-success h-100">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="card-title text-uppercase mb-1">Tổng Đơn Hàng (All time)</div>
+                    <div class="card-title text-uppercase mb-1">Tổng đơn hàng</div>
                     <div class="h5 mb-0 fw-bold"><%= stats.orderCount || 0 %></div>
                 </div>
                 <i class="fas fa-box-archive fa-3x opacity-50"></i>
@@ -25,7 +25,7 @@
         <div class="card text-info border-info h-100">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
-                    <div class="card-title text-uppercase mb-1">Tổng Số Người Dùng</div>
+                    <div class="card-title text-uppercase mb-1">Tổng số người dùng</div>
                     <div class="h5 mb-0 fw-bold"><%= stats.userCount || 0 %></div>
                 </div>
                 <i class="fas fa-users fa-3x opacity-50"></i>
@@ -84,7 +84,7 @@
                     <div class="col-lg-8">
                         <h6 class="mb-2 fw-bold text-center">Doanh thu & Đơn hàng</h6>
                         
-                        <div id="chart-toggles" class="d-flex justify-content-center gap-3 mb-2 flex-wrap">
+                        <!-- <div id="chart-toggles" class="d-flex justify-content-center gap-3 mb-2 flex-wrap">
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" id="toggle-revenue" value="0" checked>
                                 <label class="form-check-label" for="toggle-revenue" style="color: #3b82f6;">Doanh thu</label>
@@ -101,14 +101,14 @@
                                 <input class="form-check-input" type="checkbox" id="toggle-new-users" value="3">
                                 <label class="form-check-label" for="toggle-new-users" style="color: #f59e0b;">User Mới</label>
                             </div>
-                        </div>
+                        </div> -->
 
                         <div class="chart-container" style="position: relative; height:300px;">
                             <canvas id="revenueChart"></canvas>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <h6 class="mb-2 fw-bold text-center">Tỷ lệ Phương thức Thanh toán</h6>
+                        <h6 class="mb-2 fw-bold text-center">Tỷ lệ phương thức thanh toán</h6>
                         <div class="chart-container" style="position: relative; height:300px;">
                             <canvas id="paymentMethodChart"></canvas>
                         </div>

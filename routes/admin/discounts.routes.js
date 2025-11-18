@@ -19,4 +19,6 @@ router.post(
     ctrl.createDiscount
 );
 
+router.post('/:id/delete', ctrl.deleteDiscount);
+
 module.exports = router;

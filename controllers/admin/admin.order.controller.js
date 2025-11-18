@@ -14,7 +14,7 @@ function render(res, view, data) {
 const listOrders = async (req, res) => {
     try {
         const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-        const limit = 20; // 20 item mỗi trang [cite: 179]
+        const limit = 15; // 20 item mỗi trang [cite: 179]
         const skip = (page - 1) * limit;
 
         const q = (req.query.q || '').trim();
@@ -128,7 +128,7 @@ const listOrders = async (req, res) => {
 
         // Render HTML nếu tải trang
         render(res, 'orders', {
-            title: 'Quản lý Đơn hàng',
+            title: 'Quản lý đơn hàng',
             orders, pagination, filter, filterTitle, q,
             sort: sortQuery, o_status: orderStatus, p_status: paymentStatus
         });
@@ -160,7 +160,7 @@ const getOrderDetails = async (req, res) => {
         ];
 
         render(res, "order-detail", {
-            title: `Chi tiết Đơn hàng #${order.code}`,
+            title: `Chi tiết đơn hàng #${order.code}`,
             order: order,
             statuses: statuses,
         });

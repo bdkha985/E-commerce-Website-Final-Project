@@ -1,7 +1,7 @@
 <div class="card shadow-sm mb-4">
   <form class="card-header py-3" id="user-filter-form">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-      <h6 class="m-0 fw-bold text-primary">Danh sách Người dùng (Customers)</h6>
+      <h6 class="m-0 fw-bold text-primary">Danh sách người dùng (Customers)</h6>
 
       <div class="input-group" style="max-width: 400px;">
         <input type="text" name="q" id="user-search-input" class="form-control" placeholder="Tìm email, tên, SĐT..." value="<%= q %>">
@@ -71,7 +71,7 @@
     </div>
 
     <nav class="pagination-wrap mt-4 d-flex justify-content-center" id="users-pagination">
-      <% if (pagination.totalPages > 1) { %>
+      <% if (pagination.totalPages > 0) { %>
       <ul class="pagination">
         <% for (let i = 1; i <= pagination.totalPages; i++) { %>
         <li class="page-item <%= (i === pagination.page ? 'active' : '') %>">

@@ -46,7 +46,7 @@ const listUsers = async (req, res, next) => {
         }
         
         render(res, 'users', {
-            title: 'Quản lý Người dùng',
+            title: 'Quản lý người dùng',
             users,
             pagination,
             q
@@ -98,7 +98,7 @@ const getUserForm = async (req, res, next) => {
         }
 
         render(res, 'user-form', {
-            title: `Sửa Người dùng: ${user.email}`,
+            title: `Sửa người dùng: ${user.email}`,
             user: user
         });
 
