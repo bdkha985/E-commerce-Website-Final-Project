@@ -10,6 +10,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.SMTP_PASS,
     },
     // === BỔ SUNG CẤU HÌNH TRÁNH TIMEOUT ===
+    family: 4, // <--- Ép dùng IPv4 (QUAN TRỌNG)
     tls: {
         ciphers: "SSLv3",
         rejectUnauthorized: false, // Giúp tránh lỗi chứng chỉ trên một số container
