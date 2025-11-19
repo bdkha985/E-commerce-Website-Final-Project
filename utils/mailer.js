@@ -9,6 +9,15 @@ const transporter = nodemailer.createTransport({
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
     },
+    // === BỔ SUNG CẤU HÌNH TRÁNH TIMEOUT ===
+    tls: {
+        ciphers: "SSLv3",
+        rejectUnauthorized: false, // Giúp tránh lỗi chứng chỉ trên một số container
+    },
+    connectionTimeout: 10000, // Chờ tối đa 10 giây
+    greetingTimeout: 10000,   // Chờ lời chào từ Google tối đa 10 giây
+    socketTimeout: 10000,     // Chờ dữ liệu tối đa 10 giây
+    // ======================================
 });
 
 (async () => {
