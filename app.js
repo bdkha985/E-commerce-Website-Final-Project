@@ -183,7 +183,12 @@ app.use("/", webRoutes);
 // ================ DATABASE + SERVER ==================
 connectDB(process.env.MONGODB_URI)
   .then(() => {
-      return setupElasticsearch(); // Chạy setup ES sau khi connect Mongo
+      if (process.env.SKIP_ELASTICSEARCH === 'true') {
+          console.log("⏩ Đã bỏ qua kết nối ElasticSearch (theo cấu hình SKIP_ELASTICSEARCH).");
+          return; // Không làm gì cả, đi tiếp
+      }
+
+      return setupElasticsearch();
   })
   .then(() => {
     // ĐÚNG: chạy server.listen để Socket.io hook vào đúng server
