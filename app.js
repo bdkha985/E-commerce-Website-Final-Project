@@ -40,8 +40,9 @@ const adminRoutes = require('./routes/admin/index');
 //Passport cấu hình
 require("./config/passport");
 
+const redisUrl = process.env.REDIS_URL || "redis://redis:6379";
 // Redis client (node-redis v4)
-const redisClient = createClient({ url: "redis://redis:6379" });
+const redisClient = createClient({ url: redisUrl });
 redisClient.on("error", (err) => console.error("Redis Client Error", err));
 redisClient.connect().catch(console.error);
 
@@ -209,5 +210,11 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render("error");
 });
+
+// === THỦ THUẬT DEPLOY: Chạy Worker chung với App nếu có biến môi trường ===
+if (process.env.RUN_WORKER_EMBEDDED === 'true') {
+    console.log("🚀 Đang chạy Worker trong chế độ Embedded...");
+    require('./worker');
+}
 
 module.exports = app;

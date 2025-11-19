@@ -9,10 +9,9 @@ const normalize = (s) =>
         .toLowerCase()
         .trim();
 
-const redisClient = new Redis({
-  host: "redis",
-  port: 6379,
-});
+        
+const redisUrl = process.env.REDIS_URL || "redis://redis:6379";
+const redisClient = new Redis(redisUrl);
 
 const QUEUE_NAME = "email_queue";
 

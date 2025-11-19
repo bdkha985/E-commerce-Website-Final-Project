@@ -51,6 +51,7 @@ services:
     networks:
       - kshop-network
     deploy:
+      replicas: 1
 
   worker:
     image: duykh4/kshop-app:latest
