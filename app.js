@@ -53,6 +53,7 @@ const store = new RedisStore({
 });
 
 const app = express();
+app.set('trust proxy', 1);
 const server = http.createServer(app);
 const port = process.env.PORT || 8888;
 const hostname = process.env.HOST_NAME || "localhost";
