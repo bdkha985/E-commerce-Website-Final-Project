@@ -1,24 +1,24 @@
 // utils/mailer.js
 const nodemailer = require("nodemailer");
 
+const port = Number(process.env.SMTP_PORT || 587);
+const secure = port === 465; // Auto set đúng chuẩn Gmail
+
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || "smtp.gmail.com",
-    port: +(process.env.SMTP_PORT || 465),
-    secure: (process.env.SMTP_SECURE || "true") === "true",
+    host: process.env.SMTP_HOST,
+    port,
+    secure,
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
     },
-    // === BỔ SUNG CẤU HÌNH TRÁNH TIMEOUT ===
-    family: 4, // <--- Ép dùng IPv4 (QUAN TRỌNG)
+    family: 4, // ép IPv4
     tls: {
-        ciphers: "SSLv3",
-        rejectUnauthorized: false, // Giúp tránh lỗi chứng chỉ trên một số container
+        rejectUnauthorized: false, // Render đôi khi lỗi cert
     },
-    connectionTimeout: 10000, // Chờ tối đa 10 giây
-    greetingTimeout: 10000,   // Chờ lời chào từ Google tối đa 10 giây
-    socketTimeout: 10000,     // Chờ dữ liệu tối đa 10 giây
-    // ======================================
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 15000,
 });
 
 (async () => {
