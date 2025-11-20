@@ -14,8 +14,8 @@ services:
     image: duykh4/kshop-app:latest
     volumes:
       - ./public/uploads:/usr/src/app/public/uploads
-    #   - .:/usr/src/app
-    #   - /usr/src/app/node_modules
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     environment:
       - MONGODB_URI=mongodb://db:27017/web_nodejs
       - HOST_NAME=0.0.0.0
@@ -57,8 +57,8 @@ services:
     image: duykh4/kshop-app:latest
     volumes:
       - ./public/uploads:/usr/src/app/public/uploads
-    #   - .:/usr/src/app
-    #   - /usr/src/app/node_modules
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     environment:
       - MONGODB_URI=mongodb://db:27017/web_nodejs
       - HOST_NAME=0.0.0.0

@@ -123,6 +123,28 @@ header .btn:hover {
     font-size: 1.8rem;
 }
 
+/* ========== HAMBURGER MENU ========== */
+.navbar__toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    margin-left: auto;
+    margin-right: 16px;
+}
+
+.navbar__toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background: var(--text-color);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
 .navbar ul {
     display: flex;
     margin-left: 50px;
@@ -590,6 +612,279 @@ header .btn:hover {
     .mini-cart {
         width: 320px;
         right: -20px;
+    }
+}
+
+@media (max-width: 1500px) {
+    .navbar__toggle {
+        display: flex;
+        order: 3;
+        margin-left: auto;
+    }
+
+    #pc-nav {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        width: 100%;
+        flex-direction: column !important;
+        background: var(--background-color);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        margin: 0 !important;
+        padding: 0;
+        z-index: 999;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    #pc-nav.active {
+        max-height: 600px;
+        padding: 16px 0;
+    }
+
+    #pc-nav li {
+        width: 100%;
+    }
+
+    #pc-nav li a {
+        display: block;
+        padding: 12px 16px !important;
+        width: 100%;
+        border-radius: 0;
+    }
+
+    #pc-nav li a::after {
+        display: none;
+    }
+
+    #pc-nav li a:hover {
+        background: rgba(0, 84, 97, 0.1);
+    }
+
+    .dropdown .dropdown-menu {
+        position: static;
+        opacity: 0;
+        visibility: hidden;
+        max-height: 0;
+        overflow: hidden;
+        box-shadow: none;
+        background: rgba(0, 84, 97, 0.05);
+        margin: 0;
+        padding: 0;
+        transform: none;
+        transition: all 0.3s ease;
+    }
+
+    .dropdown .dropdown-menu.show {
+        opacity: 1;
+        visibility: visible;
+        max-height: 300px;
+        padding: 8px 0;
+    }
+
+    .dropdown-menu li a {
+        padding: 8px 32px !important;
+        margin: 0;
+        font-size: 1.3rem;
+    }
+
+    /* Shrink search bar */
+    .searchbar {
+        order: 2;
+        margin: 0 8px;
+        width: auto;
+        flex: 0 1 auto;
+    }
+
+    .searchbar input {
+        width: 150px;
+        padding: 6px 10px;
+        font-size: 1.3rem;
+    }
+
+    /* Actions (cart + sign in) vào trái */
+    .actions {
+        order: 1;
+        margin-left: 0;
+    }
+}
+
+/* Breakpoint cũ cho 1024px */
+@media (max-width: 1024px) {
+    .navbar__toggle {
+        display: flex;
+    }
+
+    #pc-nav {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        width: 100%;
+        flex-direction: column !important;
+        background: var(--background-color);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        margin: 0 !important;
+        padding: 0;
+        z-index: 999;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .navbar__toggle {
+        display: flex;
+    }
+
+    #pc-nav {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        width: 100%;
+        flex-direction: column !important;
+        background: var(--background-color);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        margin: 0 !important;
+        padding: 0;
+        z-index: 999;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    #pc-nav.active {
+        max-height: 800px;
+        padding: 16px 0;
+    }
+
+    #pc-nav li {
+        width: 100%;
+    }
+
+    #pc-nav li a {
+        display: block;
+        padding: 12px 16px !important;
+        width: 100%;
+        border-radius: 0;
+    }
+
+    #pc-nav li a::after {
+        display: none;
+    }
+
+    #pc-nav li a:hover {
+        background: rgba(0, 84, 97, 0.1);
+    }
+
+    .dropdown .dropdown-menu {
+        position: static;
+        opacity: 0;
+        visibility: hidden;
+        max-height: 0;
+        overflow: hidden;
+        box-shadow: none;
+        background: rgba(0, 84, 97, 0.05);
+        margin: 0;
+        padding: 0;
+        transform: none;
+        transition: all 0.3s ease;
+    }
+
+    .dropdown .dropdown-menu.show {
+        opacity: 1;
+        visibility: visible;
+        max-height: 300px;
+        padding: 8px 0;
+    }
+
+    .dropdown-menu li a {
+        padding: 8px 32px !important;
+        margin: 0;
+        font-size: 1.3rem;
+    }
+
+    /* Ẩn search bar và actions trên mobile */
+    .searchbar {
+        display: none;
+    }
+
+    .actions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        width: 100%;
+        flex-direction: column;
+        background: var(--background-color);
+        margin: 0;
+        padding: 0;
+        border: none;
+        gap: 0;
+        display: none;
+    }
+
+    .actions.active {
+        display: flex;
+        padding: 16px;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .actions .cart-hover {
+        width: 100%;
+        margin: 0;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .actions .cart-btn {
+        font-size: 1.6rem;
+    }
+
+    .actions .user-name,
+    .actions .action-link,
+    .actions .ic__logout {
+        display: block;
+        padding: 12px 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar__logo span {
+        font-size: 1.4rem;
+    }
+
+    .navbar__logo img {
+        height: 2.5rem;
+        width: 2.5rem;
+    }
+
+    #pc-nav.active {
+        max-height: 700px;
+    }
+
+    .searchbar input {
+        padding: 6px 10px;
+        font-size: 1.3rem;
+    }
+
+    .searchbar button {
+        padding: 10px 12px;
+    }
+
+    #search-suggestions {
+        width: calc(100% - 32px);
+        max-width: none;
+    }
+
+    .mini-cart {
+        width: calc(100vw - 40px);
+        right: 20px;
     }
 }
 /* === BỔ SUNG CSS CHO SEARCH SUGGESTIONS === */
