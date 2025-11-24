@@ -1,7 +1,7 @@
 // middlewares/adminValidator.js
 const { body } = require("express-validator");
 
-// 1. Validate Sản phẩm
+// 1. Validate sản phẩm
 const productRules = [
     body("name").trim().notEmpty().withMessage("Tên sản phẩm không được để trống"),
     body("basePrice")
