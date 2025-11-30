@@ -3,6 +3,7 @@ const Order = require('../../models/order.model');
 const User = require('../../models/user.model');
 const Product = require('../../models/product.model');
 const Category = require('../../models/category.model');
+const Review = require('../../models/review.model');
 const moment = require('moment');
 
 // Helper: Format ngày tháng cho MongoDB $dateToString
@@ -67,7 +68,7 @@ const getChartData = async (req, res) => {
 
         // 2. Truy vấn dữ liệu (Aggregation)
         // Chúng ta dùng Promise.all để chạy song song các truy vấn lớn
-        const [orderStats, userStats, topProducts, categoryStats] = await Promise.all([
+        const [orderStats, userStats, topProducts, categoryStats, reviewStats] = await Promise.all([
             
             // A. Dữ liệu Đơn hàng (Line Chart & Stat Cards)
             Order.aggregate([
@@ -151,6 +152,16 @@ const getChartData = async (req, res) => {
                 },
                 { $sort: { revenue: -1 } },
                 { $limit: 6 }
+            ]),
+
+            Review.aggregate([
+                { $match: { createdAt: { $gte: startDate.toDate(), $lte: endDate.toDate() } } },
+                { 
+                    $group: { 
+                        _id: "$sentiment", // Group theo 'Positive', 'Negative', 'Neutral'
+                        count: { $sum: 1 } 
+                    } 
+                }
             ])
         ]);
 
@@ -187,6 +198,11 @@ const getChartData = async (req, res) => {
         // Lấy tổng User toàn hệ thống (để hiển thị Total Users)
         const totalUsersAllTime = await User.countDocuments({ roles: 'customer' });
 
+        const sentimentMap = { 'Positive': 0, 'Negative': 0, 'Neutral': 0 };
+        reviewStats.forEach(s => {
+            if (s._id) sentimentMap[s._id] = s.count;
+        });
+
         res.json({
             ok: true,
             stats: {
@@ -200,7 +216,8 @@ const getChartData = async (req, res) => {
                 main: chartData,
                 payment: [summary.countCOD, summary.countVNPAY],
                 products: topProdData,
-                categories: catData
+                categories: catData,
+                sentiment: [sentimentMap.Positive, sentimentMap.Neutral, sentimentMap.Negative]
             }
         });
 

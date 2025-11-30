@@ -125,4 +125,59 @@ async function runConversation(message, history, userId) {
     }
 }
 
-module.exports = { runConversation };
+/**
+ * Phân tích cảm xúc (Bản Nâng Cấp)
+ * @param {string} text - Nội dung bình luận
+ * @param {number} rating - Số sao đánh giá (để fallback)
+ */
+async function analyzeSentiment(text, rating) {
+    // 1. Nếu không có text, dùng rating để phán đoán
+    if (!text || text.length < 2) {
+        if (rating >= 4) return 'Positive';
+        if (rating <= 2) return 'Negative';
+        return 'Neutral';
+    }
+
+    // 2. Prompt chặt chẽ hơn
+    const prompt = `
+        Phân tích cảm xúc của bình luận sản phẩm sau.
+        Chỉ trả về ĐÚNG 1 từ duy nhất: "Positive" (khen/hài lòng), "Negative" (chê/thất vọng), hoặc "Neutral" (hỏi/trung tính).
+        Không giải thích thêm.
+        
+        Bình luận: "${text}"
+        Output:
+    `;
+
+    try {
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const rawText = response.text().trim().toLowerCase();
+        
+        console.log(`[AI Sentiment] Input: "${text}" | Output: "${rawText}"`); // Log để debug
+
+        // 3. Phân loại dựa trên AI
+        if (rawText.includes('positive') || rawText.includes('tích cực')) return 'Positive';
+        if (rawText.includes('negative') || rawText.includes('tiêu cực')) return 'Negative';
+        
+        // 4. Nếu AI bảo Neutral (hoặc trả lời lung tung), hãy nhìn vào Rating để sửa sai!
+        // (Đây là bước tối ưu quan trọng)
+        if (rating) {
+            if (rating <= 2) return 'Negative'; // Chửi nhẹ mà 1 sao thì là Negative
+            if (rating >= 5) return 'Positive'; // Khen nhẹ mà 5 sao thì là Positive
+        }
+
+        return 'Neutral';
+
+    } catch (err) {
+        console.error("Lỗi Sentiment Analysis:", err);
+        // Fallback khi lỗi mạng
+        if (rating >= 4) return 'Positive';
+        if (rating <= 2) return 'Negative';
+        return 'Neutral';
+    }
+}
+
+module.exports = { 
+    runConversation,
+    analyzeSentiment,
+ };

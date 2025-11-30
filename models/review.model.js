@@ -31,6 +31,11 @@ const ReviewSchema = new Schema(
             trim: true,
             default: "",
         },
+        sentiment: {
+            type: String,
+            enum: ['Positive', 'Negative', 'Neutral'],
+            default: 'Neutral'
+        },
     },
     { timestamps: true } // Tự động thêm createdAt và updatedAt
 );

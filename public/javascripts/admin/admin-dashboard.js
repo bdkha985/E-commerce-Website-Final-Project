@@ -4,11 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctxPayment = document.getElementById('paymentChart');
     const ctxProduct = document.getElementById('productChart');
     const ctxCategory = document.getElementById('categoryChart');
+    const ctxSentiment = document.getElementById('chartSentiment'); // <-- BỔ SUNG
 
     if (!ctxMain) return;
 
-    let mainChart, paymentChart, productChart, categoryChart;
-    let currentGroupBy = 'year'; // Mặc định theo năm (theo PDF)
+    let mainChart, paymentChart, productChart, categoryChart, sentimentChart; // <-- BỔ SUNG
+    let currentGroupBy = 'year'; // Mặc định theo năm
 
     // --- 1. CONFIG MAIN CHART (COMBO) ---
     const mainConfig = {
@@ -30,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 yCount: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, ticks: { precision: 0 } },
                 x: { grid: { display: false } }
             },
-            plugins: { legend: { display: false } } // Tắt legend vì dùng checkbox ngoài
+            plugins: { legend: { display: false } }
         }
     };
 
@@ -71,6 +72,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // --- 5. CONFIG SENTIMENT CHART (DOUGHNUT - MỚI) ---
+    const sentimentConfig = {
+        type: 'doughnut',
+        data: {
+            labels: ['Tích cực (Positive)', 'Trung tính (Neutral)', 'Tiêu cực (Negative)'],
+            datasets: [{ 
+                data: [], 
+                backgroundColor: ['#1cc88a', '#858796', '#e74a3b'], // Xanh lá, Xám, Đỏ
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } },
+            cutout: '60%',
+        }
+    };
+
     // --- HÀM FETCH DỮ LIỆU ---
     async function fetchData(start, end, groupBy) {
         try {
@@ -93,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('stat-total-users').textContent = 'Tổng: ' + fmt(data.stats.totalUsers);
 
             // Update Charts
+            
             // 1. Main
             mainConfig.data.labels = data.charts.main.labels;
             mainConfig.data.datasets[0].data = data.charts.main.revenue;
@@ -115,10 +135,15 @@ document.addEventListener('DOMContentLoaded', () => {
             categoryConfig.data.datasets[0].data = data.charts.categories.data;
             if(categoryChart) categoryChart.update(); else categoryChart = new Chart(ctxCategory, categoryConfig);
 
+            // 5. Sentiment (BỔ SUNG)
+            // API trả về data.charts.sentiment là mảng [Pos, Neu, Neg]
+            sentimentConfig.data.datasets[0].data = data.charts.sentiment || [0, 0, 0];
+            if(sentimentChart) sentimentChart.update(); else sentimentChart = new Chart(ctxSentiment, sentimentConfig);
+
         } catch (err) { console.error(err); }
     }
 
-    // --- INIT & EVENTS ---
+    // --- INIT & EVENTS (Giữ nguyên) ---
     const picker = $('#daterange-picker');
     const ranges = {
         'Tuần này': [moment().startOf('week'), moment().endOf('week')],
@@ -134,7 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
         locale: { format: 'DD/MM/YYYY', customRangeLabel: "Tùy chọn" }
     }, (start, end) => fetchData(start, end, currentGroupBy));
 
-    // Nút lọc nhanh
     document.querySelectorAll('#time-filters button').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('#time-filters button').forEach(b => b.classList.remove('active'));
@@ -150,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Checkbox Toggles
     const toggles = [
         { id: 'tg-rev', idx: 0 }, { id: 'tg-prof', idx: 1 },
         { id: 'tg-ord', idx: 2 }, { id: 'tg-user', idx: 3 }
@@ -164,6 +187,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Load lần đầu: Năm nay (theo yêu cầu PDF: By default... annually)
     fetchData(moment().startOf('year'), moment().endOf('year'), 'year');
 });

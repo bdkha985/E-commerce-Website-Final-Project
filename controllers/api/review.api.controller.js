@@ -2,6 +2,7 @@
 const { validationResult } = require("express-validator");
 const Review = require("../../models/review.model");
 const Product = require("../../models/product.model"); // Cần để kiểm tra
+const { analyzeSentiment } = require('../../services/ai/gemini.service'); // <-- THÊM IMPORT
 
 // GET /api/reviews/:productId
 const getReviews = async (req, res) => {
@@ -68,12 +69,15 @@ const postComment = async (req, res) => {
              return res.status(400).json({ ok: false, message: "Tên và bình luận là bắt buộc." });
         }
 
+        const sentiment = await analyzeSentiment(comment, null);
+
         const newReview = new Review({
             productId,
             userId: null, // Khách
             fullName: fullName,
             comment: comment,
-            rating: null // Khách không thể rating
+            rating: null, // Khách không thể rating
+            sentiment: sentiment
         });
 
         await newReview.save(); 
@@ -101,13 +105,17 @@ const postRating = async (req, res) => {
     try {
         const { productId } = req.params;
         const { rating, comment } = req.body;
+        const star = parseInt(rating, 10);
+
+        const sentiment = await analyzeSentiment(comment, star);
 
         let newReview = new Review({
             productId,
             userId: req.user.id, // Lấy từ requireLoginApi
             fullName: req.user.fullName, // Lấy từ requireLoginApi
             rating: parseInt(rating, 10),
-            comment: comment || ""
+            comment: comment || "",
+            sentiment: sentiment
         });
 
         await newReview.save(); 
