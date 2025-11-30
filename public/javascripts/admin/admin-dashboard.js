@@ -1,205 +1,169 @@
 // public/javascripts/admin-dashboard.js
 document.addEventListener('DOMContentLoaded', () => {
-    const lineChartCanvas = document.getElementById('revenueChart');
-    const pieChartCanvas = document.getElementById('paymentMethodChart');
-    if (!lineChartCanvas || !pieChartCanvas) return; 
+    const ctxMain = document.getElementById('mainChart');
+    const ctxPayment = document.getElementById('paymentChart');
+    const ctxProduct = document.getElementById('productChart');
+    const ctxCategory = document.getElementById('categoryChart');
 
-    let revenueChartInstance;
-    let pieChartInstance;
+    if (!ctxMain) return;
 
-    const statOrders = document.getElementById('adv-stat-orders');
-    const statPaid = document.getElementById('adv-stat-paid');
-    const statCOD = document.getElementById('adv-stat-cod');
-    const statVNPAY = document.getElementById('adv-stat-vnpay');
+    let mainChart, paymentChart, productChart, categoryChart;
+    let currentGroupBy = 'year'; // Mặc định theo năm (theo PDF)
 
-    // === Cấu hình Biểu đồ Đường (Line Chart) ===
-    const lineChartConfig = {
+    // --- 1. CONFIG MAIN CHART (COMBO) ---
+    const mainConfig = {
         type: 'line',
         data: {
             labels: [],
             datasets: [
-                // 0: Doanh thu
-                {
-                    label: 'Doanh thu (VND)',
-                    data: [],
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    yAxisID: 'yRevenue',
-                    tension: 0.1,
-                    fill: true,
-                },
-                // 1: Đơn hàng đã TT
-                {
-                    label: 'Đơn hàng (Đã TT)',
-                    data: [],
-                    borderColor: '#16a34a',
-                    backgroundColor: 'rgba(22, 163, 74, 0.1)',
-                    yAxisID: 'yOrders', // Dùng chung trục y với "Tổng Đơn"
-                    tension: 0.1,
-                    fill: true,
-                },
-                // 2: Tổng Đơn Hàng
-                {
-                    label: 'Tổng Đơn Hàng',
-                    data: [],
-                    borderColor: '#6366f1',
-                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                    yAxisID: 'yOrders',
-                    tension: 0.1,
-                    fill: true,
-                    hidden: true, // Ẩn mặc định
-                },
-                // 3: Người Dùng Mới
-                {
-                    label: 'Người Dùng Mới',
-                    data: [],
-                    borderColor: '#f59e0b',
-                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                    yAxisID: 'yUsers', // Dùng trục Y riêng
-                    tension: 0.1,
-                    fill: true,
-                    hidden: true, // Ẩn mặc định
-                }
+                { label: 'Doanh thu', data: [], borderColor: '#4e73df', backgroundColor: 'rgba(78, 115, 223, 0.05)', yAxisID: 'yMoney', tension: 0.3, fill: true },
+                { label: 'Lợi nhuận', data: [], borderColor: '#1cc88a', backgroundColor: 'rgba(28, 200, 138, 0.05)', yAxisID: 'yMoney', tension: 0.3, fill: true, hidden: true },
+                { label: 'Đơn hàng', data: [], borderColor: '#36b9cc', backgroundColor: 'rgba(54, 185, 204, 0.05)', yAxisID: 'yCount', tension: 0.3 },
+                { label: 'User Mới', data: [], borderColor: '#f6c23e', backgroundColor: 'rgba(246, 194, 62, 0.05)', yAxisID: 'yCount', tension: 0.3, hidden: true }
             ]
         },
         options: {
-            responsive: true,
             maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
             scales: {
-                // Trục Y 1: Doanh thu (VND)
-                yRevenue: {
-                    type: 'linear', position: 'left',
-                    ticks: { callback: (value) => `${(value / 1000).toLocaleString('vi-VN')}k` },
-                },
-                // Trục Y 2: Đếm Đơn hàng
-                yOrders: {
-                    type: 'linear', position: 'right',
-                    ticks: { stepSize: 1, precision: 0 },
-                    grid: { drawOnChartArea: false },
-                },
-                // Trục Y 3: Đếm Người dùng
-                yUsers: {
-                    type: 'linear', position: 'right',
-                    ticks: { stepSize: 1, precision: 0 },
-                    grid: { drawOnChartArea: false },
-                    display: false, // Ẩn trục này đi, nó sẽ tự hiện khi dataset 3 được bật
-                },
-                x: { ticks: { autoSkip: true, maxTicksLimit: 15 } }
-            }
+                yMoney: { type: 'linear', position: 'left', ticks: { callback: v => (v/1000000).toFixed(1) + 'M' } },
+                yCount: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, ticks: { precision: 0 } },
+                x: { grid: { display: false } }
+            },
+            plugins: { legend: { display: false } } // Tắt legend vì dùng checkbox ngoài
         }
     };
 
-    // === Cấu hình Biểu đồ Tròn (Pie Chart) ===
-    const pieChartConfig = {
-        type: 'pie',
+    // --- 2. CONFIG PAYMENT CHART (PIE) ---
+    const paymentConfig = {
+        type: 'doughnut',
         data: {
-            labels: ['COD', 'VNPAY'],
-            datasets: [{
-                data: [0, 0],
-                backgroundColor: [ '#0ea5e9', '#f59e0b' ],
-            }]
+            labels: ['Thanh toán khi nhận hàng (COD)', 'Thanh toán Online (VNPAY)'],
+            datasets: [{ data: [], backgroundColor: ['#4e73df', '#1cc88a'], hoverBackgroundColor: ['#2e59d9', '#17a673'], hoverBorderColor: "rgba(234, 236, 244, 1)" }]
         },
         options: {
-            responsive: true,
             maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } },
+            cutout: '70%',
         }
     };
 
-    // === HÀM CHÍNH: Gọi API và Cập nhật toàn bộ UI ===
-    async function fetchAndRenderCharts(startDate, endDate) {
+    // --- 3. CONFIG PRODUCT CHART (HORIZ BAR) ---
+    const productConfig = {
+        type: 'bar',
+        data: { labels: [], datasets: [{ label: 'Đã bán', data: [], backgroundColor: '#36b9cc', borderRadius: 4 }] },
+        options: {
+            indexAxis: 'y',
+            maintainAspectRatio: false,
+            scales: { x: { beginAtZero: true } },
+            plugins: { legend: { display: false } }
+        }
+    };
+
+    // --- 4. CONFIG CATEGORY CHART (BAR) ---
+    const categoryConfig = {
+        type: 'bar',
+        data: { labels: [], datasets: [{ label: 'Doanh thu', data: [], backgroundColor: '#f6c23e', borderRadius: 4 }] },
+        options: {
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, ticks: { callback: v => (v/1000000).toFixed(1) + 'M' } } },
+            plugins: { legend: { display: false } }
+        }
+    };
+
+    // --- HÀM FETCH DỮ LIỆU ---
+    async function fetchData(start, end, groupBy) {
         try {
             const params = new URLSearchParams({
-                start: startDate.format('YYYY-MM-DD'),
-                end: endDate.format('YYYY-MM-DD')
+                start: start.format('YYYY-MM-DD'),
+                end: end.format('YYYY-MM-DD'),
+                groupBy: groupBy
             });
 
-            const res = await fetch(`/admin/api/chart-data?${params.toString()}`, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-            if (!res.ok) throw new Error('Không thể tải dữ liệu');
-            
+            const res = await fetch(`/admin/api/chart-data?${params}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             const data = await res.json();
-            
-            // 1. Cập nhật Thẻ Thống kê
-            const stats = data.aggregateStats;
-            statOrders.textContent = stats.totalOrders.toLocaleString('vi-VN');
-            statPaid.textContent = stats.totalPaid.toLocaleString('vi-VN');
-            statCOD.textContent = stats.totalCOD.toLocaleString('vi-VN');
-            statVNPAY.textContent = stats.totalVNPAY.toLocaleString('vi-VN');
-            
-            // 2. Cập nhật Biểu đồ Đường
-            lineChartConfig.data.labels = data.labels;
-            lineChartConfig.data.datasets[0].data = data.revenueData;
-            lineChartConfig.data.datasets[1].data = data.paidOrdersData;
-            lineChartConfig.data.datasets[2].data = data.totalOrdersData;
-            lineChartConfig.data.datasets[3].data = data.newUsersData;
-            
-            if (revenueChartInstance) {
-                revenueChartInstance.update();
-            } else {
-                revenueChartInstance = new Chart(lineChartCanvas, lineChartConfig);
-            }
+            if(!data.ok) return;
 
-            // 3. Cập nhật Biểu đồ Tròn
-            pieChartConfig.data.datasets[0].data = [stats.totalCOD, stats.totalVNPAY];
-            
-            if (pieChartInstance) {
-                pieChartInstance.update();
-            } else {
-                pieChartInstance = new Chart(pieChartCanvas, pieChartConfig);
-            }
+            // Update Stats
+            const fmt = n => (n || 0).toLocaleString('vi-VN');
+            document.getElementById('stat-revenue').textContent = fmt(data.stats.totalRevenue) + 'đ';
+            document.getElementById('stat-profit').textContent = fmt(data.stats.totalProfit) + 'đ';
+            document.getElementById('stat-orders').textContent = fmt(data.stats.totalOrders);
+            document.getElementById('stat-new-users').textContent = fmt(data.stats.newUsersInPeriod);
+            document.getElementById('stat-total-users').textContent = 'Tổng: ' + fmt(data.stats.totalUsers);
 
-        } catch (err) {
-            console.error(err);
-            lineChartCanvas.parentElement.innerHTML = '<p class="text-danger text-center">Không thể tải biểu đồ.</p>';
-        }
+            // Update Charts
+            // 1. Main
+            mainConfig.data.labels = data.charts.main.labels;
+            mainConfig.data.datasets[0].data = data.charts.main.revenue;
+            mainConfig.data.datasets[1].data = data.charts.main.profit;
+            mainConfig.data.datasets[2].data = data.charts.main.orders;
+            mainConfig.data.datasets[3].data = data.charts.main.newUsers;
+            if(mainChart) mainChart.update(); else mainChart = new Chart(ctxMain, mainConfig);
+
+            // 2. Payment
+            paymentConfig.data.datasets[0].data = data.charts.payment;
+            if(paymentChart) paymentChart.update(); else paymentChart = new Chart(ctxPayment, paymentConfig);
+
+            // 3. Products
+            productConfig.data.labels = data.charts.products.labels;
+            productConfig.data.datasets[0].data = data.charts.products.data;
+            if(productChart) productChart.update(); else productChart = new Chart(ctxProduct, productConfig);
+
+            // 4. Category
+            categoryConfig.data.labels = data.charts.categories.labels;
+            categoryConfig.data.datasets[0].data = data.charts.categories.data;
+            if(categoryChart) categoryChart.update(); else categoryChart = new Chart(ctxCategory, categoryConfig);
+
+        } catch (err) { console.error(err); }
     }
 
-    // === KHỞI TẠO DATEPICKER ===
-    const start = moment().subtract(29, 'days');
-    const end = moment();
-    const datePickerInput = $('#daterange-picker'); // jQuery ($)
+    // --- INIT & EVENTS ---
+    const picker = $('#daterange-picker');
+    const ranges = {
+        'Tuần này': [moment().startOf('week'), moment().endOf('week')],
+        'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+        'Quý này': [moment().startOf('quarter'), moment().endOf('quarter')],
+        'Năm nay': [moment().startOf('year'), moment().endOf('year')]
+    };
 
-    datePickerInput.daterangepicker({ /* ... (Giữ nguyên cấu hình daterangepicker từ bước trước) ... */
-        startDate: start,
-        endDate: end,
-        ranges: {
-           'Hôm nay': [moment(), moment()],
-           'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-           '7 ngày qua': [moment().subtract(6, 'days'), moment()],
-           '30 ngày qua': [moment().subtract(29, 'days'), moment()],
-           'Tháng này': [moment().startOf('month'), moment().endOf('month')],
-           'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        },
-        locale: {
-            format: 'DD/MM/YYYY', applyLabel: 'Áp dụng', cancelLabel: 'Hủy',
-            customRangeLabel: 'Tùy chỉnh',
-            daysOfWeek: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
-            monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
-        }
-    });
+    picker.daterangepicker({
+        startDate: moment().startOf('year'),
+        endDate: moment().endOf('year'),
+        ranges: ranges,
+        locale: { format: 'DD/MM/YYYY', customRangeLabel: "Tùy chọn" }
+    }, (start, end) => fetchData(start, end, currentGroupBy));
 
-    // Lắng nghe sự kiện thay đổi ngày
-    datePickerInput.on('apply.daterangepicker', (ev, picker) => {
-        fetchAndRenderCharts(picker.startDate, picker.endDate);
-    });
-    
-    // === LẮNG NGHE SỰ KIỆN CHECKBOX ===
-    document.getElementById('chart-toggles').addEventListener('change', (e) => {
-        if (e.target.matches('input[type="checkbox"]')) {
-            const index = e.target.value; // Lấy index (0, 1, 2, 3)
-            const isVisible = revenueChartInstance.isDatasetVisible(index);
-            revenueChartInstance.setDatasetVisibility(index, !isVisible);
+    // Nút lọc nhanh
+    document.querySelectorAll('#time-filters button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#time-filters button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentGroupBy = btn.dataset.type;
             
-            // Nếu bật/tắt dataset 3 (New Users), bật/tắt trục Y của nó
-            if (index == 3) {
-                 revenueChartInstance.options.scales.yUsers.display = !isVisible;
+            let start = moment().startOf(currentGroupBy);
+            let end = moment().endOf(currentGroupBy);
+            
+            picker.data('daterangepicker').setStartDate(start);
+            picker.data('daterangepicker').setEndDate(end);
+            fetchData(start, end, currentGroupBy);
+        });
+    });
+
+    // Checkbox Toggles
+    const toggles = [
+        { id: 'tg-rev', idx: 0 }, { id: 'tg-prof', idx: 1 },
+        { id: 'tg-ord', idx: 2 }, { id: 'tg-user', idx: 3 }
+    ];
+    toggles.forEach(t => {
+        document.getElementById(t.id).addEventListener('change', e => {
+            if(mainChart) {
+                mainChart.setDatasetVisibility(t.idx, e.target.checked);
+                mainChart.update();
             }
-            
-            revenueChartInstance.update();
-        }
+        });
     });
 
-    // Tải biểu đồ lần đầu
-    fetchAndRenderCharts(start, end);
+    // Load lần đầu: Năm nay (theo yêu cầu PDF: By default... annually)
+    fetchData(moment().startOf('year'), moment().endOf('year'), 'year');
 });

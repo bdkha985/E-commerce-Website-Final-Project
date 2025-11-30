@@ -14,8 +14,8 @@ services:
     image: duykh4/kshop-app:latest
     volumes:
       - ./public/uploads:/usr/src/app/public/uploads
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+      # - .:/usr/src/app
+      # - /usr/src/app/node_modules
     environment:
       - MONGODB_URI=mongodb://db:27017/web_nodejs
       - HOST_NAME=0.0.0.0
@@ -57,8 +57,8 @@ services:
     image: duykh4/kshop-app:latest
     volumes:
       - ./public/uploads:/usr/src/app/public/uploads
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+      # - .:/usr/src/app
+      # - /usr/src/app/node_modules
     environment:
       - MONGODB_URI=mongodb://db:27017/web_nodejs
       - HOST_NAME=0.0.0.0
@@ -71,17 +71,16 @@ services:
     command: node worker.js
 
   elasticsearch:
-    image: elasticsearch:7.17.10 # Dùng bản 7.x cho nhẹ và ổn định
+    image: elasticsearch:7.17.10 
     environment:
       - discovery.type=single-node
-      # Giới hạn RAM cho ElasticSearch (rất quan trọng)
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
-      - "9200:9200" # Mở cổng 9200 để debug
+      - "9200:9200"
     networks:
       - kshop-network
     volumes:
-      - esdata:/usr/share/elasticsearch/data # Dùng volume
+      - esdata:/usr/share/elasticsearch/data
     deploy:
       replicas: 1
 
