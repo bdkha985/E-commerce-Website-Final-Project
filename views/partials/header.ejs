@@ -35,11 +35,17 @@
 
       <!-- Search bar -->
       <form class="searchbar" id="headerSearchForm" method="GET" action="/search">
-                <input type="text" name="q" id="headerSearchInput" placeholder="Tìm kiếm sản phẩm..." autocomplete="off" />
-                <button type="submit"><i class="fa fa-search"></i></button>
-                
-                <div id="search-suggestions"></div> 
-            </form>
+        <input type="text" name="q" id="headerSearchInput" placeholder="Tìm kiếm sản phẩm..." autocomplete="off" />
+
+        <label for="headerSearchFile" class="search-file-label" title="Tìm bằng hình ảnh" style="cursor: pointer; padding: 0 10px; color: #64748b;">
+          <i class="fa-solid fa-camera"></i>
+        </label>
+        <input type="file" id="headerSearchFile" accept="image/*" style="display: none;">
+
+        <button type="submit"><i class="fa fa-search"></i></button>
+
+        <div id="search-suggestions" class="search-dropdown"></div>
+      </form>
 
       <div class="actions">
         <!-- Cart hover -->

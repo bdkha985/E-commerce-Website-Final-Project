@@ -1,6 +1,7 @@
 // controllers/api/search.api.controller.js
 const Product = require('../../models/product.model');
 const { searchProducts } = require('../../services/search/elastic.service');
+const { generateKeywordsFromImage } = require('../../services/ai/gemini.service');
 
 // === Sao chép 2 hàm helper từ home.controller.js [cite: 327-329] ===
 function getDisplayImage(p) {
@@ -77,4 +78,30 @@ const getSuggestions = async (req, res) => {
     }
 };
 
-module.exports = { getSuggestions };
+// 2. Image Search (AI)
+const searchByImage = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ ok: false, message: "Vui lòng chọn ảnh." });
+        }
+
+        // Gọi AI để lấy từ khóa
+        const keywords = await generateKeywordsFromImage(req.file.buffer, req.file.mimetype);
+        
+        if (!keywords) {
+            return res.status(500).json({ ok: false, message: "AI không nhận diện được ảnh." });
+        }
+
+        // Trả về từ khóa để frontend chuyển hướng
+        res.json({ ok: true, keywords });
+
+    } catch (err) {
+        console.error("Lỗi searchByImage:", err);
+        res.status(500).json({ ok: false, message: "Lỗi xử lý ảnh." });
+    }
+};
+
+module.exports = { 
+    getSuggestions,
+    searchByImage,
+};

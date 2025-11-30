@@ -33,6 +33,7 @@ const tools = [
 
 const model = genAI.getGenerativeModel({ 
     model: "gemini-2.5-flash",
+    // model: "gemini-flash-latest",
     tools: tools
 });
 
@@ -177,7 +178,44 @@ async function analyzeSentiment(text, rating) {
     }
 }
 
+/**
+ * Tạo từ khóa tìm kiếm từ hình ảnh (Dùng Gemini Vision)
+ * @param {Buffer} imageBuffer - Buffer của file ảnh
+ * @param {string} mimeType - Loại file (image/jpeg, image/png...)
+ */
+async function generateKeywordsFromImage(imageBuffer, mimeType) {
+    // Model flash hỗ trợ cả text và image
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+    const prompt = `
+        Bạn là một công cụ tìm kiếm thời trang. 
+        Hãy nhìn vào hình ảnh sản phẩm này và trích xuất ra một cụm từ khóa tìm kiếm chính xác nhất bằng tiếng Việt (khoảng 2-5 từ).
+        Tập trung vào: Loại sản phẩm, Màu sắc, Kiểu dáng, Thương hiệu (nếu rõ).
+        Ví dụ: "áo thun nam trắng", "giày sneaker nike", "đầm hoa nhí".
+        Chỉ trả về cụm từ khóa, không có dấu chấm câu hay lời dẫn.
+    `;
+    
+    const imagePart = {
+        inlineData: {
+            data: imageBuffer.toString("base64"),
+            mimeType
+        },
+    };
+
+    try {
+        const result = await model.generateContent([prompt, imagePart]);
+        const response = await result.response;
+        const text = response.text().trim();
+        console.log(`[AI Vision] Ảnh -> Từ khóa: "${text}"`);
+        return text;
+    } catch (err) {
+        console.error("Lỗi Gemini Vision:", err);
+        return null;
+    }
+}
+
 module.exports = { 
     runConversation,
     analyzeSentiment,
+    generateKeywordsFromImage,
  };

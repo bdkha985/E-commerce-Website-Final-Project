@@ -223,6 +223,68 @@ header .btn:hover {
     transition: all 0.3s ease;
 }
 
+.search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: none; /* Ẩn mặc định */
+    overflow: hidden;
+    margin-top: 2px;
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    text-decoration: none;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.2s;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background: #f8fafc;
+}
+
+.suggestion-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #eee;
+}
+
+.suggestion-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.suggestion-name {
+    font-size: 1.4rem;
+    color: #0f172a;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.suggestion-price {
+    font-size: 1.2rem;
+    color: #ef4444;
+    font-weight: 700;
+    margin-top: 2px;
+}
+
 .searchbar:focus-within input {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(0, 84, 97, 0.1);
@@ -256,6 +318,19 @@ header .btn:hover {
 .searchbar button:hover {
     background: var(--primary-color);
     opacity: 0.9;
+}
+
+.search-file-label {
+    cursor: pointer;
+    padding: 8px 10px;
+    color: #64748b;
+    transition: color 0.2s;
+}
+.search-file-label:hover {
+    color: var(--primary-color);
+}
+.searchbar input[type="text"] {
+    flex: 1; /* Để input chiếm hết chỗ trống */
 }
 
 .actions .action-btn i {
