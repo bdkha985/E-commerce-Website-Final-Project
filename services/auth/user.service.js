@@ -20,7 +20,7 @@ async function createUserAndSendPassword({ email, fullName, address }) {
     const existing = await User.findOne({ email: mail });
     if (existing) throw new Error("Email đã được sử dụng");
 
-    // 1. Tạo mật khẩu tạm thời
+    // 1. Tạo mật khẩu tạm thời a
     const tempPassword = crypto.randomBytes(8).toString("hex");
 
     // 2. Hash mật khẩu tạm để lưu vào DB
