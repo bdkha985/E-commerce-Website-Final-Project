@@ -179,9 +179,58 @@ async function sendOrderConfirmationEmail(toEmail, order) {
     });
 }
 
+// 1. Gửi email liên hệ từ khách về cho Admin
+async function sendContactEmail(data) {
+    const adminEmail = process.env.SMTP_USER; // Gửi về cho chính mình
+    
+    const html = `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <h3 style="color: #005461;">📩 Có liên hệ mới từ Website K Shopping</h3>
+        <hr style="border: 0; border-top: 1px solid #eee;">
+        <p><strong>Người gửi:</strong> ${data.firstName} ${data.lastName}</p>
+        <p><strong>Email:</strong> <a href="mailto:${data.email}">${data.email}</a></p>
+        <p><strong>SĐT:</strong> ${data.phone || 'Không có'}</p>
+        <p><strong>Nội dung tin nhắn:</strong></p>
+        <blockquote style="background: #f9fafb; padding: 15px; border-left: 4px solid #005461; margin: 10px 0;">
+            ${data.message.replace(/\n/g, '<br>')}
+        </blockquote>
+        <hr style="border: 0; border-top: 1px solid #eee;">
+        <p style="font-size: 12px; color: #666;">Email này được gửi tự động từ hệ thống K Shopping.</p>
+    </div>
+    `;
+
+    return transporter.sendMail({
+        from: `"K Shopping System" <${process.env.SMTP_USER}>`,
+        to: adminEmail,
+        replyTo: data.email, // Để Admin bấm Reply là trả lời khách luôn
+        subject: `[Liên hệ] Tin nhắn mới từ ${data.firstName} ${data.lastName}`,
+        html,
+    });
+}
+
+// 2. Gửi thông báo có người đăng ký Newsletter
+async function sendNewsletterNotification(email) {
+    const adminEmail = process.env.SMTP_USER;
+    
+    const html = `
+        <p>🔔 <strong>Thông báo mới:</strong></p>
+        <p>Có khách hàng vừa đăng ký nhận bản tin (Newsletter).</p>
+        <p><strong>Email đăng ký:</strong> <a href="mailto:${email}">${email}</a></p>
+    `;
+
+    return transporter.sendMail({
+        from: `"K Shopping System" <${process.env.SMTP_USER}>`,
+        to: adminEmail,
+        subject: `[Newsletter] Khách hàng mới đăng ký: ${email}`,
+        html,
+    });
+}
+
 module.exports = { 
     sendOtpEmail, 
     sendWelcomeEmail, 
     sendTemporaryPasswordEmail,
     sendOrderConfirmationEmail,
+    sendContactEmail,
+    sendNewsletterNotification,
  };

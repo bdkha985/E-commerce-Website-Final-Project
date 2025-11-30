@@ -8,6 +8,7 @@ const catalog  = require('../controllers/catalog/catalog.controller');
 const cartController = require('../controllers/cart/cart.controller');
 const checkoutController = require('../controllers/checkout/checkout.controller');
 const searchController = require('../controllers/web/search.controller');
+const homeController = require("../controllers/web/home.controller");
 
 router.get('/', getHomePage);   
 router.get('/homepage', getHomePage);  
@@ -58,6 +59,12 @@ router.get("/blog", (req, res) => render(res, "pages/blog", { title: "Blog" }));
 router.get("/contact", (req, res) =>
     render(res, "pages/contact", { title: "Contact Us" })
 );
+
+// POST: Xử lý gửi form liên hệ
+router.post("/contact", homeController.postContact); 
+
+// POST: Xử lý đăng ký newsletter (Footer)
+router.post("/newsletter", homeController.subscribeNewsletter);
 
 // About us
 router.get("/about", (req, res) =>

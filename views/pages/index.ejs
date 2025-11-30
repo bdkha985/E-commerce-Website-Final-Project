@@ -26,7 +26,7 @@
                         alt="Banner 2" />
                     <div
                         class="carousel-caption d-flex flex-column justify-content-center h-100">
-                        <h1 class="banner-title">Best Sellers</h1>
+                        <h1 class="banner-title">BEST SELLERS</h1>
                         <p class="banner-subtitle">
                             Những sản phẩm được yêu thích nhất
                         </p>
@@ -75,14 +75,14 @@
     </section>
     
     <section id="products" class="products container">
-        <h2 class="section-title">Best Seller</h2>
+        <h2 class="section-title">BEST SELLER</h2>
         <div class="grid">
             <% (bestSellers || []).forEach(p => { %>
                 <%- include('./catalog/_product-card', { p }) %>
             <% }) %>
         </div>
 
-        <h2 class="section-title" style="margin-top: 32px">New Collection</h2>
+        <h2 class="section-title" style="margin-top: 32px">NEW COLLECTION</h2>
         <div class="grid">
             <% (newCollection || []).forEach(p => { %>
                 <%- include('./catalog/_product-card', { p }) %>
@@ -120,44 +120,57 @@
     </section>
 
     <section id="blog" class="blog container">
-        <h2 class="section-title">Blog</h2>
+        <h2 class="section-title">Blog Thời Trang</h2>
         <div class="grid">
             <article class="card">
-                <img src="https://picsum.photos/seed/b1/400/300" alt="" />
-                <h3>Cách phối đồ Thu-Đông</h3>
+                <a href="/blog">
+                    <img src="https://images.unsplash.com/photo-1490578474895-699cd4d2ff5f?auto=format&fit=crop&w=600&q=80" alt="Nam tính" />
+                </a>
+                <h3>Xu hướng Thu-Đông 2025 cho Nam giới</h3>
                 <p class="line-clamp">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Khám phá những cách phối đồ layer với áo khoác dạ, len cổ lọ và quần jeans giúp bạn vừa ấm áp vừa lịch lãm trong mùa lạnh này.
                 </p>
             </article>
+
             <article class="card">
-                <img src="https://picsum.photos/seed/b2/400/300" alt="" />
-                <h3>Top 5 phụ kiện hot</h3>
+                <a href="/blog">
+                    <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=600&q=80" alt="Sneaker care" />
+                </a>
+                <h3>5 Mẹo bảo quản Sneaker luôn như mới</h3>
                 <p class="line-clamp">
-                    Integer vel turpis ac odio aliquet malesuada.
+                    Đừng để đôi giày yêu thích của bạn bị ố vàng. Hướng dẫn chi tiết cách vệ sinh, khử mùi và bảo quản sneaker đúng chuẩn chuyên gia.
                 </p>
             </article>
+
             <article class="card">
-                <img src="https://picsum.photos/seed/b3/400/300" alt="" />
-                <h3>Mix &amp; Match phong cách</h3>
+                <a href="/blog">
+                    <img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=600&q=80" alt="Váy xinh" />
+                </a>
+                <h3>Bí quyết chọn đầm tôn dáng cho phái đẹp</h3>
                 <p class="line-clamp">
-                    Quisque commodo nisi sed neque hendrerit feugiat.
+                    Dù bạn có vóc dáng quả lê, quả táo hay đồng hồ cát, luôn có một chiếc váy sinh ra dành cho bạn. Tìm hiểu ngay cách chọn đồ phù hợp.
                 </p>
             </article>
         </div>
     </section>
 
     <section id="contactus" class="contact container">
-        <h2 class="section-title">Contact Us</h2>
-        <form class="contact-form">
-            <input type="text" placeholder="Tên của bạn" required />
-            <input type="email" placeholder="Email" required />
-            <textarea placeholder="Nội dung" rows="5"></textarea>
+        <h2 class="section-title">CONTACT US</h2>
+        <form class="contact-form" action="/contact" method="POST">
+            <input type="text" name="firstName" placeholder="Tên của bạn" required />
+            
+            <input type="hidden" name="lastName" value="">
+            <input type="hidden" name="phone" value="">
+
+            <input type="email" name="email" placeholder="Email" required />
+            <textarea name="message" placeholder="Nội dung" rows="5" required></textarea>
+            
             <button type="submit" class="btn">Gửi</button>
         </form>
     </section>
 
     <section id="aboutus" class="about container">
-        <h2 class="section-title">About Us</h2>
+        <h2 class="section-title">ABOUT US</h2>
         <div class="grid">
             <div class="member-card">
                 <img src="https://picsum.photos/seed/m1/200" alt="Member 1" />

@@ -1,23 +1,29 @@
 <section class="blog-page container">
   <header class="blog-header">
-    <h1>Our latest blog</h1>
+    <h1>Tạp chí Thời trang</h1>
     <p class="muted">
-      On the other hand, we denounce with righteous indignation and dislike men who
-      are so beguiled and demoralized by the charms.
+      Cập nhật những xu hướng mới nhất, mẹo phối đồ và phong cách sống từ K Shopping.
     </p>
   </header>
 
   <div class="grid blog-grid">
     <% const posts = [
-      {img:'https://picsum.photos/seed/b1/800/600', title:'To be our partner',        excerpt:'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium.'},
-      {img:'https://picsum.photos/seed/b2/800/600', title:'For best results work',    excerpt:'But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born.'},
-      {img:'https://picsum.photos/seed/b3/800/600', title:'Awesome tips',             excerpt:'There are many variations of passages of Lorem Ipsum available.'},
-      {img:'https://picsum.photos/seed/b4/800/600', title:'Printing and typesetting', excerpt:'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium.'},
-      {img:'https://picsum.photos/seed/b5/800/600', title:'Type of sports shoes',     excerpt:'But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born.'},
-      {img:'https://picsum.photos/seed/b6/800/600', title:'Awesome tips',             excerpt:'There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration.'},
-      {img:'https://picsum.photos/seed/b7/800/600', title:'To be our partner',        excerpt:'At vero eos et accusamus et iusto odio dignissimos ducimus.'},
-      {img:'https://picsum.photos/seed/b8/800/600', title:'For best results work',    excerpt:'But I must explain to you how all this mistaken idea was born.'},
-      {img:'https://picsum.photos/seed/b9/800/600', title:'Awesome tips',             excerpt:'There are many variations of passages of Lorem Ipsum available.'},
+      {
+        img: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80', 
+        title: 'Tuần lễ thời trang: Những bộ cánh ấn tượng nhất', 
+        excerpt: 'Điểm lại những khoảnh khắc đáng nhớ và những bộ trang phục street style "chất lừ" từ tuần lễ thời trang Paris vừa qua.'
+      },
+      {
+        img: 'https://images.unsplash.com/photo-1551488852-d814c937d25d?auto=format&fit=crop&w=800&q=80', 
+        title: 'Phối đồ công sở: Không còn nhàm chán', 
+        excerpt: 'Biến tấu trang phục đi làm hàng ngày trở nên thú vị và cá tính hơn với những phụ kiện đơn giản.'
+      },
+      {
+        img: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80', 
+        title: 'Sống xanh: Thời trang bền vững là gì?', 
+        excerpt: 'Tìm hiểu về xu hướng thời trang bền vững và cách bạn có thể đóng góp vào việc bảo vệ môi trường qua thói quen mua sắm.'
+      },
+      // ... (Thêm các bài khác nếu muốn)
     ]; %>
 
     <% posts.forEach(p => { %>
@@ -25,13 +31,11 @@
         <a href="#!" class="post-thumb">
           <img src="<%= p.img %>" alt="<%= p.title %>">
         </a>
-        <h3 class="post-title"><a href="#!"><%= p.title %></a></h3>
-        <p class="post-excerpt"><%= p.excerpt %></p>
+        <div class="post-content"> <h3 class="post-title"><a href="#!"><%= p.title %></a></h3>
+            <p class="post-excerpt"><%= p.excerpt %></p>
+        </div>
       </article>
     <% }) %>
   </div>
-
-  <div class="blog-more">
-    <a href="#!" class="btn blog-load">Load More</a>
-  </div>
-</section>
+  
+  </section>

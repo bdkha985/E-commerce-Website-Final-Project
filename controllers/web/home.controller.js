@@ -1,6 +1,7 @@
 // controllers/web/home.controller.js
 const Product = require("../../models/product.model");
 const Category = require("../../models/category.model");
+const { sendContactEmail, sendNewsletterNotification } = require('../../utils/mailer');
 
 function render(res, viewPath, locals = {}) {
     res.render("layouts/main", { body: viewPath, ...locals });
@@ -84,7 +85,42 @@ const getHomePage = async (req, res, next) => {
     }
 };
 
+// === XỬ LÝ FORM LIÊN HỆ ===
+const postContact = async (req, res) => {
+    try {
+        const { firstName, lastName, email, phone, message } = req.body;
+        
+        // Gửi mail cho Admin
+        await sendContactEmail({ firstName, lastName, email, phone, message });
+        
+        req.flash('success', 'Tin nhắn của bạn đã được gửi! Chúng tôi sẽ phản hồi sớm.');
+        res.redirect('/contact');
+    } catch (err) {
+        console.error("Contact Error:", err);
+        req.flash('error', 'Có lỗi xảy ra khi gửi tin nhắn. Vui lòng thử lại.');
+        res.redirect('/contact');
+    }
+};
+
+// === XỬ LÝ FORM NEWSLETTER ===
+const subscribeNewsletter = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if(email) {
+            await sendNewsletterNotification(email);
+            req.flash('success', 'Đăng ký nhận tin thành công!');
+        }
+        res.redirect('back'); // Quay lại trang cũ (dù đang ở Home hay Blog)
+    } catch (err) {
+        console.error("Newsletter Error:", err);
+        req.flash('error', 'Lỗi đăng ký.');
+        res.redirect('back');
+    }
+};
+
 module.exports = {
     render,
     getHomePage,
+    postContact,
+    subscribeNewsletter,
 };
