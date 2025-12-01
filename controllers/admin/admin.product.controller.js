@@ -3,6 +3,7 @@ const Product = require('../../models/product.model');
 const Category = require('../../models/category.model');
 const Brand = require('../../models/brand.model');
 const slugify = require('slugify');
+const { indexProduct, removeProduct } = require('../../services/search/elastic.service');
 
 // Hàm helper để render (tránh lặp code)
 function render(res, view, data) {
@@ -191,10 +192,12 @@ const saveProduct = async (req, res) => {
             
             // Cập nhật
             await Product.findByIdAndUpdate(id, payload);
+            indexProduct(id);
             req.flash('success', 'Cập nhật sản phẩm thành công.');
         } else {
             // Thêm mới
-            await Product.create(payload);
+            const newProduct = await Product.create(payload);
+            indexProduct(newProduct._id);
             req.flash('success', 'Thêm sản phẩm mới thành công.');
         }
         res.redirect('/admin/products');
@@ -210,6 +213,7 @@ const deleteProduct = async (req, res) => {
     try {
         const { id } = req.params;
         await Product.findByIdAndDelete(id);
+        removeProduct(id);
         req.flash('success', 'Đã xóa sản phẩm thành công.');
     } catch (err) {
         req.flash('error', 'Không thể xóa sản phẩm.');

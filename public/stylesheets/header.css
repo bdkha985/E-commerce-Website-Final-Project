@@ -302,9 +302,20 @@ header .btn:hover {
 }
 
 /* User-name */
-.user-name,
+.user-name {
+    color: var(--text-color);
+
+    display: inline-block;
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
 .ic__logout {
     color: var(--text-color);
+    vertical-align: middle;
 }
 
 /* Cart hover */

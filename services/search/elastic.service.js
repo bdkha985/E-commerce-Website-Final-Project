@@ -162,9 +162,73 @@ async function searchProducts(query) {
     }
 }
 
+/**
+ * Thêm hoặc Cập nhật 1 sản phẩm vào ElasticSearch (Real-time)
+ */
+async function indexProduct(productId) {
+    try {
+        // 1. Lấy thông tin chi tiết sản phẩm (phải populate để lấy tên Brand/Category)
+        const product = await Product.findById(productId)
+            .populate('brandId', 'name')
+            .populate('categoryIds', 'name')
+            .lean();
+
+        if (!product) return;
+
+        // 2. Format dữ liệu (Giống hệt logic trong syncProductsToES)
+        const getDisplayImage = (p) => (p.images?.length ? p.images[0] : (p.variants?.[0]?.images?.[0] || ''));
+        const getDisplayPrice = (p) => (p.variants?.[0]?.price || p.basePrice || 0);
+
+        const esDoc = {
+            name: product.name,
+            slug: product.slug,
+            tags: product.tags || [],
+            shortDesc: product.shortDesc,
+            brandName: product.brandId?.name || null,
+            categoryNames: (product.categoryIds || []).map(c => c.name),
+            thumb: getDisplayImage(product).replace('public/', ''),
+            price: getDisplayPrice(product)
+        };
+
+        // 3. Đẩy lên ES
+        await esClient.index({
+            index: INDEX_NAME,
+            id: product._id.toString(),
+            body: esDoc,
+            refresh: true // Quan trọng: Làm mới index ngay lập tức để tìm thấy ngay
+        });
+        
+        console.log(`✅ [ES] Đã index sản phẩm: ${product.name}`);
+
+    } catch (err) {
+        console.error(`❌ [ES] Lỗi index sản phẩm ${productId}:`, err.message);
+        // Không throw lỗi để tránh làm crash luồng chính của Admin
+    }
+}
+
+/**
+ * Xóa 1 sản phẩm khỏi ElasticSearch
+ */
+async function removeProduct(productId) {
+    try {
+        await esClient.delete({
+            index: INDEX_NAME,
+            id: productId.toString(),
+            refresh: true
+        });
+        console.log(`🗑️ [ES] Đã xóa sản phẩm: ${productId}`);
+    } catch (err) {
+        // Bỏ qua lỗi 404 (nếu sản phẩm vốn không có trong ES)
+        if (err.meta && err.meta.statusCode === 404) return;
+        console.error(`❌ [ES] Lỗi xóa sản phẩm ${productId}:`, err.message);
+    }
+}
+
 module.exports = {
     esClient,
     setupElasticsearch,
     syncProductsToES,
-    searchProducts
+    searchProducts,
+    indexProduct,
+    removeProduct,
 };

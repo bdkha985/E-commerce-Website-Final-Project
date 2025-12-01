@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- 1. HÀM TẠO HTML (Có data-id để check trùng) ---
   function createReviewHTML(r) {
     const name = (r.userId && r.userId.fullName) ? r.userId.fullName : (r.fullName || 'Người dùng');
-    const badge = r.userId ? '(Đã mua)' : '(Khách)';
+    const badge = r.userId ? '(Người dùng)' : '(Khách)';
     const stars = r.rating ? `<span class="review-stars">${'★'.repeat(r.rating)}</span>` : '';
     const date = r.createdAt ? new Date(r.createdAt).toLocaleDateString('vi-VN') : 'Vừa xong';
     const comment = r.comment ? String(r.comment).replace(/[<>]/g, "") : ''; 
