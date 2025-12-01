@@ -14,7 +14,7 @@
 
 ## 2\. TRIỂN KHAI PUBLIC (DEPLOYMENT)
 
-Dự án đã được deploy công khai trên nền tảng Cloud để phục vụ việc chấm điểm nhanh.
+Dự án đã được deploy công khai trên nền tảng Cloud để phục vụ việc chấm điểm nhanh (nhưng cũng có 1 số hạn chế)
 
   * **Public URL:** [https://kshop-live-website.onrender.com](https://kshop-live-website.onrender.com)
   * **Hạ tầng:** Render.com (Web Service) + MongoDB Atlas (Database) + Redis Cloud (Cache/Queue).
@@ -113,10 +113,11 @@ Sau khi các container đã chạy (khoảng 30s), chạy lệnh sau để nạp
 
 ```bash
 # 1. Lấy ID của container app
-docker ps | grep kshop_stack_app
+docker ps
 
 # 2. Chạy seed (Thay CONTAINER_ID bằng ID tìm được ở trên)
-docker exec -it <CONTAINER_ID> node seeders/catalog.seed.js
+docker exec -it <CONTAINER_ID> node seeders/catalog_new.seed.js
+docker exec -it <CONTAINER_ID> node seeders/seed-users.js
 # Ví dụ: docker exec -it kshop_stack_app.1.xxxxx node seeders/catalog.seed.js
 ```
 
@@ -128,5 +129,13 @@ docker exec -it <CONTAINER_ID> node seeders/catalog.seed.js
   * **Admin Dashboard:** http://localhost/admin
 
 -----
+
+## 5\. TÀI KHOẢN TEST THANH TOÁN QUA VNPAY 🛠️
+| NGÂN HÀNG | NCB |
+|---|---|
+| **Số thẻ** | 9704198526191432198 |
+| **Tên chủ thẻ** | NGUYEN VAN A |
+| **Ngày phát hành** | 07/15 |
+| **Mật khẩu OTP** | 123456 |
 
 **Xin cảm ơn Thầy đã xem xét dự án của nhóm\!**
