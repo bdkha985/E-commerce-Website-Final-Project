@@ -82,12 +82,26 @@ Nhóm đã hoàn thành **4/4** tính năng nâng cao theo yêu cầu của đ�
   * Docker Desktop đã được cài đặt và đang chạy.
   * Git.
 
+### Về cơ sở dữ liệu
+  * Ở bài nộp em sẽ để tự động kết nối với **Mongo Atlas Cloud** của em, nếu thầy muốn thay đổi để chạy với database local thì chỉnh sửa ở:
+  1. .env (dòng 7)
+  2. docker-compose.yml (dòng 20, 32, 64)
+  3. docker-compose.swarm.yml (dòng 21, 35, 66)
+
+  Tất cả em đều để thầy chỉ cần comment/uncomment là được ạ
+  
+### Cách 1: Chạy cơ bản
+
+1. `docker compose up -d`
+2. `docker exec -it <ID_APP> node seeders/catalog_new.seed.js`
+2. `docker exec -it <ID_APP> node seeders/seed-users.js`
+3. Truy cập: http://localhost
+
+### Cách 2: Chạy chế độ Swarm Cluster (Tính năng Bonus)
 ### Bước 1: Clone và Chuẩn bị
 
 ```bash
 # 1. Giải nén file zip hoặc clone repo
-cd web_nodejs
-
 # 2. Đảm bảo file .env đã có đầy đủ thông tin (File .env mẫu đã được đính kèm trong source)
 # Lưu ý: Kiểm tra key GEMINI_API_KEY và SMTP_PASS trong file .env
 ```
@@ -98,13 +112,13 @@ Mở terminal tại thư mục gốc dự án:
 
 ```bash
 # 1. Build Image (Bắt buộc để cập nhật code mới nhất)
-docker build -t duykh4/kshop-app:latest .
-
+docker build -t duykh4/kshop-app:latest . 
+# docker push duykh4/kshop-app:latest  
 # 2. Khởi tạo Swarm (Nếu chưa từng làm)
 docker swarm init
 
 # 3. Triển khai Stack
-docker stack deploy -c docker-compose.yml kshop_stack
+docker stack deploy -c docker-compose.swarm.yml kshop_stack
 ```
 
 ### Bước 3: Nạp dữ liệu mẫu (Seed Data)

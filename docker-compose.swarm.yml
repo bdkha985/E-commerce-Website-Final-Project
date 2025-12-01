@@ -11,7 +11,6 @@ services:
       replicas: 1
 
   app:
-    build: .
     image: duykh4/kshop-app:latest
     volumes:
       - ./public/uploads:/usr/src/app/public/uploads
@@ -25,6 +24,8 @@ services:
       - .env
     networks:
       - kshop-network
+    deploy:
+      replicas: 3
     command: npm run dev
 
   db:
@@ -55,7 +56,6 @@ services:
       replicas: 1
 
   worker:
-    build: .
     image: duykh4/kshop-app:latest
     volumes:
       - ./public/uploads:/usr/src/app/public/uploads
@@ -89,7 +89,7 @@ services:
 
 networks:
   kshop-network:
-    driver: bridge
+    driver: overlay
 
 volumes:
   mongodb_data:
