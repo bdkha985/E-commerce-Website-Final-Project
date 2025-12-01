@@ -152,4 +152,7 @@ docker exec -it <CONTAINER_ID> node seeders/seed-users.js
 | **Ngày phát hành** | 07/15 |
 | **Mật khẩu OTP** | 123456 |
 
+## 6\. GITHUB REPOSITORY LINK
+ * **URL**: [https://github.com/bdkha985/E-commerce-Website-Final-Project](https://github.com/bdkha985/E-commerce-Website-Final-Project)
+ 
 **Xin cảm ơn Thầy đã xem xét dự án của nhóm\!**
