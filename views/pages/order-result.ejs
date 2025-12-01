@@ -32,9 +32,15 @@
         <div class="order-result-summary" style="margin-top: 24px;">
             <h3>Tóm tắt đơn hàng</h3>
             <div class="summary-items-list">
-                <% order.items.forEach(item => { %>
+                <% order.items.forEach(item => { 
+                    // Xử lý đường dẫn ảnh: Nếu là ảnh nội bộ (không có http), thêm dấu '/' vào đầu
+                    let img = item.image || 'https://placehold.co/80x80?text=No+Img';
+                    if (img && !img.startsWith('http') && !img.startsWith('/')) {
+                        img = '/' + img;
+                    }
+                %>
                 <div class="summary-item">
-                    <img src="<%= item.image || 'https://placehold.co/80x80?text=No+Img' %>" alt="<%= item.name %>">
+                    <img src="<%= img %>" alt="<%= item.name %>">
                     <div class="summary-item-info">
                         <span class="name"><%= item.name %> (x<%= item.quantity %>)</span>
                         <span class="sku">SKU: <%= item.sku %></span>

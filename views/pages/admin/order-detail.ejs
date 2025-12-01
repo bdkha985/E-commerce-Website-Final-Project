@@ -1,82 +1,119 @@
-<link rel="stylesheet" href="/stylesheets/order-result.css"> 
+<link rel="stylesheet" href="/stylesheets/admin-order-detail.css">
 
 <a href="/admin/orders" class="btn btn-outline-dark mb-3">
-    <i class="fas fa-arrow-left"></i> Quay lại danh sách
+  <i class="fas fa-arrow-left"></i> Quay lại danh sách
 </a>
 
 <div class="row">
-    <div class="col-lg-8">
-        <div class="card shadow-sm mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 fw-bold text-primary">Chi tiết đơn hàng</h6>
+  <div class="col-lg-8">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 fw-bold text-primary">Chi tiết đơn hàng</h6>
+      </div>
+      <div class="card-body">
+        <div class="order-result-summary" style="background: #fff; border: none; padding: 0;">
+          <div class="summary-items-list" style="max-height: none;">
+            <% order.items.forEach(item => { 
+                    // Xử lý đường dẫn ảnh: Nếu là ảnh nội bộ (không có http), thêm dấu '/' vào đầu
+                    let img = item.image || 'https://placehold.co/80x80?text=No+Img';
+                    if (img && !img.startsWith('http') && !img.startsWith('/')) {
+                        img = '/' + img;
+                    }
+                %>
+            <div class="summary-item">
+              <img src="<%= img %>" alt="<%= item.name %>">
+              <div class="summary-item-info">
+                <span class="name"><%= item.name %> (x<%= item.quantity %>)</span>
+                <span class="sku">SKU: <%= item.sku %></span>
+              </div>
+              <span class="price"><%= (item.price * item.quantity).toLocaleString('vi-VN') %>đ</span>
             </div>
-            <div class="card-body">
-                <div class="order-result-summary" style="background: #fff; border: none; padding: 0;">
-                    <div class="summary-items-list" style="max-height: none;">
-                        <% order.items.forEach(item => { %>
-                        <div class="summary-item">
-                            <img src="<%= item.image || 'https://placehold.co/80x80?text=No+Img' %>" alt="<%= item.name %>">
-                            <div class="summary-item-info">
-                                <span class="name"><%= item.name %> (x<%= item.quantity %>)</span>
-                                <span class="sku">SKU: <%= item.sku %></span>
-                            </div>
-                            <span class="price"><%= (item.price * item.quantity).toLocaleString('vi-VN') %>đ</span>
-                        </div>
-                        <% }) %>
-                    </div>
-                    <div class="summary-breakdown">
-                        <div class="sum-row"><span>Tạm tính</span><strong><%= order.subtotal.toLocaleString('vi-VN') %>đ</strong></div>
-                        <div class="sum-row"><span>Vận chuyển</span><strong><%= order.shippingFee.toLocaleString('vi-VN') %>đ</strong></div>
-                        <div class="sum-row"><span>Thuế (VAT 8%)</span><strong><%= order.tax.toLocaleString('vi-VN') %>đ</strong></div>
-                        <% if (order.discountApplied > 0) { %>
-                        <div class="sum-row success"><span>Giảm giá (<%= order.discountCode %>)</span><strong>-<%= order.discountApplied.toLocaleString('vi-VN') %>đ</strong></div>
-                        <% } %>
-                        <% if (order.loyaltyPointsUsed > 0) { %>
-                        <div class="sum-row success"><span>Dùng điểm thưởng</span><strong>-<%= order.loyaltyPointsUsed.toLocaleString('vi-VN') %>đ</strong></div>
-                        <% } %>
-                        <div class="sum-row total"><span>Tổng cộng</span><span class="amount"><%= order.total.toLocaleString('vi-VN') %>đ</span></div>
-                    </div>
-                </div>
-            </div>
+            <% }) %>
+          </div>
+          <div class="summary-breakdown">
+            <div class="sum-row"><span>Tạm tính</span><strong><%= order.subtotal.toLocaleString('vi-VN') %>đ</strong></div>
+            <div class="sum-row"><span>Vận chuyển</span><strong><%= order.shippingFee.toLocaleString('vi-VN') %>đ</strong></div>
+            <div class="sum-row"><span>Thuế (VAT 8%)</span><strong><%= order.tax.toLocaleString('vi-VN') %>đ</strong></div>
+            <% if (order.discountApplied > 0) { %>
+            <div class="sum-row success"><span>Giảm giá (<%= order.discountCode %>)</span><strong>-<%= order.discountApplied.toLocaleString('vi-VN') %>đ</strong></div>
+            <% } %>
+            <% if (order.loyaltyPointsUsed > 0) { %>
+            <div class="sum-row success"><span>Dùng điểm thưởng</span><strong>-<%= order.loyaltyPointsUsed.toLocaleString('vi-VN') %>đ</strong></div>
+            <% } %>
+            <div class="sum-row total"><span>Tổng cộng</span><span class="amount"><%= order.total.toLocaleString('vi-VN') %>đ</span></div>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card shadow-sm mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 fw-bold text-primary">Cập nhật trạng thái</h6>
+      </div>
+      <div class="card-body">
+        <form action="/admin/orders/<%= order._id %>/status" method="POST">
+          <div class="mb-3">
+            <label for="statusSelect" class="form-label">Trạng thái hiện tại: <strong class="text-dark"><%= order.status %></strong></label>
+            <select id="statusSelect" name="status" class="form-select">
+              <% statuses.forEach(s => { %>
+              <option value="<%= s %>" <%= (s === order.status ? 'selected' : '') %>>
+                <%= s %>
+              </option>
+              <% }) %>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Cập nhật</button>
+        </form>
+      </div>
     </div>
 
-    <div class="col-lg-4">
-        <div class="card shadow-sm mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 fw-bold text-primary">Cập nhật trạng thái</h6>
-            </div>
-            <div class="card-body">
-                <form action="/admin/orders/<%= order._id %>/status" method="POST">
-                    <div class="mb-3">
-                        <label for="statusSelect" class="form-label">Trạng thái hiện tại: <strong class="text-dark"><%= order.status %></strong></label>
-                        <select id="statusSelect" name="status" class="form-select">
-                            <% statuses.forEach(s => { %>
-                                <option value="<%= s %>" <%= (s === order.status ? 'selected' : '') %>>
-                                    <%= s %>
-                                </option>
-                            <% }) %>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Cập nhật</button>
-                </form>
-            </div>
+    <div class="card shadow-sm mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 fw-bold text-primary">Thông tin đơn hàng & Khách hàng</h6>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <strong class="d-block text-dark mb-1">Người nhận:</strong>
+          <span><%= order.shippingAddress.fullName %></span><br>
+          <small class="text-muted"><%= order.email %></small><br>
+          <small class="text-muted"><%= order.shippingAddress.phone %></small>
         </div>
 
-        <div class="card shadow-sm mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 fw-bold text-primary">Thông tin khách hàng</h6>
-            </div>
-            <div class="card-body">
-                <p>
-                    <strong><%= order.shippingAddress.fullName %></strong><br>
-                    <%= order.email %><br>
-                    <%= order.shippingAddress.phone %><br>
-                    <hr>
-                    <strong>Địa chỉ giao hàng:</strong><br>
-                    <%= order.shippingAddress.street %>, <%= order.shippingAddress.ward %>, <%= order.shippingAddress.city %>
-                </p>
-            </div>
+        <div class="mb-3">
+          <strong class="d-block text-dark mb-1">Địa chỉ giao hàng:</strong>
+          <span class="text-secondary">
+            <%= order.shippingAddress.street %>, <%= order.shippingAddress.ward %>, <%= order.shippingAddress.city %>
+          </span>
         </div>
+
+        <hr class="my-3">
+
+        <div class="mb-3">
+          <strong class="d-block text-dark mb-1">Thanh toán:</strong>
+          <% if (order.paymentMethod === 'COD') { %>
+          <span class="badge bg-info text-dark"><i class="fas fa-money-bill-wave me-1"></i> COD (Tiền mặt)</span>
+          <% } else { %>
+          <span class="badge bg-warning text-dark"><i class="fas fa-credit-card me-1"></i> VNPAY</span>
+          <% } %>
+          <span class="ms-2 badge <%= order.paymentStatus === 'Paid' ? 'bg-success' : 'bg-secondary' %>">
+            <%= order.paymentStatus %>
+          </span>
+        </div>
+
+        <div>
+          <strong class="d-block text-dark mb-1">Ghi chú của khách:</strong>
+          <% if (order.notes) { %>
+          <div class="p-2 bg-light rounded border text-secondary fst-italic">
+            "<%= order.notes %>"
+          </div>
+          <% } else { %>
+          <span class="text-muted small">Running... (Không có ghi chú)</span>
+          <% } %>
+        </div>
+
+      </div>
     </div>
+  </div>
 </div>
