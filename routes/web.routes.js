@@ -87,6 +87,7 @@ router.get("/order/result/:orderCode", checkoutController.getOrderResultPage);
 router.get('/search', searchController.getResults);
 
 // ========== CATALOG ==========
+router.get('/categories', catalog.categoriesPage);
 router.get('/c/:slug', catalog.categoryPage);  
 router.get('/products/all', catalog.allProductsPage);
 

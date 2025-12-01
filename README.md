@@ -1,92 +1,132 @@
-# web_nodejs
-# K Shopping - Hướng Dẫn Triển Khai Docker Swarm (Midterm Project)
+# K SHOPPING - E-COMMERCE WEBSITE (Node.js Final Project)
 
-Tài liệu này cung cấp hướng dẫn để triển khai và chạy ứng dụng web K Shopping bằng Docker Swarm trên máy tính.
+**Môn học:** Lập trình Web với Node.js (502070)
+**Giảng viên:** ThS. Dương Hữu Phước
 
-## Yêu Cầu Cần Có 🛠️
+## 1\. THÔNG TIN NHÓM
 
-* **Docker Engine:** Đảm bảo đã cài đặt và khởi chạy Docker trên máy của mình. Có thể tải Docker tại [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/).
-* **Mã Nguồn:** Clone hoặc tải mã nguồn của dự án về máy tính.
+| STT | Họ và Tên | MSSV | Vai trò |
+|---|---|---|---|
+| 1 | **Bùi Duy Kha** | 52300032 | Fullstack, DevOps (Docker, CI/CD), AI Features |
+| 2 | **Bùi Minh Khải** | 52300033 | Backend, Database, Frontend UI |
 
----
-## Các Bước Triển Khai 🚀
+-----
 
-1.  **Di Chuyển Đến Thư Mục Dự Án:**
-    Mở terminal (hoặc Command Prompt) và di chuyển đến thư mục gốc của dự án (nơi chứa file `docker-compose.yml` và `Dockerfile`).
+## 2\. TRIỂN KHAI PUBLIC (DEPLOYMENT)
 
-    ```bash
-    cd /đường/dẫn/đến/dự/án/của/bạn/source
-    ```
+Dự án đã được deploy công khai trên nền tảng Cloud để phục vụ việc chấm điểm nhanh.
 
-2.  **Build Docker Image:**
-    Build image cho ứng dụng bằng `Dockerfile` đã cung cấp. Image này chứa cả ứng dụng web (`app`) và tiến trình xử lý email (`worker`).
+  * **Public URL:** [https://kshop-live-website.onrender.com](https://kshop-live-website.onrender.com)
+  * **Hạ tầng:** Render.com (Web Service) + MongoDB Atlas (Database) + Redis Cloud (Cache/Queue).
 
-    ```bash
-    docker build -t duykh4/kshop-app:latest .
-    ```
-    * `-t kshop-app:latest`: Đặt tên (tag) cho image là `kshop-app` với phiên bản `latest`.
-    * `.`: Chỉ định thư mục hiện tại là ngữ cảnh build.
-    
-    # 2. Push lên Hub (Nếu dùng CI/CD, chỉ cần git push)
-    # docker push duykh4/kshop-app:latest
+### Tài khoản Đăng nhập (Pre-loaded Data):
 
-3.  **Khởi Tạo Docker Swarm (Nếu chưa có):**
-    Nếu đây là lần đầu bạn sử dụng Swarm mode trên máy, bạn cần khởi tạo nó. Nếu đã khởi tạo rồi, bạn có thể bỏ qua bước này.
+**1. Tài khoản ADMIN (Quyền quản trị):**
 
-    ```bash
-    docker swarm init
-    ```
-    * Lệnh này biến Docker engine của bạn thành một node quản lý (manager) của Swarm.
+  * **Email:** `admin@kshop.com`
+  * **Mật khẩu:** `123456`
+  * *Chức năng:* Truy cập Dashboard, Quản lý Sản phẩm, Đơn hàng, Người dùng, Mã giảm giá.
 
-4.  **Triển Khai Stack:**
-    Sử dụng lệnh `docker stack deploy` cùng với file `docker-compose.yml` để triển khai tất cả các dịch vụ (nginx, các bản sao app, db, redis, worker).
+**2. Tài khoản CUSTOMER (Khách hàng):**
 
-    ```bash
-    docker stack deploy -c docker-compose.yml kshop_stack
-    ```
-    * `-c docker-compose.yml`: Chỉ định file cấu hình.
-    * `kshop_stack`: Tên bạn đặt cho stack ứng dụng này.
-    * Docker Swarm sẽ đọc file cấu hình và tạo các service, network, volume cần thiết. Quá trình này có thể mất vài phút, đặc biệt là lần đầu.
+  * **Email:** `customer@kshop.com`
+  * **Mật khẩu:** `123456`
+  * *Chức năng:* Đặt hàng, Xem lịch sử, Đánh giá sản phẩm.
 
-5.  **Kiểm Tra Trạng Thái Dịch Vụ (Tùy chọn):**
-    Bạn có thể kiểm tra xem tất cả các dịch vụ đã khởi động đúng cách chưa:
+### GHI CHÚ QUAN TRỌNG
 
-    ```bash
-    docker stack services kshop_stack
-    ```
-    * Kiểm tra cột `REPLICAS`. Dịch vụ `app` nên hiển thị `3/3`, các dịch vụ khác nên là `1/1`.
+**1. Về tính năng gửi Email (SMTP):**
 
-6. **Cách thêm seed để xem dữ liệu (Tùy chọn):**
-    Tìm tên một container app: Mở terminal và chạy lệnh để xem các container đang chạy:
+  * Hệ thống Email (Đăng ký, Quên mật khẩu, Xác nhận đơn hàng) hoạt động **hoàn hảo 100% trên môi trường Local (Docker)**.
+  * Tuy nhiên, trên môi trường **Public Cloud (Render/Railway)**, do chính sách bảo mật của Google (chặn các dải IP Hosting miễn phí) nên kết nối SMTP đến Gmail thường xuyên bị **Timeout**.
+      * *Trên Cloud:* Web vẫn báo thành công (để không gián đoạn trải nghiệm), nhưng email có thể không đến.
+      * *Trên Local:* Email gửi/nhận bình thường.
 
-    ```bash
-    docker ps
-    ```
-    Chạy lệnh docker exec: Sử dụng tên container bạn vừa copy, chạy lệnh sau:
-    ``` bash
-    docker exec -it <TÊN_CONTAINER_APP_ĐẦY_ĐỦ> node seeders/catalog.seed.js
-    ```
----
-## Truy Cập Ứng Dụng 🌐
+**Về ElasticSearch trên Cloud:**
 
-Sau khi stack đã được triển khai và các dịch vụ đang chạy, bạn có thể truy cập ứng dụng K Shopping bằng cách mở trình duyệt web và vào địa chỉ:
+  * Do giới hạn RAM của gói Free Hosting, dịch vụ ElasticSearch đã được tắt trên môi trường Cloud (Render). Tính năng tìm kiếm trên Cloud sẽ tự động chuyển về tìm kiếm cơ bản (MongoDB).
+  * Tính năng tìm kiếm nâng cao và AI Image Search hoạt động đầy đủ nhất trên môi trường Docker Local.
+-----
 
-**`http://localhost`**
+## 3\. TÍNH NĂNG BONUS (ĐIỂM THƯỞNG)
 
-* *Lưu ý:* Truy cập qua cổng 80 (HTTP mặc định), vì Nginx sẽ xử lý định tuyến nội bộ. **Không** sử dụng cổng 8081.
+Nhóm đã hoàn thành **4/4** tính năng nâng cao theo yêu cầu của đồ án:
 
----
-## Dừng Ứng Dụng 🛑
+1.  **Microservices Architecture:**
 
-Để dừng và xóa tất cả các service, network và container liên quan đến stack, chạy lệnh sau:
+      * Hệ thống tách biệt thành các dịch vụ: **App** (Web chính), **Worker** (Xử lý tác vụ nặng nền như gửi Email), **Redis** (Message Queue & Session), **Database**, **ElasticSearch**.
+      * Giao tiếp bất đồng bộ qua Redis Queue.
+
+2.  **CI/CD Pipeline:**
+
+      * Tích hợp **GitHub Actions**.
+      * Tự động Build Docker Image và Push lên Docker Hub khi có commit vào nhánh `main`.
+
+3.  **ElasticSearch Integration:**
+
+      * Tích hợp **ElasticSearch** để tìm kiếm sản phẩm tốc độ cao (Full-text search).
+      * Hỗ trợ tìm kiếm mờ (Fuzzy search) và gợi ý từ khóa (Live Search).
+
+4.  **AI Features (Google Gemini):**
+
+      * **Chatbot thông minh:** Hỗ trợ tìm kiếm sản phẩm và tra cứu trạng thái đơn hàng bằng ngôn ngữ tự nhiên.
+      * **Sentiment Analysis:** Tự động phân tích cảm xúc (Tích cực/Tiêu cực) của bình luận đánh giá và gắn nhãn.
+      * **Image Search (AI Vision):** Cho phép tìm kiếm sản phẩm bằng cách upload hình ảnh.
+
+-----
+
+## 4\. HƯỚNG DẪN CÀI ĐẶT & CHẠY LOCAL (DOCKER) 🛠️
+
+### Yêu cầu:
+
+  * Docker Desktop đã được cài đặt và đang chạy.
+  * Git.
+
+### Bước 1: Clone và Chuẩn bị
 
 ```bash
-docker stack rm kshop_stack
+# 1. Giải nén file zip hoặc clone repo
+cd web_nodejs
+
+# 2. Đảm bảo file .env đã có đầy đủ thông tin (File .env mẫu đã được đính kèm trong source)
+# Lưu ý: Kiểm tra key GEMINI_API_KEY và SMTP_PASS trong file .env
 ```
 
----
+### Bước 2: Build & Deploy Stack
 
-## RESET
-```
+Mở terminal tại thư mục gốc dự án:
+
+```bash
+# 1. Build Image (Bắt buộc để cập nhật code mới nhất)
+docker build -t duykh4/kshop-app:latest .
+
+# 2. Khởi tạo Swarm (Nếu chưa từng làm)
+docker swarm init
+
+# 3. Triển khai Stack
 docker stack deploy -c docker-compose.yml kshop_stack
 ```
+
+### Bước 3: Nạp dữ liệu mẫu (Seed Data)
+
+Sau khi các container đã chạy (khoảng 30s), chạy lệnh sau để nạp dữ liệu vào MongoDB và đồng bộ sang ElasticSearch:
+
+```bash
+# 1. Lấy ID của container app
+docker ps | grep kshop_stack_app
+
+# 2. Chạy seed (Thay CONTAINER_ID bằng ID tìm được ở trên)
+docker exec -it <CONTAINER_ID> node seeders/catalog.seed.js
+# Ví dụ: docker exec -it kshop_stack_app.1.xxxxx node seeders/catalog.seed.js
+```
+
+*Log thành công sẽ hiện: `✅ Đồng bộ thành công...`*
+
+### Bước 4: Truy cập
+
+  * **Website:** http://localhost (Cổng 80)
+  * **Admin Dashboard:** http://localhost/admin
+
+-----
+
+**Xin cảm ơn Thầy đã xem xét dự án của nhóm\!**

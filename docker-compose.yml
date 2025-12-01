@@ -18,6 +18,7 @@ services:
       # - /usr/src/app/node_modules
     environment:
       - MONGODB_URI=mongodb://db:27017/web_nodejs
+      # - MONGODB_URI=mongodb+srv://kshop_admin:Duykha%40123@cluster0.vmrrcq4.mongodb.net/web_nodejs?appName=Cluster0
       - HOST_NAME=0.0.0.0
     env_file:
       - .env
@@ -31,6 +32,7 @@ services:
     image: mongo:latest
     environment:
       - MONGO_INITDB_DATABASE=web_nodejs
+      # - MONGO_INITDB_DATABASE=mongodb+srv://kshop_admin:Duykha%40123@cluster0.vmrrcq4.mongodb.net/web_nodejs?appName=Cluster0
     ports:
       - "27018:27017"
     volumes:
@@ -61,6 +63,7 @@ services:
       # - /usr/src/app/node_modules
     environment:
       - MONGODB_URI=mongodb://db:27017/web_nodejs
+      # - MONGODB_URI=mongodb://db:27017/mongodb+srv://kshop_admin:Duykha%40123@cluster0.vmrrcq4.mongodb.net/web_nodejs?appName=Cluster0
       - HOST_NAME=0.0.0.0
     env_file:
       - .env

@@ -142,4 +142,37 @@ const allProductsPage = async (req, res, next) => {
   }
 };
 
-module.exports = { categoryPage, allProductsPage };
+const categoriesPage = async (req, res, next) => {
+  try {
+    // Lấy các danh mục cha (Nam, Nữ, Giày...)
+    const parents = await Category.find({ parentId: null }).lean();
+    
+    // Ảnh đại diện cứng cho các danh mục (để hiển thị cho đẹp)
+    const catImages = {
+        'nam': 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=600&q=80', // Ảnh nam
+        'nu': 'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?auto=format&fit=crop&w=600&q=80',  // Ảnh nữ
+        'giay-dep': 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=600&q=80', // Giày
+        'phu-kien': 'https://images.unsplash.com/photo-1576053139778-7e32f2ae3cfd?auto=format&fit=crop&w=600&q=80' // Phụ kiện
+    };
+
+    // Gắn ảnh vào data
+    const categories = parents.map(c => ({
+        ...c,
+        image: catImages[c.slug] || 'https://placehold.co/600x400?text=Category'
+    }));
+
+    return res.render('layouts/main', {
+      title: 'Danh mục sản phẩm',
+      body: 'pages/catalog/categories', // View mới
+      categories
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { 
+  categoryPage, 
+  allProductsPage, 
+  categoriesPage,
+};

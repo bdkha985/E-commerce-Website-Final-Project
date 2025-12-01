@@ -2,11 +2,6 @@
 <header class="fixed-header">
   <div class="container">
     <nav class="navbar">
-      <!-- Logo -->
-      <a href="/homepage" class="navbar__logo">
-        <img class="logo" src="/images/K.svg" alt="K Shopping" />
-        <span>K Shopping</span>
-      </a>
 
       <!-- Hamburger Menu Button -->
       <button class="navbar__toggle" id="navToggle" aria-label="Toggle menu">
@@ -15,13 +10,19 @@
         <span></span>
       </button>
 
+      <!-- Logo -->
+      <a href="/homepage" class="navbar__logo">
+        <img class="logo" src="/images/K.svg" alt="K Shopping" />
+        <span>K Shopping</span>
+      </a>
+
       <!-- Navigation -->
       <ul id="pc-nav">
         <li><a href="/homepage">Home</a></li>
         <li><a href="/products/all">Products</a></li>
 
         <li class="dropdown">
-          <a href="#!">Categories</a>
+          <a href="/categories">Categories</a>
           <ul class="dropdown-menu">
             <% (navCategories || []).forEach(c => { %>
             <li><a href="/c/<%= c.slug %>"><%= c.name %></a></li>
