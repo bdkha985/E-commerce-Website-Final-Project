@@ -90,11 +90,11 @@ Nhóm đã hoàn thành **4/4** tính năng nâng cao theo yêu cầu của đ�
 
   Tất cả em đều để thầy chỉ cần comment/uncomment là được ạ
   
-### Cách 1: Chạy cơ bản
+### Cách 1: Chạy cơ bản (Docker Compose)
 
 1. `docker compose up -d`
-2. `docker exec -it <ID_APP> node seeders/catalog_new.seed.js`
-2. `docker exec -it <ID_APP> node seeders/seed-users.js`
+2. `docker exec -it <ID_APP> node seeders/catalog_new.seed.js` (Để container ElasticSearch LOCAL có dữ liệu và hoạt động được)
+2. `docker exec -it <ID_APP> node seeders/seed-users.js` (Có thể không cần chạy vì ở cloud đã có dữ liệu, tài khoản giống ở phần 2.)
 3. Truy cập: http://localhost
 
 ### Cách 2: Chạy chế độ Swarm Cluster (Tính năng Bonus)
@@ -130,8 +130,8 @@ Sau khi các container đã chạy (khoảng 30s), chạy lệnh sau để nạp
 docker ps
 
 # 2. Chạy seed (Thay CONTAINER_ID bằng ID tìm được ở trên)
-docker exec -it <CONTAINER_ID> node seeders/catalog_new.seed.js
-docker exec -it <CONTAINER_ID> node seeders/seed-users.js
+docker exec -it <CONTAINER_ID> node seeders/catalog_new.seed.js # (Để container ElasticSearch LOCAL có dữ liệu và hoạt động được)
+docker exec -it <CONTAINER_ID> node seeders/seed-users.js # (Có thể không cần chạy vì ở cloud đã có dữ liệu, tài khoản giống ở phần 2.)
 # Ví dụ: docker exec -it kshop_stack_app.1.xxxxx node seeders/catalog.seed.js
 ```
 

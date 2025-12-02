@@ -117,7 +117,7 @@ const getOrderResultPage = async (req, res, next) => {
         }
 
         const tempPassword = req.flash("tempPassword")[0];
-        // === KẾT THÚC NÂNG CẤP ===
+        const tempEmail = req.flash('tempEmail')[0];
 
         res.render("layouts/main", {
             title: `Kết quả đơn hàng ${order.code}`,
