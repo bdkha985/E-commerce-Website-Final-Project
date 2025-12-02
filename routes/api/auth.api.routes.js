@@ -25,7 +25,7 @@ router.post("/signin", signinRules, handleApiValidation, apiSignin);
 // POST /api/auth/force-change-password
 router.post(
     "/force-change-password",
-    forceChangePasswordRules, // Sử dụng rule đã tách ra
+    forceChangePasswordRules,
     handleApiValidation,
     forceChangePassword
 );

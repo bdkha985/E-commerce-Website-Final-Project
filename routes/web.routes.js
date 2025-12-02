@@ -4,14 +4,14 @@ const router = express.Router();
 const { render, getHomePage } = require("../controllers/web/home.controller");
 const products = require("../controllers/catalog/product.controller");
 const requireLoginPage = require("../middlewares/requireLoginPage");
-const catalog  = require('../controllers/catalog/catalog.controller');
-const cartController = require('../controllers/cart/cart.controller');
-const checkoutController = require('../controllers/checkout/checkout.controller');
-const searchController = require('../controllers/web/search.controller');
+const catalog = require("../controllers/catalog/catalog.controller");
+const cartController = require("../controllers/cart/cart.controller");
+const checkoutController = require("../controllers/checkout/checkout.controller");
+const searchController = require("../controllers/web/search.controller");
 const homeController = require("../controllers/web/home.controller");
 
-router.get('/', getHomePage);   
-router.get('/homepage', getHomePage);  
+router.get("/", getHomePage);
+router.get("/homepage", getHomePage);
 
 router.get("/signin", (req, res) =>
     render(res, "pages/auth/signin", { title: "Đăng nhập" })
@@ -22,9 +22,8 @@ router.get("/signup", (req, res) =>
 );
 
 router.get("/force-change-password", (req, res) => {
-    // Kiểm tra xem có tempUserId trong session không
     if (!req.session.tempUserId) {
-        return res.redirect('/signin'); // Nếu không có, quay lại đăng nhập
+        return res.redirect("/signin");
     }
     render(res, "pages/auth/force-change-password", { title: "Đổi Mật Khẩu" });
 });
@@ -61,7 +60,7 @@ router.get("/contact", (req, res) =>
 );
 
 // POST: Xử lý gửi form liên hệ
-router.post("/contact", homeController.postContact); 
+router.post("/contact", homeController.postContact);
 
 // POST: Xử lý đăng ký newsletter (Footer)
 router.post("/newsletter", homeController.subscribeNewsletter);
@@ -84,16 +83,16 @@ router.get("/checkout/vnpay_return", checkoutController.handleVnpayReturn);
 router.get("/order/result/:orderCode", checkoutController.getOrderResultPage);
 
 // Search
-router.get('/search', searchController.getResults);
+router.get("/search", searchController.getResults);
 
 // ========== CATALOG ==========
-router.get('/categories', catalog.categoriesPage);
-router.get('/c/:slug', catalog.categoryPage);  
-router.get('/products/all', catalog.allProductsPage);
+router.get("/categories", catalog.categoriesPage);
+router.get("/c/:slug", catalog.categoryPage);
+router.get("/products/all", catalog.allProductsPage);
 
 // ========== PRODUCTS ==========
-// router.get('/products',       products.list); 
-router.get('/products/:slug', products.detail);  // Trang chi tiết sản phẩm
+// router.get('/products',       products.list);
+router.get("/products/:slug", products.detail); // Trang chi tiết sản phẩm
 
 // === Logout ===
 router.get("/logout", (req, res, next) => {
@@ -105,8 +104,8 @@ router.get("/logout", (req, res, next) => {
 
         // clear session local
         req.session.destroy(() => {
-            res.clearCookie("connect.sid"); // xoá cookie session
-            res.redirect("/homepage"); // quay về trang đăng nhập
+            res.clearCookie("connect.sid"); 
+            res.redirect("/homepage");
         });
     });
 });

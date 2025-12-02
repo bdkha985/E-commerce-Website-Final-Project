@@ -1,7 +1,7 @@
 // seeders/discount.seed.js
 require('dotenv').config();
 const mongoose = require('mongoose');
-const Discount = require('../models/discount.model'); // Đường dẫn tới model
+const Discount = require('../models/discount.model');
 
 async function seedDiscounts() {
     await mongoose.connect(process.env.MONGODB_URI);
@@ -12,16 +12,16 @@ async function seedDiscounts() {
 
     const discounts = [
         {
-            code: 'SALEK', // 5 ký tự
-            discountValue: 50000, // Giảm 50.000 VND
+            code: 'SALEK',
+            discountValue: 50000, 
             usageLimit: 10,
             usageCount: 0 
         },
         {
-            code: 'USEDX', // 5 ký tự
-            discountValue: 10000, // Giảm 10.000 VND
+            code: 'USEDX',
+            discountValue: 10000,
             usageLimit: 10,
-            usageCount: 10 // Hết lượt
+            usageCount: 10
         },
         {
             code: 'HELLO', 

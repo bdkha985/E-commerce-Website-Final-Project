@@ -1,18 +1,18 @@
 // routes/api/cart.api.routes.js
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { body } = require('express-validator');
-const cartApiController = require('../../controllers/cart/cart.api.controller');
-const { handleApiValidation } = require('../../middlewares/authValidator'); // Tái sử dụng hàm xử lý lỗi
-const { 
-    addToCartRules, 
-    updateCartItemRules, 
-    applyDiscountRules 
-} = require('../../middlewares/cartValidator');
+const { body } = require("express-validator");
+const cartApiController = require("../../controllers/cart/cart.api.controller");
+const { handleApiValidation } = require("../../middlewares/authValidator");
+const {
+    addToCartRules,
+    updateCartItemRules,
+    applyDiscountRules,
+} = require("../../middlewares/cartValidator");
 
 // POST /api/cart/add
 router.post(
-    '/add',
+    "/add",
     addToCartRules,
     handleApiValidation,
     cartApiController.addToCart
@@ -20,36 +20,27 @@ router.post(
 
 // PATCH /api/cart/update/:sku
 router.patch(
-    '/update/:sku',
+    "/update/:sku",
     updateCartItemRules,
     handleApiValidation,
     cartApiController.updateItem
 );
 
 // DELETE /api/cart/remove/:sku
-router.delete(
-    '/remove/:sku',
-    cartApiController.removeItem
-);
+router.delete("/remove/:sku", cartApiController.removeItem);
 
 // DELETE /api/cart/clear
-router.delete(
-    '/clear',
-    cartApiController.clearCart
-);
+router.delete("/clear", cartApiController.clearCart);
 
 // POST /api/cart/apply-discount
 router.post(
-    '/apply-discount',
+    "/apply-discount",
     applyDiscountRules,
     handleApiValidation,
     cartApiController.applyDiscount
 );
 
 // GET /api/cart/items
-router.get(
-    '/items',
-    cartApiController.getCartItems
-);
+router.get("/items", cartApiController.getCartItems);
 
 module.exports = router;

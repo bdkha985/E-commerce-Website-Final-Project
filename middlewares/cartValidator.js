@@ -12,9 +12,7 @@ const addToCartRules = [
 
 // 2. Cập nhật số lượng
 const updateCartItemRules = [
-    body("quantity")
-        .isInt()
-        .withMessage("Số lượng phải là số nguyên"),
+    body("quantity").isInt().withMessage("Số lượng phải là số nguyên"),
 ];
 
 // 3. Áp dụng mã giảm giá
@@ -25,5 +23,5 @@ const applyDiscountRules = [
 module.exports = {
     addToCartRules,
     updateCartItemRules,
-    applyDiscountRules
+    applyDiscountRules,
 };

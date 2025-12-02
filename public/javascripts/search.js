@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const searchForm = document.getElementById("headerSearchForm");
     const searchInput = document.getElementById("headerSearchInput");
     const resultsBox = document.getElementById("search-suggestions");
-    const fileInput = document.getElementById("headerSearchFile"); // Input ảnh
+    const fileInput = document.getElementById("headerSearchFile");
 
     if (!searchForm || !searchInput || !resultsBox) return;
 
@@ -14,14 +14,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // 1. LOGIC LIVE SEARCH (TÌM BẰNG CHỮ)
     // ==========================================
 
-    // Lắng nghe sự kiện gõ phím
     const toggleResults = (show) => {
         if (show) {
             resultsBox.classList.add("active");
-            resultsBox.style.display = "block"; // Đảm bảo nó không bị display: none
+            resultsBox.style.display = "block";
         } else {
             resultsBox.classList.remove("active");
-            // Đợi animation chạy xong mới ẩn (tùy chọn), hoặc ẩn luôn
             setTimeout(() => {
                 if (!resultsBox.classList.contains("active")) {
                     resultsBox.style.display = "none";
@@ -60,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 300);
     });
 
-    // Hàm vẽ HTML danh sách gợi ý
     function renderSuggestions(products) {
         const html = products
             .map(
@@ -84,14 +81,12 @@ document.addEventListener("DOMContentLoaded", () => {
         toggleResults(true);
     }
 
-    // Ẩn box khi click ra ngoài
     document.addEventListener("click", (e) => {
         if (!searchForm.contains(e.target)) {
             toggleResults(false);
         }
     });
 
-    // Hiện lại khi focus vào ô input
     searchInput.addEventListener("focus", () => {
         if (resultsBox.innerHTML.trim() !== "") {
             toggleResults(true);
@@ -107,7 +102,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const file = e.target.files[0];
             if (!file) return;
 
-            // UI: Hiển thị trạng thái đang xử lý
             const originalPlaceholder = searchInput.placeholder;
             searchInput.value = "";
             searchInput.placeholder = "AI đang phân tích ảnh...";
@@ -126,8 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 const data = await res.json();
 
                 if (data.ok && data.keywords) {
-                    // Thành công: Chuyển hướng sang trang tìm kiếm với từ khóa AI gợi ý
-                    // Ví dụ: AI trả về "giày sneaker trắng" -> Chuyển sang /products/all?q=giày sneaker trắng
                     window.location.href = `/search?q=${encodeURIComponent(
                         data.keywords
                     )}`;
@@ -149,6 +141,6 @@ document.addEventListener("DOMContentLoaded", () => {
         searchInput.disabled = false;
         searchInput.placeholder = placeholder;
         searchInput.focus();
-        if (fileInput) fileInput.value = ""; // Reset input file để chọn lại được ảnh cũ nếu muốn
+        if (fileInput) fileInput.value = "";
     }
 });

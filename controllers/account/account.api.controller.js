@@ -3,7 +3,7 @@
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const User = require("../../models/user.model");
-const Order = require('../../models/order.model');
+const Order = require("../../models/order.model");
 
 // Helper get id
 function getUserId(req) {
@@ -43,22 +43,19 @@ const updateProfile = async (req, res) => {
     if (phone !== undefined) toSet.phone = phone;
     if (avatarUrl !== undefined) toSet.avatarUrl = avatarUrl;
 
-    // === BẮT ĐẦU LOGIC CẬP NHẬT EMAIL ===
     if (email !== undefined) {
-        // 1. Kiểm tra xem email có bị trùng với người khác không
-        // (Tìm user có cùng email NHƯNG khác ID với user hiện tại)
-        const existingUser = await User.findOne({ 
-            email: email.toLowerCase().trim(), 
-            _id: { $ne: id } 
+        const existingUser = await User.findOne({
+            email: email.toLowerCase().trim(),
+            _id: { $ne: id },
         });
-        
+
         if (existingUser) {
             return res.status(400).json({
                 ok: false,
                 message: "Email này đã được sử dụng bởi tài khoản khác.",
             });
         }
-        
+
         toSet.email = email.toLowerCase().trim();
     }
 
@@ -290,31 +287,36 @@ const setDefaultAddressByIndex = async (req, res) => {
 // GET /api/account/orders
 const getOrderHistory = async (req, res) => {
     const id = getUserId(req);
-  try {
-    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit, 10) || 5));
-    const skip = (page - 1) * limit;
+    try {
+        const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+        const limit = Math.min(
+            50,
+            Math.max(1, parseInt(req.query.limit, 10) || 5)
+        );
+        const skip = (page - 1) * limit;
 
-    const [orders, totalOrders] = await Promise.all([
-      Order.find({ userId: id })
-        .sort({ createdAt: -1 })
-        .select('code createdAt total status paymentMethod')
-        .skip(skip)
-        .limit(limit)
-        .lean(),
-      Order.countDocuments({ userId: id })
-    ]);
+        const [orders, totalOrders] = await Promise.all([
+            Order.find({ userId: id })
+                .sort({ createdAt: -1 })
+                .select("code createdAt total status paymentMethod")
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+            Order.countDocuments({ userId: id }),
+        ]);
 
-    const totalPages = Math.max(1, Math.ceil(totalOrders / limit) || 1);
-    return res.json({
-      ok: true,
-      orders,
-      pagination: { page, limit, totalPages, totalOrders }
-    });
-  } catch (err) {
-    console.error('getOrderHistory error:', err);
-    return res.status(500).json({ ok: false, message: 'Không lấy được lịch sử đơn hàng' });
-  }
+        const totalPages = Math.max(1, Math.ceil(totalOrders / limit) || 1);
+        return res.json({
+            ok: true,
+            orders,
+            pagination: { page, limit, totalPages, totalOrders },
+        });
+    } catch (err) {
+        console.error("getOrderHistory error:", err);
+        return res
+            .status(500)
+            .json({ ok: false, message: "Không lấy được lịch sử đơn hàng" });
+    }
 };
 
 // GET /api/account/orders/:code
@@ -323,9 +325,11 @@ const getOrderDetail = async (req, res) => {
     const { code } = req.params;
 
     const order = await Order.findOne({ userId: id, code: code }).lean();
-    
+
     if (!order) {
-        return res.status(404).json({ ok: false, message: "Không tìm thấy đơn hàng" });
+        return res
+            .status(404)
+            .json({ ok: false, message: "Không tìm thấy đơn hàng" });
     }
 
     res.json({ ok: true, order });
@@ -342,5 +346,4 @@ module.exports = {
     setDefaultAddressByIndex,
     getOrderHistory,
     getOrderDetail,
-    
 };

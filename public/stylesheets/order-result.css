@@ -61,11 +61,10 @@ h3 {
     background: #f9fafb;
     border: 1px solid #e5e7eb;
 }
-/* (MỚI) Style cho box tài khoản */
 .account-creation-box {
     margin-top: 24px;
     padding: 20px;
-    background: #fefce8; /* Nền vàng nhạt */
+    background: #fefce8;
     border: 1px solid #fde047;
     border-radius: 12px;
     text-align: left;

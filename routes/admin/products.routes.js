@@ -1,33 +1,32 @@
 // routes/admin/products.routes.js
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const ctrl = require('../../controllers/admin/admin.product.controller');
-const upload = require('../../middlewares/upload');
+const ctrl = require("../../controllers/admin/admin.product.controller");
+const upload = require("../../middlewares/upload");
 
 // Import Validator
-const { productRules } = require('../../middlewares/adminValidator');
-const { handleValidation } = require('../../middlewares/authValidator'); // Tái sử dụng hàm xử lý lỗi redirect
+const { productRules } = require("../../middlewares/adminValidator");
+const { handleValidation } = require("../../middlewares/authValidator");
 
 // GET /admin/products (Danh sách sản phẩm)
-router.get('/', ctrl.listProducts);
+router.get("/", ctrl.listProducts);
 
 // GET /admin/products/new (Hiển thị form thêm mới)
-// (Phải đặt trước /:id để "new" không bị nhầm là 1 ID)
-router.get('/new', ctrl.getProductForm);
+router.get("/new", ctrl.getProductForm);
 
 // GET /admin/products/:id (Hiển thị form sửa)
-router.get('/:id', ctrl.getProductForm);
+router.get("/:id", ctrl.getProductForm);
 
 // POST /admin/products/save (Xử lý lưu - cả thêm mới và cập nhật)
 router.post(
-    '/save', 
-    upload.array('images', 5),
-    productRules, 
-    handleValidation, 
+    "/save",
+    upload.array("images", 5),
+    productRules,
+    handleValidation,
     ctrl.saveProduct
 );
 
 // POST /admin/products/:id/delete (Xử lý xóa)
-router.post('/:id/delete', ctrl.deleteProduct);
+router.post("/:id/delete", ctrl.deleteProduct);
 
 module.exports = router;

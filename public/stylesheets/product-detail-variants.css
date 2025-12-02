@@ -1,6 +1,3 @@
-/* CSS cho logic chọn variant */
-
-/* 1. Trạng thái Active (đã chọn) cho Variant Chip */
 .variant-chip.active {
     background: var(--primary-color) !important;
     border-color: var(--primary-color) !important;
@@ -8,7 +5,6 @@
     box-shadow: 0 4px 12px rgba(0, 84, 97, 0.3);
 }
 
-/* 2. Trạng thái Disabled (không khả dụng) cho Variant Chip */
 .variant-chip.disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -23,13 +19,11 @@
     border-color: #e5e7eb;
 }
 
-/* 3. Trạng thái Active cho ảnh Thumbnail (nếu JS chọn) */
 .pd-thumbs img.active {
     border-color: var(--primary-color);
     box-shadow: 0 4px 12px rgba(0, 84, 97, 0.3);
 }
 
-/* 4. Định dạng nút Add to Cart */
 .btn-add-cart {
     flex: 1;
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
@@ -63,7 +57,7 @@
 }
 
 .btn-wishlist {
-    width: 62px; /* Căn cho bằng nút add to cart */
+    width: 62px;
     height: 62px;
     border: 2px solid #e5e7eb;
     background: #fff;
@@ -82,9 +76,8 @@
     color: #ef4444;
 }
 
-/* CSS cho Nút Slide Ảnh */
 .pd-main {
-    position: relative; /* Đảm bảo .pd-main là gốc cho các nút */
+    position: relative;
 }
 
 .pd-slide-btn {
@@ -92,7 +85,7 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 10;
-    
+
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(4px);
     border: 1px solid #e5e7eb;
@@ -100,11 +93,11 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    
+
     font-size: 1.6rem;
     cursor: pointer;
     transition: all 0.25s ease;
-    
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -130,7 +123,6 @@
     opacity: 1;
 }
 
-/* Ẩn nút nếu không có ảnh gallery */
 .pd-thumbs:not(:has(img)) + .pd-main .pd-slide-btn {
     display: none;
 }
@@ -139,8 +131,12 @@
         width: 38px;
         height: 38px;
         font-size: 1.4rem;
-        opacity: 1; /* Luôn hiển thị trên mobile */
+        opacity: 1;
     }
-    .pd-slide-btn.prev { left: 10px; }
-    .pd-slide-btn.next { right: 10px; }
+    .pd-slide-btn.prev {
+        left: 10px;
+    }
+    .pd-slide-btn.next {
+        right: 10px;
+    }
 }

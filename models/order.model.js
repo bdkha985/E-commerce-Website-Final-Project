@@ -1,16 +1,14 @@
 // models/order.model.js
 const { Schema, model } = require("mongoose");
 
-// Schema cho từng sản phẩm trong đơn hàng
 const OrderItemSchema = new Schema({
     productId: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     sku: { type: String, required: true },
     name: { type: String, required: true },
-    price: { type: Number, required: true }, // Giá tại thời điểm mua
+    price: { type: Number, required: true },
     quantity: { type: Number, required: true, min: 1 },
 }, { _id: false });
 
-// Schema cho địa chỉ giao hàng
 const ShippingAddressSchema = new Schema({
     fullName: { type: String, required: true },
     phone: { type: String, required: true },
@@ -21,7 +19,7 @@ const ShippingAddressSchema = new Schema({
 
 const OrderSchema = new Schema(
     {
-        // Mã đơn hàng (tùy chỉnh)
+        // Mã đơn hàng
         code: {
             type: String,
             required: true,
@@ -29,20 +27,20 @@ const OrderSchema = new Schema(
             default: () => `KSHOP-${Date.now().toString().slice(-6)}`
         },
         // Thông tin người dùng
-        userId: { // Sẽ là null nếu là Guest Checkout
+        userId: {
             type: Schema.Types.ObjectId,
             ref: 'User',
             index: true,
             default: null
         },
-        email: { // Email (bắt buộc, kể cả guest)
+        email: {
             type: String,
             required: true,
             lowercase: true,
             trim: true
         },
         // Thông tin đơn hàng
-        items: [OrderItemSchema], // Danh sách sản phẩm
+        items: [OrderItemSchema],
         shippingAddress: {
             type: ShippingAddressSchema,
             required: true
@@ -59,10 +57,10 @@ const OrderSchema = new Schema(
         discountCode: { type: String, default: null },
         discountApplied: { type: Number, default: 0 },
         
-        loyaltyPointsUsed: { type: Number, default: 0 }, // Số điểm đã dùng
-        loyaltyPointsGained: { type: Number, default: 0 }, // Số điểm nhận được
+        loyaltyPointsUsed: { type: Number, default: 0 },
+        loyaltyPointsGained: { type: Number, default: 0 },
 
-        total: { type: Number, required: true }, // Tổng tiền cuối cùng
+        total: { type: Number, required: true },
         
         paymentMethod: {
             type: String,
@@ -82,7 +80,6 @@ const OrderSchema = new Schema(
             enum: ['Pending', 'Confirmed', 'Shipping', 'Delivered', 'Cancelled'],
             default: 'Pending'
         },
-        // (Yêu cầu PDF) Lịch sử trạng thái [cite: 183-185]
         statusHistory: [{
             status: String,
             updatedAt: { type: Date, default: Date.now }
@@ -91,7 +88,6 @@ const OrderSchema = new Schema(
     { timestamps: true }
 );
 
-// Tự động thêm status 'Pending' vào lịch sử khi tạo mới
 OrderSchema.pre('save', function (next) {
     if (this.isNew && this.statusHistory.length === 0) {
         this.statusHistory.push({ status: this.status, updatedAt: new Date() });

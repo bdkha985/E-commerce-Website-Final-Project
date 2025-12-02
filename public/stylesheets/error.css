@@ -24,7 +24,6 @@ body {
   overflow: hidden;
 }
 
-/* Animated Background */
 body::before {
   content: '';
   position: absolute;
@@ -54,7 +53,6 @@ body::after {
   50% { transform: translate(30px, 30px) rotate(180deg); }
 }
 
-/* Error Container */
 .notfound {
   text-align: center;
   padding: 40px;
@@ -79,7 +77,6 @@ body::after {
   }
 }
 
-/* Illustration */
 .illustration {
   max-width: 80%;
   height: auto;
@@ -92,7 +89,6 @@ body::after {
   50% { transform: translateY(-20px); }
 }
 
-/* Error Code */
 .notfound h1 {
   font-size: clamp(8rem, 20vw, 16rem);
   font-weight: 800;
@@ -118,7 +114,6 @@ body::after {
   border-radius: 2px;
 }
 
-/* Subtitle */
 .notfound .subtitle {
   font-size: 2.4rem;
   font-weight: 700;
@@ -126,7 +121,6 @@ body::after {
   color: #0f172a;
 }
 
-/* Description */
 .notfound .desc {
   font-size: 1.6rem;
   margin-bottom: 32px;
@@ -137,7 +131,6 @@ body::after {
   margin-right: auto;
 }
 
-/* Buttons */
 .notfound .actions {
   display: flex;
   gap: 12px;
@@ -202,7 +195,6 @@ body::after {
   box-shadow: 0 4px 12px rgba(0, 84, 97, 0.3);
 }
 
-/* Quick Links */
 .quick-links {
   margin-top: 40px;
   padding-top: 32px;
@@ -248,7 +240,6 @@ body::after {
   box-shadow: 0 4px 12px rgba(0, 84, 97, 0.15);
 }
 
-/* Error Codes Specific Styles */
 .error-404 h1 { color: #0ea5e9; }
 .error-500 h1 { 
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
@@ -261,7 +252,6 @@ body::after {
   -webkit-text-fill-color: transparent;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .notfound {
     padding: 32px 24px;

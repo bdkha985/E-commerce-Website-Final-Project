@@ -2,7 +2,7 @@
 const nodemailer = require("nodemailer");
 
 const port = Number(process.env.SMTP_PORT || 587);
-const secure = port === 465; // Auto set đúng chuẩn Gmail
+const secure = port === 465;
 
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -12,9 +12,9 @@ const transporter = nodemailer.createTransport({
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
     },
-    family: 4, // ép IPv4
+    family: 4,
     tls: {
-        rejectUnauthorized: false, // Render đôi khi lỗi cert
+        rejectUnauthorized: false,
     },
     connectionTimeout: 15000,
     greetingTimeout: 15000,
@@ -76,30 +76,41 @@ async function sendOtpEmail(to, otp, expiresAt) {
 }
 
 async function sendOrderConfirmationEmail(toEmail, order) {
-    // Helper để format tiền
-    const formatCurrency = (val) => (val || 0).toLocaleString('vi-VN') + 'đ';
+    const formatCurrency = (val) => (val || 0).toLocaleString("vi-VN") + "đ";
 
-    // Tạo danh sách item HTML
-    const itemsHtml = order.items.map(item => `
+    const itemsHtml = order.items
+        .map(
+            (item) => `
         <tr>
             <td style="padding: 8px; border-bottom: 1px solid #ddd;">
                 ${item.name} (SKU: ${item.sku})
             </td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatCurrency(item.price)}</td>
-            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatCurrency(item.price * item.quantity)}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${
+                item.quantity
+            }</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatCurrency(
+                item.price
+            )}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">${formatCurrency(
+                item.price * item.quantity
+            )}</td>
         </tr>
-    `).join('');
+    `
+        )
+        .join("");
 
-    const paymentMethodText = (order.paymentMethod === 'COD') 
-        ? 'Thanh toán khi nhận hàng (COD)' 
-        : 'Đã thanh toán qua VNPAY';
+    const paymentMethodText =
+        order.paymentMethod === "COD"
+            ? "Thanh toán khi nhận hàng (COD)"
+            : "Đã thanh toán qua VNPAY";
 
     const html = `
     <div style="font-family: Arial, sans-serif; line-height: 1.6;">
         <h2>Cảm ơn bạn đã đặt hàng tại K Shopping!</h2>
         <p>Xin chào ${order.shippingAddress.fullName},</p>
-        <p>Đơn hàng <strong>${order.code}</strong> của bạn đã được xác nhận thành công.</p>
+        <p>Đơn hàng <strong>${
+            order.code
+        }</strong> của bạn đã được xác nhận thành công.</p>
         
         <h3 style="border-bottom: 2px solid #eee; padding-bottom: 5px;">Chi tiết đơn hàng</h3>
         <table style="width: 100%; border-collapse: collapse;">
@@ -121,31 +132,53 @@ async function sendOrderConfirmationEmail(toEmail, order) {
             <tbody>
                 <tr>
                     <td style="padding: 5px;">Tạm tính:</td>
-                    <td style="padding: 5px; text-align: right;">${formatCurrency(order.subtotal)}</td>
+                    <td style="padding: 5px; text-align: right;">${formatCurrency(
+                        order.subtotal
+                    )}</td>
                 </tr>
                 <tr>
                     <td style="padding: 5px;">Phí vận chuyển:</td>
-                    <td style="padding: 5px; text-align: right;">${formatCurrency(order.shippingFee)}</td>
+                    <td style="padding: 5px; text-align: right;">${formatCurrency(
+                        order.shippingFee
+                    )}</td>
                 </tr>
-                ${order.discountApplied > 0 ? `
+                ${
+                    order.discountApplied > 0
+                        ? `
                 <tr>
-                    <td style="padding: 5px;">Giảm giá (${order.discountCode}):</td>
-                    <td style="padding: 5px; text-align: right;">-${formatCurrency(order.discountApplied)}</td>
+                    <td style="padding: 5px;">Giảm giá (${
+                        order.discountCode
+                    }):</td>
+                    <td style="padding: 5px; text-align: right;">-${formatCurrency(
+                        order.discountApplied
+                    )}</td>
                 </tr>
-                ` : ''}
-                ${order.loyaltyPointsUsed > 0 ? `
+                `
+                        : ""
+                }
+                ${
+                    order.loyaltyPointsUsed > 0
+                        ? `
                 <tr style="color: #16a34a; font-weight: bold;">
                     <td style="padding: 5px;">Sử dụng điểm thưởng:</td>
-                    <td style="padding: 5px; text-align: right;">-${formatCurrency(order.loyaltyPointsUsed)}</td>
+                    <td style="padding: 5px; text-align: right;">-${formatCurrency(
+                        order.loyaltyPointsUsed
+                    )}</td>
                 </tr>
-                ` : ''}
+                `
+                        : ""
+                }
                 <tr>
                     <td style="padding: 5px;">Thuế (VAT 8%):</td>
-                    <td style="padding: 5px; text-align: right;">${formatCurrency(order.tax)}</td>
+                    <td style="padding: 5px; text-align: right;">${formatCurrency(
+                        order.tax
+                    )}</td>
                 </tr>
                 <tr>
                     <td style="padding: 5px;"><strong>Tổng tiền:</strong></td>
-                    <td style="padding: 5px; text-align: right;"><strong>${formatCurrency(order.total)}</strong></td>
+                    <td style="padding: 5px; text-align: right;"><strong>${formatCurrency(
+                        order.total
+                    )}</strong></td>
                 </tr>
             </tbody>
         </table>
@@ -154,14 +187,20 @@ async function sendOrderConfirmationEmail(toEmail, order) {
         <p>
             <strong>${order.shippingAddress.fullName}</strong><br>
             ${order.shippingAddress.phone}<br>
-            ${order.shippingAddress.street}, ${order.shippingAddress.ward}, ${order.shippingAddress.city}
+            ${order.shippingAddress.street}, ${order.shippingAddress.ward}, ${
+        order.shippingAddress.city
+    }
         </p>
 
-        ${order.notes ? `
+        ${
+            order.notes
+                ? `
         <p style="background: #f9f9f9; padding: 10px; border-left: 4px solid #ccc; font-style: italic;">
             <strong>Ghi chú:</strong> ${order.notes}
         </p>
-        ` : ''}
+        `
+                : ""
+        }
         
         <p>
             <strong>Phương thức thanh toán:</strong> ${paymentMethodText}
@@ -181,18 +220,20 @@ async function sendOrderConfirmationEmail(toEmail, order) {
 
 // 1. Gửi email liên hệ từ khách về cho Admin
 async function sendContactEmail(data) {
-    const adminEmail = process.env.SMTP_USER; // Gửi về cho chính mình
-    
+    const adminEmail = process.env.SMTP_USER;
+
     const html = `
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <h3 style="color: #005461;">📩 Có liên hệ mới từ Website K Shopping</h3>
         <hr style="border: 0; border-top: 1px solid #eee;">
         <p><strong>Người gửi:</strong> ${data.firstName} ${data.lastName}</p>
-        <p><strong>Email:</strong> <a href="mailto:${data.email}">${data.email}</a></p>
-        <p><strong>SĐT:</strong> ${data.phone || 'Không có'}</p>
+        <p><strong>Email:</strong> <a href="mailto:${data.email}">${
+        data.email
+    }</a></p>
+        <p><strong>SĐT:</strong> ${data.phone || "Không có"}</p>
         <p><strong>Nội dung tin nhắn:</strong></p>
         <blockquote style="background: #f9fafb; padding: 15px; border-left: 4px solid #005461; margin: 10px 0;">
-            ${data.message.replace(/\n/g, '<br>')}
+            ${data.message.replace(/\n/g, "<br>")}
         </blockquote>
         <hr style="border: 0; border-top: 1px solid #eee;">
         <p style="font-size: 12px; color: #666;">Email này được gửi tự động từ hệ thống K Shopping.</p>
@@ -202,7 +243,7 @@ async function sendContactEmail(data) {
     return transporter.sendMail({
         from: `"K Shopping System" <${process.env.SMTP_USER}>`,
         to: adminEmail,
-        replyTo: data.email, // Để Admin bấm Reply là trả lời khách luôn
+        replyTo: data.email,
         subject: `[Liên hệ] Tin nhắn mới từ ${data.firstName} ${data.lastName}`,
         html,
     });
@@ -211,7 +252,7 @@ async function sendContactEmail(data) {
 // 2. Gửi thông báo có người đăng ký Newsletter
 async function sendNewsletterNotification(email) {
     const adminEmail = process.env.SMTP_USER;
-    
+
     const html = `
         <p>🔔 <strong>Thông báo mới:</strong></p>
         <p>Có khách hàng vừa đăng ký nhận bản tin (Newsletter).</p>
@@ -226,11 +267,11 @@ async function sendNewsletterNotification(email) {
     });
 }
 
-module.exports = { 
-    sendOtpEmail, 
-    sendWelcomeEmail, 
+module.exports = {
+    sendOtpEmail,
+    sendWelcomeEmail,
     sendTemporaryPasswordEmail,
     sendOrderConfirmationEmail,
     sendContactEmail,
     sendNewsletterNotification,
- };
+};

@@ -75,17 +75,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 const modal = new bootstrap.Modal(modalEl);
                 modal.show();
 
-                // 2. Xử lý khi bấm nút "Về Trang Chủ"
                 if (btnGoHome) {
                     btnGoHome.addEventListener("click", () => {
                         window.location.href = "/homepage";
                     });
                 }
 
-                // (Tùy chọn) Tự động chuyển sau 5 giây nếu họ không bấm
-                setTimeout(() => { window.location.href = '/homepage'; }, 10000);
+                setTimeout(() => {
+                    window.location.href = "/homepage";
+                }, 10000);
             } else {
-                // Fallback nếu lỗi bootstrap
                 alert(
                     "Đăng ký thành công! Vui lòng kiểm tra email để nhận mật khẩu tạm thời."
                 );

@@ -1,6 +1,5 @@
 /* =========== Body =========== */
 
-/* ===== Page Loader ===== */
 #app-loader {
     position: fixed;
     inset: 0;
@@ -40,7 +39,6 @@
     }
 }
 
-/* ===== Banner===== */
 .banner {
     height: calc(100vh - 140px);
     position: relative;
@@ -64,11 +62,14 @@
 }
 
 @keyframes kenburns {
-    0% { transform: scale(1); }
-    100% { transform: scale(1.1); }
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.1);
+    }
 }
 
-/* Overlay gradient */
 .banner .carousel-caption {
     left: 0;
     right: 0;
@@ -90,8 +91,12 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .banner-title {
@@ -140,7 +145,7 @@
 }
 
 .btn-banner::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
@@ -236,14 +241,12 @@
     box-shadow: 0 2px 8px rgba(0, 84, 97, 0.3);
 }
 
-/* ===== Grid System ===== */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 28px;
 }
 
-/* ===== Product/Blog Cards ===== */
 .card {
     background: #fff;
     border-radius: 16px;
@@ -256,7 +259,7 @@
 }
 
 .card::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -277,7 +280,6 @@
     border-color: transparent;
 }
 
-/* Image */
 .card img {
     width: 100%;
     height: 240px;
@@ -318,7 +320,6 @@
     line-height: 1.6;
 }
 
-/* Card với badge */
 .card[data-badge] {
     position: relative;
 }
@@ -341,11 +342,15 @@
 }
 
 @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
 }
 
-/* ===== Products Grid ===== */
 .products .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -371,7 +376,6 @@
     margin: 0 14px 14px;
 }
 
-/* ===== Contact Form ===== */
 .contact-form {
     max-width: 600px;
     margin: 0 auto;
@@ -417,7 +421,7 @@
 }
 
 .contact-form button::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -439,7 +443,6 @@
     box-shadow: 0 8px 20px rgba(0, 84, 97, 0.4);
 }
 
-/* ===== Member Cards (About Us) ===== */
 #aboutus {
     margin-bottom: 32px;
 }
@@ -456,7 +459,7 @@
 }
 
 .member-card::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -507,7 +510,6 @@
     border-color: transparent;
 }
 
-/* Social links trong member card */
 .member-card .social-links {
     display: flex;
     gap: 10px;
@@ -533,7 +535,6 @@
     transform: translateY(-2px);
 }
 
-/* ===== Testimonials Section ===== */
 .testimonials {
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     padding: 80px 0;
@@ -606,7 +607,6 @@
     margin: 0;
 }
 
-/* ===== Stats Section ===== */
 .stats-section {
     background: linear-gradient(135deg, var(--primary-color) 0%, #007a8c 100%);
     color: #fff;
@@ -625,10 +625,18 @@
     animation: fadeInUp 0.6s ease both;
 }
 
-.stat-item:nth-child(1) { animation-delay: 0.1s; }
-.stat-item:nth-child(2) { animation-delay: 0.2s; }
-.stat-item:nth-child(3) { animation-delay: 0.3s; }
-.stat-item:nth-child(4) { animation-delay: 0.4s; }
+.stat-item:nth-child(1) {
+    animation-delay: 0.1s;
+}
+.stat-item:nth-child(2) {
+    animation-delay: 0.2s;
+}
+.stat-item:nth-child(3) {
+    animation-delay: 0.3s;
+}
+.stat-item:nth-child(4) {
+    animation-delay: 0.4s;
+}
 
 @keyframes fadeInUp {
     from {
@@ -655,7 +663,6 @@
     letter-spacing: 0.1em;
 }
 
-/* ===== CTA Section ===== */
 .cta-section {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     color: #fff;
@@ -668,19 +675,30 @@
 }
 
 .cta-section::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -50%;
     right: -50%;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
+    background: radial-gradient(
+        circle,
+        rgba(14, 165, 233, 0.1) 0%,
+        transparent 70%
+    );
     animation: pulse 4s ease-in-out infinite;
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.1); opacity: 0.8; }
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
 }
 
 .cta-section h2 {
@@ -718,7 +736,6 @@
     box-shadow: 0 12px 32px rgba(14, 165, 233, 0.5);
 }
 
-/* ===== Feature Cards ===== */
 .features-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -775,53 +792,43 @@
 }
 
 .toast {
-    /* 1. Tăng chiều rộng (Mặc định Bootstrap là 350px) */
-    --bs-toast-max-width: 500px; 
-    width: 500px; 
-    max-width: 90vw; /* Để không bị tràn trên điện thoại */
-
-    /* 2. Tăng cỡ chữ */
-    font-size: 1.6rem; 
+    --bs-toast-max-width: 500px;
+    width: 500px;
+    max-width: 90vw;
+    font-size: 1.6rem;
     font-weight: 500;
-    
-    /* 3. Bo góc tròn hơn (nếu thích) */
     border-radius: 12px !important;
-    
-    /* 4. Đổ bóng đậm hơn cho nổi bật */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
 }
 
 .toast-body {
-    /* 5. Tăng khoảng cách đệm bên trong */
-    padding: 16px 24px; 
+    padding: 16px 24px;
 }
 
-/* Tùy chỉnh nút đóng cho to ra tương ứng */
 .toast .btn-close {
     width: 1.2em;
     height: 1.2em;
 }
 
-/* ===== Responsive Design ===== */
 @media (max-width: 992px) {
     .banner {
         height: 60vh;
     }
-    
+
     .section-title {
         font-size: 2.8rem;
         margin: 60px 0 36px;
     }
-    
+
     .banner-title {
         font-size: clamp(2.4rem, 5vw, 4rem);
     }
-    
+
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 30px;
     }
-    
+
     .stat-number {
         font-size: 3.6rem;
     }
@@ -832,26 +839,26 @@
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 20px;
     }
-    
+
     .products .grid {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .banner .carousel-control-prev,
     .banner .carousel-control-next {
         width: 48px;
         height: 48px;
         margin: 0 10px;
     }
-    
+
     .cta-section {
         padding: 60px 24px;
     }
-    
+
     .cta-section h2 {
         font-size: 2.8rem;
     }
-    
+
     .features-grid {
         grid-template-columns: 1fr;
         gap: 24px;
@@ -862,31 +869,31 @@
     .banner {
         height: 50vh;
     }
-    
+
     .section-title {
         font-size: 2.4rem;
         margin: 48px 0 32px;
     }
-    
+
     .card img,
     .products .card img {
         height: 200px;
     }
-    
+
     .stats-grid {
         grid-template-columns: 1fr;
         gap: 24px;
     }
-    
+
     .stat-number {
         font-size: 3.2rem;
     }
-    
+
     .member-card img {
         width: 120px;
         height: 120px;
     }
-    
+
     .products .grid {
         grid-template-columns: 1fr;
     }

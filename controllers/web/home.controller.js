@@ -1,7 +1,11 @@
 // controllers/web/home.controller.js
+
 const Product = require("../../models/product.model");
 const Category = require("../../models/category.model");
-const { sendContactEmail, sendNewsletterNotification } = require('../../utils/mailer');
+const {
+    sendContactEmail,
+    sendNewsletterNotification,
+} = require("../../utils/mailer");
 
 function render(res, viewPath, locals = {}) {
     res.render("layouts/main", { body: viewPath, ...locals });
@@ -26,41 +30,39 @@ function getDisplayPrice(p) {
 
 const getHomePage = async (req, res, next) => {
     try {
-        // Lấy ID 3 danh mục chúng ta muốn hiển thị
         const [catAoNam, catDamNu, catSneaker] = await Promise.all([
-            Category.findOne({ slug: 'ao-nam' }).select('_id').lean(),
-            Category.findOne({ slug: 'dam-nu' }).select('_id').lean(),
-            Category.findOne({ slug: 'sneaker' }).select('_id').lean()
+            Category.findOne({ slug: "ao-nam" }).select("_id").lean(),
+            Category.findOne({ slug: "dam-nu" }).select("_id").lean(),
+            Category.findOne({ slug: "sneaker" }).select("_id").lean(),
         ]);
 
-        // Tải tất cả 5 nhóm sản phẩm cùng lúc
         const [
-            bestSellersData, 
-            newCollectionData, 
-            aoNamProductsData, 
-            damNuProductsData, 
-            sneakerProductsData
+            bestSellersData,
+            newCollectionData,
+            aoNamProductsData,
+            damNuProductsData,
+            sneakerProductsData,
         ] = await Promise.all([
-            // 1. Best Sellers (Giữ nguyên)
+            // 1. Best Sellers
             Product.find()
                 .sort({ ratingCount: -1, ratingAvg: -1, createdAt: -1 })
                 .limit(12)
                 .lean(),
-            // 2. New Collection (Giữ nguyên)
+            // 2. New Collection
             Product.find().sort({ createdAt: -1 }).limit(12).lean(),
-            
+
             // 3. Category "Áo Nam"
-            catAoNam 
-                ? Product.find({ categoryIds: catAoNam._id }).limit(12).lean() 
+            catAoNam
+                ? Product.find({ categoryIds: catAoNam._id }).limit(12).lean()
                 : Promise.resolve([]),
             // 4. Category "Đầm Nữ"
-            catDamNu 
-                ? Product.find({ categoryIds: catDamNu._id }).limit(12).lean() 
+            catDamNu
+                ? Product.find({ categoryIds: catDamNu._id }).limit(12).lean()
                 : Promise.resolve([]),
             // 5. Category "Sneaker"
-            catSneaker 
-                ? Product.find({ categoryIds: catSneaker._id }).limit(12).lean() 
-                : Promise.resolve([])
+            catSneaker
+                ? Product.find({ categoryIds: catSneaker._id }).limit(12).lean()
+                : Promise.resolve([]),
         ]);
 
         const mapView = (arr) =>
@@ -75,7 +77,6 @@ const getHomePage = async (req, res, next) => {
             body: "pages/index",
             bestSellers: mapView(bestSellersData),
             newCollection: mapView(newCollectionData),
-            // Truyền 3 danh mục mới ra view
             aoNamProducts: mapView(aoNamProductsData),
             damNuProducts: mapView(damNuProductsData),
             sneakerProducts: mapView(sneakerProductsData),
@@ -89,16 +90,18 @@ const getHomePage = async (req, res, next) => {
 const postContact = async (req, res) => {
     try {
         const { firstName, lastName, email, phone, message } = req.body;
-        
-        // Gửi mail cho Admin
+
         await sendContactEmail({ firstName, lastName, email, phone, message });
-        
-        req.flash('success', 'Tin nhắn của bạn đã được gửi! Chúng tôi sẽ phản hồi sớm.');
-        res.redirect('/contact');
+
+        req.flash(
+            "success",
+            "Tin nhắn của bạn đã được gửi! Chúng tôi sẽ phản hồi sớm."
+        );
+        res.redirect("/contact");
     } catch (err) {
         console.error("Contact Error:", err);
-        req.flash('error', 'Có lỗi xảy ra khi gửi tin nhắn. Vui lòng thử lại.');
-        res.redirect('/contact');
+        req.flash("error", "Có lỗi xảy ra khi gửi tin nhắn. Vui lòng thử lại.");
+        res.redirect("/contact");
     }
 };
 
@@ -106,15 +109,15 @@ const postContact = async (req, res) => {
 const subscribeNewsletter = async (req, res) => {
     try {
         const { email } = req.body;
-        if(email) {
+        if (email) {
             await sendNewsletterNotification(email);
-            req.flash('success', 'Đăng ký nhận tin thành công!');
+            req.flash("success", "Đăng ký nhận tin thành công!");
         }
-        res.redirect('back'); // Quay lại trang cũ (dù đang ở Home hay Blog)
+        res.redirect("back");
     } catch (err) {
         console.error("Newsletter Error:", err);
-        req.flash('error', 'Lỗi đăng ký.');
-        res.redirect('back');
+        req.flash("error", "Lỗi đăng ký.");
+        res.redirect("back");
     }
 };
 

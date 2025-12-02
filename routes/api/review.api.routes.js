@@ -3,8 +3,11 @@ const express = require("express");
 const { body } = require("express-validator");
 const ctrl = require("../../controllers/api/review.api.controller");
 const requireLoginApi = require("../../middlewares/requireLogin.api");
-const { reviewCommentRules, reviewRatingRules } = require('../../middlewares/featureValidator');
-const { handleApiValidation } = require('../../middlewares/authValidator');
+const {
+    reviewCommentRules,
+    reviewRatingRules,
+} = require("../../middlewares/featureValidator");
+const { handleApiValidation } = require("../../middlewares/authValidator");
 
 const router = express.Router();
 
@@ -22,7 +25,7 @@ router.post(
 // POST 2: Gửi Rating (cho user, BẮT BUỘC login)
 router.post(
     "/:productId/rate",
-    requireLoginApi, // Đã có sẵn
+    requireLoginApi,
     reviewRatingRules,
     handleApiValidation,
     ctrl.postRating

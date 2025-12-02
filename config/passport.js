@@ -32,18 +32,18 @@ passport.use(
                 const email = profile.emails?.[0]?.value?.toLowerCase();
                 const displayName = profile.displayName;
 
-                // 1. Tìm xem Google ID này đã có trong DB chưa
+                // 1. Tìm Google ID
                 let user = await User.findOne({ "oauth.googleId": googleId });
 
                 if (user) {
-                    // Case A: Đã từng đăng nhập bằng Google này -> OK
+                    // Case A: Đã từng đăng nhập bằng Google
                     return done(null, user);
                 }
 
                 // 2. Nếu chưa có Google ID, thử tìm theo Email
                 if (email) {
                     user = await User.findOne({ email: email });
-                    
+
                     if (user) {
                         // Case B: Email đã tồn tại (do đăng ký thủ công hoặc FB trước đó)
                         // => THỰC HIỆN LIÊN KẾT (LINKING)
@@ -57,15 +57,14 @@ passport.use(
                 // 3. Case C: Chưa có ID, chưa có Email => Tạo User mới hoàn toàn
                 user = await User.create({
                     fullName: displayName,
-                    email: email, // Lưu ý: Nếu Google không trả về email, chỗ này có thể null (cần handle ở Model)
+                    email: email,
                     roles: ["customer"],
                     oauth: { googleId: googleId },
-                    passwordHash: null, // Không có mật khẩu
-                    phone: ""
+                    passwordHash: null,
+                    phone: "",
                 });
 
                 return done(null, user);
-
             } catch (err) {
                 console.error("[Passport Google Error]", err);
                 return done(err, null);
@@ -82,21 +81,28 @@ passport.use(
         {
             clientID: process.env.FB_APP_ID,
             clientSecret: process.env.FB_APP_SECRET,
-            callbackURL: process.env.FB_CALLBACK_URL || "http://localhost:8081/auth/facebook/callback",
+            callbackURL:
+                process.env.FB_CALLBACK_URL ||
+                "http://localhost:8081/auth/facebook/callback",
             profileFields: ["id", "emails", "name", "displayName"],
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
                 const facebookId = profile.id;
                 const email = profile.emails?.[0]?.value?.toLowerCase();
-                
+
                 // Xử lý tên hiển thị
-                const displayName = profile.displayName || 
-                    [profile.name?.givenName, profile.name?.familyName].filter(Boolean).join(" ") || 
+                const displayName =
+                    profile.displayName ||
+                    [profile.name?.givenName, profile.name?.familyName]
+                        .filter(Boolean)
+                        .join(" ") ||
                     "Facebook User";
 
                 // 1. Tìm theo Facebook ID
-                let user = await User.findOne({ "oauth.facebookId": facebookId });
+                let user = await User.findOne({
+                    "oauth.facebookId": facebookId,
+                });
 
                 if (user) {
                     return done(null, user);
@@ -115,8 +121,7 @@ passport.use(
                 }
 
                 // 3. Tạo mới
-                // (Lưu ý: Facebook đôi khi không trả về email nếu user đăng ký bằng SĐT)
-                const finalEmail = email || `fb-${facebookId}@no-email.com`; 
+                const finalEmail = email || `fb-${facebookId}@no-email.com`;
 
                 user = await User.create({
                     fullName: displayName,
@@ -124,11 +129,10 @@ passport.use(
                     roles: ["customer"],
                     oauth: { facebookId: facebookId },
                     passwordHash: null,
-                    phone: ""
+                    phone: "",
                 });
 
                 return done(null, user);
-
             } catch (err) {
                 console.error("[Passport Facebook Error]", err);
                 return done(err, null);

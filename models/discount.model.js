@@ -7,30 +7,32 @@ const DiscountSchema = new Schema(
             type: String,
             required: true,
             unique: true,
-            uppercase: true, // Tự động viết hoa
+            uppercase: true,
             trim: true,
-            minlength: 5, // Yêu cầu 5 ký tự
-            maxlength: 5, // Yêu cầu 5 ký tự
+            minlength: 5,
+            maxlength: 5,
         },
-        discountValue: { // Giá trị giảm (VND)
+        discountValue: {
             type: Number,
             required: true,
-            min: 0
+            min: 0,
         },
-        usageLimit: { // Giới hạn sử dụng (tối đa 10)
+        usageLimit: {
             type: Number,
             required: true,
             default: 10,
-            max: 10
+            max: 10,
         },
-        usageCount: { // Số lần đã dùng
+        usageCount: {
             type: Number,
-            default: 0
+            default: 0,
         },
-        orderIds: [{
-            type: Schema.Types.ObjectId,
-            ref: 'Order'
-        }]
+        orderIds: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Order",
+            },
+        ],
     },
     { timestamps: true }
 );

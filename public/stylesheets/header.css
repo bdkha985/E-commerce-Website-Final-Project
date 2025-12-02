@@ -24,7 +24,6 @@ body {
     padding-top: calc(var(--header-h) + 12px);
 }
 
-/* Common */
 a {
     text-decoration: none;
 }
@@ -59,7 +58,6 @@ header .btn:hover {
     overflow: hidden;
 }
 
-/* ======== Header ======== */
 .fixed-header {
     position: fixed;
     top: 0;
@@ -72,7 +70,6 @@ header .btn:hover {
     transition: all 0.3s ease;
 }
 
-/* Glassmorphism khi scroll */
 .fixed-header.scrolled {
     background: rgba(242, 237, 230, 0.85);
     backdrop-filter: blur(12px);
@@ -123,7 +120,6 @@ header .btn:hover {
     font-size: 1.8rem;
 }
 
-/* ========== HAMBURGER MENU ========== */
 .navbar__toggle {
     display: none;
     background: none;
@@ -226,7 +222,7 @@ header .btn:hover {
 .searchbar:focus-within input {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(0, 84, 97, 0.1);
-    z-index: 2; /* Đảm bảo input đè lên button */
+    z-index: 2;
 }
 .searchbar:focus-within button {
     border-color: var(--primary-color);
@@ -244,13 +240,13 @@ header .btn:hover {
 }
 
 .searchbar button {
-    border: 1px solid var(--primary-color); /* <-- THAY ĐỔI */
+    border: 1px solid var(--primary-color);
     background: var(--primary-color);
     color: #fff;
     padding: 12px 14px;
     cursor: pointer;
     transition: all 0.25s ease;
-    border-radius: 0 20px 20px 0; /* <-- THÊM */
+    border-radius: 0 20px 20px 0;
 }
 
 .searchbar button:hover {
@@ -301,7 +297,6 @@ header .btn:hover {
     bottom: 0;
 }
 
-/* User-name */
 .user-name {
     color: var(--text-color);
 
@@ -318,7 +313,6 @@ header .btn:hover {
     vertical-align: middle;
 }
 
-/* Cart hover */
 .cart-hover {
     position: relative;
     display: inline-block;
@@ -343,7 +337,6 @@ header .btn:hover {
     box-shadow: 0 4px 12px rgba(0, 84, 97, 0.3);
 }
 
-/* Badge số lượng */
 .cart-badge {
     position: absolute;
     top: -6px;
@@ -371,7 +364,6 @@ header .btn:hover {
     }
 }
 
-/* Mini-cart panel */
 .mini-cart {
     position: absolute;
     top: calc(100% + 10px);
@@ -520,7 +512,6 @@ header .btn:hover {
     color: #111;
 }
 
-/* Ẩn menu mặc định - CHỈ HIỆN KHI HOVER */
 .dropdown {
     position: relative;
 }
@@ -542,7 +533,6 @@ header .btn:hover {
     pointer-events: none;
 }
 
-/* CHỈ KHI HOVER MỚI HIỆN */
 @media (min-width: 992px) {
     .dropdown:hover > .dropdown-menu {
         opacity: 1;
@@ -592,7 +582,6 @@ header .btn:hover {
     pointer-events: auto !important;
 }
 
-/* Responsive */
 @media (max-width: 992px) {
     .navbar {
         flex-wrap: wrap;
@@ -706,7 +695,6 @@ header .btn:hover {
         font-size: 1.3rem;
     }
 
-    /* Shrink search bar */
     .searchbar {
         order: 2;
         margin: 0 8px;
@@ -720,23 +708,20 @@ header .btn:hover {
         font-size: 1.3rem;
     }
 
-    /* Actions (cart + sign in) vào trái */
     .actions {
         order: 1;
         margin-left: 0;
     }
 }
 
-/* Breakpoint cũ cho 1024px */
 @media (max-width: 1024px) {
     .navbar {
-        flex-wrap: wrap; /* Cho phép rớt dòng */
+        flex-wrap: wrap;
         justify-content: space-between;
         padding: 10px 0;
         gap: 10px;
     }
 
-    /* 1. Nút Hamburger: Hiện lên, nằm đầu tiên */
     .navbar__toggle {
         display: flex;
         order: 1;
@@ -744,22 +729,20 @@ header .btn:hover {
         z-index: 1001;
     }
 
-    /* 2. Logo: Nằm thứ 2 */
     .navbar__logo {
         order: 2;
-        margin-right: auto; /* Đẩy các phần tử bên phải ra xa */
+        margin-right: auto;
         margin-left: 12px;
     }
     .navbar__logo span {
-        font-size: 1.6rem; /* Thu nhỏ chữ logo chút */
+        font-size: 1.6rem;
     }
 
-    /* 3. Actions (Giỏ hàng/Login): Nằm thứ 3 (Góc phải) */
     .actions {
-        display: flex !important; /* Bắt buộc hiện */
+        display: flex !important;
         order: 3;
         margin-left: 0;
-        position: static; /* Reset vị trí */
+        position: static;
         background: transparent;
         width: auto;
         flex-direction: row;
@@ -767,8 +750,7 @@ header .btn:hover {
         padding: 0;
         gap: 12px;
     }
-    
-    /* Tinh chỉnh nút trong actions cho gọn */
+
     .actions .action-btn {
         margin: 0;
         padding: 8px;
@@ -778,7 +760,7 @@ header .btn:hover {
         margin-top: 8px;
     }
     .actions .user-name {
-        display: none; /* Ẩn tên user cho gọn, chỉ hiện icon logout */
+        display: none;
     }
     .actions .ic__logout {
         display: block;
@@ -786,36 +768,33 @@ header .btn:hover {
         padding: 0 5px;
     }
 
-    /* 4. Search Bar: Nằm thứ 4 (Xuống dòng, Full width) */
     .searchbar {
-        display: flex !important; /* Bắt buộc hiện */
+        display: flex !important;
         order: 4;
-        width: 100%; /* Chiếm hết chiều ngang */
+        width: 100%;
         margin: 5px 0 0 0;
-        max-width: none; /* Bỏ giới hạn chiều rộng */
+        max-width: none;
     }
-    
+
     .searchbar input {
         width: 100%;
         padding: 10px 16px;
     }
-    
-    /* Fix lỗi gợi ý search bị lệch trên mobile */
+
     #search-suggestions {
         width: 100%;
         left: 0;
     }
 
-    /* 5. Menu Chính: Nằm cuối cùng (Hiện ra khi active) */
     #pc-nav {
         order: 5;
         width: 100%;
-        position: absolute; /* Để đè lên nội dung bên dưới */
-        top: 100%; /* Bắt đầu từ đáy header */
+        position: absolute;
+        top: 100%;
         left: 0;
         flex-direction: column !important;
-        background: #fff; /* Đặt nền trắng */
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        background: #fff;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.3s ease;
@@ -825,7 +804,7 @@ header .btn:hover {
     }
 
     #pc-nav.active {
-        max-height: 600px; /* Chiều cao đủ để hiện hết menu */
+        max-height: 600px;
         padding: 10px 0;
         border-top: 1px solid #eee;
     }
@@ -841,18 +820,16 @@ header .btn:hover {
         border-radius: 0;
         border-bottom: 1px solid #f9fafb;
     }
-    
-    /* Ẩn thanh gạch chân hover trên mobile */
+
     #pc-nav li a::after {
         display: none;
     }
 
-    /* Dropdown trong menu (Categories) */
     .dropdown .dropdown-menu {
-        position: static; /* Không absolute nữa */
-        opacity: 1; /* Luôn hiện trong DOM để JS toggle class show */
+        position: static;
+        opacity: 1;
         visibility: visible;
-        max-height: 0; /* Ẩn bằng height */
+        max-height: 0;
         overflow: hidden;
         box-shadow: none;
         background: #f8fafc;
@@ -864,16 +841,15 @@ header .btn:hover {
         border: none;
     }
 
-    /* Khi JS thêm class .show vào dropdown-menu */
     .dropdown .dropdown-menu.show {
-        max-height: 500px; /* Mở ra */
+        max-height: 500px;
         padding: 5px 0;
         border-top: 1px solid #e2e8f0;
         border-bottom: 1px solid #e2e8f0;
     }
 
     .dropdown-menu li a {
-        padding-left: 40px !important; /* Thụt đầu dòng cho menu con */
+        padding-left: 40px !important;
         font-size: 1.3rem;
         color: #64748b;
     }
@@ -912,13 +888,12 @@ header .btn:hover {
         right: 20px;
     }
 }
-/* === BỔ SUNG CSS CHO SEARCH SUGGESTIONS === */
 
 #search-suggestions {
     position: absolute;
-    top: calc(100% + 8px); /* Nằm dưới ô search */
+    top: calc(100% + 8px);
     left: 0;
-    width: 450px; /* Rộng hơn ô search một chút */
+    width: 450px;
     max-height: 400px;
     overflow-y: auto;
 
@@ -928,7 +903,6 @@ header .btn:hover {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     z-index: 1001;
 
-    /* Ẩn mặc định */
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
@@ -967,7 +941,7 @@ header .btn:hover {
 .suggestion-info {
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Chống vỡ layout */
+    overflow: hidden;
 }
 .suggestion-name {
     font-size: 1.4rem;
@@ -975,7 +949,6 @@ header .btn:hover {
     color: #0f172a;
     line-height: 1.3;
 
-    /* Chống tràn text */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -993,9 +966,8 @@ header .btn:hover {
     color: #64748b;
 }
 
-/* Responsive */
 @media (max-width: 992px) {
     #search-suggestions {
-        width: 100%; /* Full width trên mobile */
+        width: 100%;
     }
 }

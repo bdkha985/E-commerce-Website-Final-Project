@@ -4,7 +4,6 @@ const router = express.Router();
 const ctrl = require("../../controllers/api/search.api.controller");
 const multer = require("multer");
 
-// Cấu hình Multer: Lưu vào RAM (MemoryStorage) để xử lý nhanh, không cần lưu đĩa
 const upload = multer({ storage: multer.memoryStorage() });
 
 // GET /api/search/suggest

@@ -1,5 +1,4 @@
 //app.js
-// === TEST CI/CD PIPELINE ===3
 require("dotenv").config();
 require("express-async-errors");
 
@@ -41,6 +40,7 @@ const adminRoutes = require('./routes/admin/index');
 require("./config/passport");
 
 const redisUrl = process.env.REDIS_URL || "redis://redis:6379";
+
 // Redis client (node-redis v4)
 const redisClient = createClient({ url: redisUrl });
 redisClient.on("error", (err) => console.error("Redis Client Error", err));
@@ -103,19 +103,16 @@ const otpLimiter = rateLimit({
 app.use('/api/auth', authLimiter);
 app.use('/api/password-recovery', otpLimiter);
 
-// === BỔ SUNG: Cấu hình Socket.io ===
 const { Server } = require("socket.io");
-const io = new Server(server); // 4. Khởi tạo Socket.io với http server
+const io = new Server(server);
 
-// Cho phép Socket.io truy cập session
 io.engine.use(sessionMiddleware); 
 
 io.on("connection", (socket) => {
   console.log("✅ Một người dùng đã kết nối Socket.io");
 
-  // Lắng nghe sự kiện "join_room" từ client
   socket.on("join_room", (productId) => {
-    socket.join(productId); // Cho socket này vào "phòng" của sản phẩm
+    socket.join(productId);
     console.log(`Socket ${socket.id} đã tham gia phòng ${productId}`);
   });
 
@@ -124,9 +121,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// 5. Gắn 'io' vào app để controller có thể dùng
 app.set('io', io);
-// === KẾT THÚC BỔ SUNG ===
 
 app.use(async (req, res, next) => {
     try {
@@ -144,8 +139,8 @@ app.use(async (req, res, next) => {
         const cartItems = await cartService.getCart(req);
         const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-        res.locals.cartItems = cartItems; // Cho mini-cart
-        res.locals.cartCount = totalItems; // Cho badge
+        res.locals.cartItems = cartItems;
+        res.locals.cartCount = totalItems;
 
         // Flash cho toast
         res.locals.flashSuccess = req.flash("success");
@@ -153,7 +148,7 @@ app.use(async (req, res, next) => {
 
         next();
     } catch (err) {
-        next(err); // Chuyển lỗi nếu có
+        next(err);
     }
 });
 
@@ -164,7 +159,7 @@ app.use(async (req, res, next) => {
       .select('name slug')
       .sort({ name: 1 })
       .lean();
-    res.locals.navCategories = cats;  // mảng [{name, slug}, ...]
+    res.locals.navCategories = cats;
   } catch (e) {
     res.locals.navCategories = [];
   }
@@ -185,13 +180,12 @@ connectDB(process.env.MONGODB_URI)
   .then(() => {
       if (process.env.SKIP_ELASTICSEARCH === 'true') {
           console.log("⏩ Đã bỏ qua kết nối ElasticSearch (theo cấu hình SKIP_ELASTICSEARCH).");
-          return; // Không làm gì cả, đi tiếp
+          return;
       }
 
       return setupElasticsearch();
   })
   .then(() => {
-    // ĐÚNG: chạy server.listen để Socket.io hook vào đúng server
     server.listen(port, () => {
       console.log(`✅ Server running at http://0.0.0.0:${port}`);
     });
@@ -201,14 +195,13 @@ connectDB(process.env.MONGODB_URI)
     process.exit(1);
   });
 
-// catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));
 });
 
 // error handler
 app.use(function (err, req, res, next) {
-      console.error('ERROR HANDLER:', err); // test
+      console.error('ERROR HANDLER:', err);
     res.locals.message = err.message;
     res.locals.error = req.app.get("env") === "development" ? err : {};
 
@@ -217,7 +210,6 @@ app.use(function (err, req, res, next) {
     res.render("error");
 });
 
-// === THỦ THUẬT DEPLOY: Chạy Worker chung với App nếu có biến môi trường ===
 if (process.env.RUN_WORKER_EMBEDDED === 'true') {
     console.log("🚀 Đang chạy Worker trong chế độ Embedded...");
     require('./worker');

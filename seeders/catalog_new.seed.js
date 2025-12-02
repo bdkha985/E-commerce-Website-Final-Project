@@ -49,13 +49,10 @@ const CATEGORY_IMAGES = {
 
 // Hàm lấy ảnh ngẫu nhiên từ kho theo danh mục
 function getImagesForCategory(categorySlug, count = 3) {
-    // Nếu có kho ảnh riêng, lấy từ đó
     if (CATEGORY_IMAGES[categorySlug]) {
         const pool = CATEGORY_IMAGES[categorySlug];
-        // Trộn ngẫu nhiên và lấy 'count' ảnh
         return pool.sort(() => 0.5 - Math.random()).slice(0, count);
     }
-    // Fallback: Nếu không có kho ảnh (ví dụ danh mục mới), dùng picsum random
     return [
         `https://placehold.co/800x800?text=${categorySlug}-1`,
         `https://placehold.co/800x800?text=${categorySlug}-2`,
@@ -154,7 +151,6 @@ async function main() {
     variantOptions = {} 
   }) => {
     
-    // === TỐI ƯU: Lấy ảnh thật từ kho ===
     // Lấy 3 ảnh chính
     const images = getImagesForCategory(categorySlug, 3);
     
@@ -166,7 +162,6 @@ async function main() {
         const comboName = Object.values(combo).join('-');
         const stock = Math.random() < 0.2 ? 0 : rand(10, 50);
 
-        // Lấy 1 ảnh cho variant (lấy ngẫu nhiên từ kho của category đó luôn)
         const variantImages = getImagesForCategory(categorySlug, 1);
 
         variants.push({
@@ -195,7 +190,6 @@ async function main() {
     };
   };
 
-  // ====== TẠO DANH SÁCH SẢN PHẨM ======
   const products = [];
   const sizes = ['S', 'M', 'L', 'XL'];
   const colors = ['Black', 'White', 'Navy'];
@@ -274,7 +268,7 @@ async function main() {
   products.push(makeProduct({
       name: `Nón Kết Trơn`,
       basePrice: 149000,
-      categorySlug: 'phu-kien', // Sẽ lấy ảnh nón
+      categorySlug: 'phu-kien',
       brandId: brandIds[0],
       variantOptions: {} 
   }));

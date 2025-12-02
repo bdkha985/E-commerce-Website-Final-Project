@@ -29,30 +29,33 @@ const OAuthSchema = new Schema(
     { _id: false }
 );
 
-const CartItemSchema = new Schema({
-    productId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Product',
-        required: true
+const CartItemSchema = new Schema(
+    {
+        productId: {
+            type: Schema.Types.ObjectId,
+            ref: "Product",
+            required: true,
+        },
+        sku: {
+            type: String,
+            required: true,
+        },
+        quantity: {
+            type: Number,
+            required: true,
+            min: 1,
+            default: 1,
+        },
+        price: {
+            type: Number,
+            required: true,
+        },
+        name: String,
+        image: String,
+        slug: String,
     },
-    sku: {
-        type: String, 
-        required: true
-    },
-    quantity: {
-        type: Number,
-        required: true,
-        min: 1,
-        default: 1
-    },
-    price: {
-        type: Number,
-        required: true
-    },
-    name: String,
-    image: String,
-    slug: String,
-}, { _id: false });
+    { _id: false }
+);
 
 const UserSchema = new Schema(
     {
@@ -102,7 +105,7 @@ const UserSchema = new Schema(
         },
         mustChangePassword: {
             type: Boolean,
-            default: false
+            default: false,
         },
         isBanned: {
             type: Boolean,
@@ -111,8 +114,8 @@ const UserSchema = new Schema(
         },
         cart: {
             type: [CartItemSchema],
-            default: []
-        }
+            default: [],
+        },
     },
     { timestamps: true }
 );

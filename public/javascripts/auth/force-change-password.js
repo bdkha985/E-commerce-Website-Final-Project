@@ -13,8 +13,10 @@
         const newPass = form.newPassword?.value || "";
         const confirm = form.confirmPassword?.value || "";
 
-        if (newPass.length < 6) return show("danger", "Mật khẩu phải ít nhất 6 ký tự");
-        if (newPass !== confirm) return show("danger", "Mật khẩu xác nhận không khớp");
+        if (newPass.length < 6)
+            return show("danger", "Mật khẩu phải ít nhất 6 ký tự");
+        if (newPass !== confirm)
+            return show("danger", "Mật khẩu xác nhận không khớp");
 
         btn.disabled = true;
         show("info", "Đang xử lý...");
@@ -33,9 +35,11 @@
             }
 
             // Thành công, chuyển đến trang chủ
-            show("success", "Đổi mật khẩu thành công. Đang chuyển đến trang chủ...");
+            show(
+                "success",
+                "Đổi mật khẩu thành công. Đang chuyển đến trang chủ..."
+            );
             setTimeout(() => (location.href = "/homepage"), 1000);
-
         } catch (e) {
             btn.disabled = false;
             show("danger", "Có lỗi kết nối, vui lòng thử lại");

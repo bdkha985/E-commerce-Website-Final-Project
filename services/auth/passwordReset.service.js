@@ -13,7 +13,10 @@ const RESET_TOKEN_EXPIRES_MIN = +(process.env.RESET_TOKEN_EXPIRES_MIN || 5);
 
 // Sinh OTP ngẫu nhiên
 function genOtp(len = OTP_LENGTH) {
-    return String(Math.floor(Math.random() * Math.pow(10, len))).padStart(len, "0");
+    return String(Math.floor(Math.random() * Math.pow(10, len))).padStart(
+        len,
+        "0"
+    );
 }
 
 // Hash OTP bằng sha256
@@ -23,9 +26,11 @@ function hashOtp(otp) {
 
 // Tạo yêu cầu reset password, gửi OTP tới email
 async function createResetRequest(email, clientIp) {
-    const mail = String(email || "").toLowerCase().trim();
+    const mail = String(email || "")
+        .toLowerCase()
+        .trim();
     const user = await User.findOne({ email: mail });
-    if (!user) return { ok: true }; // Nếu không có user thì không báo lỗi
+    if (!user) return { ok: true };
 
     const otp = genOtp();
     const otpHash = hashOtp(otp);
@@ -50,8 +55,12 @@ async function createResetRequest(email, clientIp) {
 
 // Xác thực OTP
 async function verifyOtp(email, otp) {
-    const mail = String(email || "").toLowerCase().trim();
-    const pr = await PasswordReset.findOne({ email: mail }).sort({ createdAt: -1 });
+    const mail = String(email || "")
+        .toLowerCase()
+        .trim();
+    const pr = await PasswordReset.findOne({ email: mail }).sort({
+        createdAt: -1,
+    });
     if (!pr) return { ok: false, message: "OTP không hợp lệ" };
 
     // Kiểm tra thời hạn OTP
@@ -63,18 +72,26 @@ async function verifyOtp(email, otp) {
     // Kiểm tra số lần thử
     if ((pr.attempts || 0) >= 3) {
         await PasswordReset.deleteOne({ _id: pr._id });
-        return { ok: false, message: "Bạn đã thử quá số lần cho phép, vui lòng yêu cầu lại" };
+        return {
+            ok: false,
+            message: "Bạn đã thử quá số lần cho phép, vui lòng yêu cầu lại",
+        };
     }
 
     // Kiểm tra OTP
     if (hashOtp(otp) !== pr.otpHash) {
-        await PasswordReset.updateOne({ _id: pr._id }, { $inc: { attempts: 1 } });
+        await PasswordReset.updateOne(
+            { _id: pr._id },
+            { $inc: { attempts: 1 } }
+        );
         return { ok: false, message: "OTP không đúng" };
     }
 
     // Tạo reset token thay cho OTP
     const resetToken = crypto.randomBytes(24).toString("hex");
-    const resetTokenExpiresAt = new Date(Date.now() + RESET_TOKEN_EXPIRES_MIN * 60 * 1000);
+    const resetTokenExpiresAt = new Date(
+        Date.now() + RESET_TOKEN_EXPIRES_MIN * 60 * 1000
+    );
     await PasswordReset.updateOne(
         { _id: pr._id },
         { $set: { resetToken, resetTokenExpiresAt }, $unset: { otpHash: "" } }
@@ -85,12 +102,18 @@ async function verifyOtp(email, otp) {
 
 // Thực hiện reset password
 async function resetPassword(email, resetToken, newPassword) {
-    const mail = String(email || "").toLowerCase().trim();
-    const pr = await PasswordReset.findOne({ email: mail }).sort({ createdAt: -1 });
+    const mail = String(email || "")
+        .toLowerCase()
+        .trim();
+    const pr = await PasswordReset.findOne({ email: mail }).sort({
+        createdAt: -1,
+    });
 
     // Kiểm tra token hợp lệ
-    if (!pr || !pr.resetToken) return { ok: false, message: "Token không hợp lệ" };
-    if (pr.resetToken !== resetToken) return { ok: false, message: "Token không đúng" };
+    if (!pr || !pr.resetToken)
+        return { ok: false, message: "Token không hợp lệ" };
+    if (pr.resetToken !== resetToken)
+        return { ok: false, message: "Token không đúng" };
     if (Date.now() > new Date(pr.resetTokenExpiresAt).getTime()) {
         await PasswordReset.deleteOne({ _id: pr._id });
         return { ok: false, message: "Token đã hết hạn" };

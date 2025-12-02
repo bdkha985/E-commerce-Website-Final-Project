@@ -3,10 +3,8 @@
     const $ = (s) => document.querySelector(s);
     const $$ = (s) => document.querySelectorAll(s);
 
-    // === CONSTANTS ===
-    const ORDER_LIMIT = 5; // 5 đơn hàng 1 trang
+    const ORDER_LIMIT = 5;
 
-    // === HÀM HELPER ===
     const showAlert = (el, type, msg) => {
         el.className = `alert alert-${type}`;
         el.textContent = msg;
@@ -61,17 +59,16 @@
             $$(".tab-panel").forEach((p) => p.classList.add("d-none"));
             $("#tab-" + btn.dataset.tab).classList.remove("d-none");
 
-            // Kích hoạt tải khi bấm tab
             if (btn.dataset.tab === 'orders' && !$('#order-list-container').innerHTML.includes('order-item-row')) {
                 loadOrderHistory(1);
             }
             if (btn.dataset.tab === 'addresses' && !$('#addrList').innerHTML.includes('addr-item')) {
-                loadAddresses(); // Tải địa chỉ (logic cũ)
+                loadAddresses();
             }
         });
     });
 
-    // === 2. LOGIC PROFILE & PASSWORD (Giữ nguyên) ===
+    // === 2. LOGIC PROFILE & PASSWORD ===
     async function loadMe() {
         const r = await fetch("/api/account/me");
         const data = await r.json();
@@ -111,11 +108,9 @@
           })
         : "Chưa có hoạt động";
     
-    // Calculate tier progress (optional - adjust based on your tier system)
-    const nextTier = 1000; // Example: next tier at 1000 points
+    const nextTier = 1000;
     const progress = Math.min((lp.balance / nextTier) * 100, 100);
     
-    // Render loyalty card
     box.innerHTML = `
         <div class="loyalty-card">
             <!-- Header -->
@@ -211,7 +206,7 @@
         f.reset();
     });
 
-    // === 3. LOGIC ĐỊA CHỈ (Giữ nguyên logic cũ, không phân trang) ===
+    // === 3. LOGIC ĐỊA CHỈ ===
     async function loadAddresses() {
         const r = await fetch("/api/account/addresses");
         const data = await r.json();
@@ -278,7 +273,7 @@
         if (data.ok) {
             bootstrap.Modal.getInstance($("#modalAddress"))?.hide();
             form.reset();
-            await loadAddresses(); // Gọi lại hàm load cũ
+            await loadAddresses();
         } else {
             alert(data.message || "Lưu địa chỉ thất bại");
         }
@@ -291,7 +286,7 @@
         const data = await r.json();
         if (data.ok) {
             bootstrap.Modal.getInstance($("#modalConfirmDelete"))?.hide();
-            await loadAddresses(); // Gọi lại hàm load cũ
+            await loadAddresses();
         } else {
             alert(data.message || "Xóa địa chỉ thất bại");
         }
@@ -329,7 +324,7 @@
         }
     });
 
-    // === 4. LOGIC ĐƠN HÀNG (ĐÃ NÂNG CẤP - PHÂN TRANG SERVER) ===
+    // === 4. LOGIC ĐƠN HÀNG ===
     const orderListView = $('#order-list-view');
     const orderDetailView = $('#order-detail-view');
     const orderListContainer = $('#order-list-container');
@@ -418,7 +413,6 @@
     }
 
     // Tải 1 trang đơn hàng (phân trang server)
-    // Phải export ra global (window) để inline onclick="" có thể gọi
     window.loadOrderHistory = async (page = 1) => {
         orderListContainer.innerHTML = '<div class="loading-overlay" style="display: flex;"><div class="spinner"></div></div>';
         try {
@@ -459,7 +453,6 @@
     });
     btnRefreshOrders?.addEventListener('click', () => loadOrderHistory(1));
 
-    // Event Delegation cho cả list (chỉ "Xem")
     orderListContainer.addEventListener('click', (e) => {
         const detailButton = e.target.closest('.btn-view-detail');
         if (detailButton) {
@@ -468,8 +461,7 @@
         }
     });
 
-    // === 5. INIT ===
     loadMe();
-    loadAddresses(); // Tải địa chỉ (logic cũ)
+    loadAddresses();
 
 })();

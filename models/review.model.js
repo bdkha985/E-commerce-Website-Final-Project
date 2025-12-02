@@ -1,6 +1,7 @@
 // models/review.model.js
+
 const { Schema, model } = require("mongoose");
-const Product = require("./product.model"); // Import model Product
+const Product = require("./product.model");
 
 const ReviewSchema = new Schema(
     {
@@ -10,38 +11,36 @@ const ReviewSchema = new Schema(
             required: true,
             index: true,
         },
-        userId: { // Có thể là null nếu là khách
+        userId: {
             type: Schema.Types.ObjectId,
             ref: "User",
             default: null,
         },
-        fullName: { // Tên người dùng (lấy từ tài khoản hoặc khách tự nhập)
+        fullName: {
             type: String,
             required: true,
             trim: true,
         },
-        rating: { // Số sao
+        rating: {
             type: Number,
             min: 1,
             max: 5,
             default: null,
         },
-        comment: { // Nội dung bình luận
+        comment: {
             type: String,
             trim: true,
             default: "",
         },
         sentiment: {
             type: String,
-            enum: ['Positive', 'Negative', 'Neutral'],
-            default: 'Neutral'
+            enum: ["Positive", "Negative", "Neutral"],
+            default: "Neutral",
         },
     },
-    { timestamps: true } // Tự động thêm createdAt và updatedAt
+    { timestamps: true }
 );
 
-// === Rất quan trọng: Tính toán lại Rating trung bình ===
-// Sau mỗi lần một review được LƯU (save)
 ReviewSchema.post("save", async function (doc) {
     try {
         await updateProductRating(doc.productId);
@@ -52,14 +51,12 @@ ReviewSchema.post("save", async function (doc) {
 
 // Hàm helper để tính toán
 async function updateProductRating(productId) {
-    // 1. LẤY NHỮNG REVIEW CÓ RATING (sao)
     const reviewsWithRating = await model("Review", ReviewSchema).find({
         productId: productId,
-        rating: { $ne: null } // <-- CHỈ LẤY NHỮNG DOCS CÓ RATING
+        rating: { $ne: null },
     });
 
     if (reviewsWithRating.length === 0) {
-        // Nếu không có review nào có sao, reset về 0
         await Product.findByIdAndUpdate(productId, {
             ratingAvg: 0,
             ratingCount: 0,
@@ -68,9 +65,12 @@ async function updateProductRating(productId) {
     }
 
     // 2. Tính tổng số sao và rating trung bình
-    const ratingCount = reviewsWithRating.length; // <-- Chỉ đếm review có sao
-    const ratingSum = reviewsWithRating.reduce((acc, item) => acc + item.rating, 0);
-    const ratingAvg = (ratingSum / ratingCount).toFixed(1); // Làm tròn 1 chữ số
+    const ratingCount = reviewsWithRating.length;
+    const ratingSum = reviewsWithRating.reduce(
+        (acc, item) => acc + item.rating,
+        0
+    );
+    const ratingAvg = (ratingSum / ratingCount).toFixed(1);
 
     // 3. Cập nhật lại model Product
     await Product.findByIdAndUpdate(productId, {

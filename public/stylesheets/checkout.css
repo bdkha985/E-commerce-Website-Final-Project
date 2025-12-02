@@ -2,7 +2,7 @@
 
 .checkout-page {
     padding: 48px 0 72px;
-    background: #f9fafb; /* Nền xám nhạt */
+    background: #f9fafb;
 }
 
 .checkout-layout {
@@ -12,7 +12,6 @@
     align-items: start;
 }
 
-/* Cột 1: Main form */
 .checkout-main {
     background: #fff;
     border: 1px solid #e5e7eb;
@@ -71,14 +70,13 @@
     gap: 16px;
 }
 
-/* Cột 2: Summary */
 .checkout-summary {
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 16px;
     padding: 28px;
     position: sticky;
-    top: 100px; /* Dính lại khi cuộn */
+    top: 100px;
 }
 
 .checkout-summary h3 {
@@ -195,7 +193,6 @@
     font-weight: 500;
 }
 
-/* (THÊM VÀO CUỐI FILE checkout.css) */
 .payment-methods {
     margin-top: 24px;
     padding-top: 20px;
@@ -240,7 +237,7 @@
 }
 
 .order-result-container {
-    max-width: 800px; /* Rộng hơn để chứa chi tiết */
+    max-width: 800px;
     margin: 48px auto 72px;
     padding: 40px;
     background: #fff;
@@ -292,7 +289,6 @@
     line-height: 1.6;
 }
 
-/* Tái sử dụng .checkout-summary từ checkout.css */
 .order-result-summary {
     padding: 24px;
     border-radius: 16px;
@@ -301,11 +297,10 @@
 }
 
 .sum-row.loyalty {
-    color: #16a34a; /* Màu xanh lá */
+    color: #16a34a;
     font-weight: 600;
 }
 
-/* Responsive */
 @media (max-width: 991px) {
     .checkout-layout {
         grid-template-columns: 1fr;

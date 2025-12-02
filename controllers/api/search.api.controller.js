@@ -1,9 +1,10 @@
 // controllers/api/search.api.controller.js
-const Product = require('../../models/product.model');
-const { searchProducts } = require('../../services/search/elastic.service');
-const { generateKeywordsFromImage } = require('../../services/ai/gemini.service');
+const Product = require("../../models/product.model");
+const { searchProducts } = require("../../services/search/elastic.service");
+const {
+    generateKeywordsFromImage,
+} = require("../../services/ai/gemini.service");
 
-// === Sao chép 2 hàm helper từ home.controller.js [cite: 327-329] ===
 function getDisplayImage(p) {
     if (Array.isArray(p.images) && p.images.length) return p.images[0];
     if (Array.isArray(p.variants) && p.variants[0]?.images?.length)
@@ -19,8 +20,10 @@ function getDisplayPrice(p) {
     }
     return typeof p.basePrice === "number" ? p.basePrice : 0;
 }
-// === Hết 2 hàm helper ===
 
+// ========================================================
+// Hàm tìm kiếm gốc của mongoDB
+// ========================================================
 // const getSuggestions = async (req, res) => {
 //     try {
 //         const q = (req.query.q || '').trim();
@@ -41,7 +44,7 @@ function getDisplayPrice(p) {
 //         const items = await Product.find(cond)
 //             .select('name slug images basePrice variants') // Chọn các trường cần thiết
 //             .sort({ name: 1 }) // Sắp xếp theo tên
-//             .limit(5) 
+//             .limit(5)
 //             .lean();
 
 //         // Map lại dữ liệu cho gọn
@@ -51,7 +54,7 @@ function getDisplayPrice(p) {
 //             thumb: getDisplayImage(p),
 //             price: getDisplayPrice(p)
 //         }));
-        
+
 //         res.json({ ok: true, products });
 //     } catch (err) {
 //         res.status(500).json({ ok: false, message: "Lỗi máy chủ" });
@@ -60,18 +63,14 @@ function getDisplayPrice(p) {
 
 const getSuggestions = async (req, res) => {
     try {
-        const q = (req.query.q || '').trim();
+        const q = (req.query.q || "").trim();
         if (q.length < 2) {
             return res.json({ ok: true, products: [] });
         }
 
-        // === THAY ĐỔI: Gọi ElasticSearch ===
-        // Thay vì Product.find(), chúng ta gọi service mới
         const products = await searchProducts(q);
-        // Dữ liệu trả về (name, slug, thumb, price) đã được format sẵn
-        // === KẾT THÚC THAY ĐỔI ===
-        
-        res.json({ ok: true, products: products.slice(0, 5) }); // Giới hạn 5 kết quả
+
+        res.json({ ok: true, products: products.slice(0, 5) });
     } catch (err) {
         console.error("Lỗi getSuggestions (ES):", err);
         res.status(500).json({ ok: false, message: "Lỗi máy chủ" });
@@ -82,26 +81,30 @@ const getSuggestions = async (req, res) => {
 const searchByImage = async (req, res) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ ok: false, message: "Vui lòng chọn ảnh." });
+            return res
+                .status(400)
+                .json({ ok: false, message: "Vui lòng chọn ảnh." });
         }
 
-        // Gọi AI để lấy từ khóa
-        const keywords = await generateKeywordsFromImage(req.file.buffer, req.file.mimetype);
-        
+        const keywords = await generateKeywordsFromImage(
+            req.file.buffer,
+            req.file.mimetype
+        );
+
         if (!keywords) {
-            return res.status(500).json({ ok: false, message: "AI không nhận diện được ảnh." });
+            return res
+                .status(500)
+                .json({ ok: false, message: "AI không nhận diện được ảnh." });
         }
 
-        // Trả về từ khóa để frontend chuyển hướng
         res.json({ ok: true, keywords });
-
     } catch (err) {
         console.error("Lỗi searchByImage:", err);
         res.status(500).json({ ok: false, message: "Lỗi xử lý ảnh." });
     }
 };
 
-module.exports = { 
+module.exports = {
     getSuggestions,
     searchByImage,
 };

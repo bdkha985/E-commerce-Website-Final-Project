@@ -1,8 +1,8 @@
 // controllers/api/review.api.controller.js
 const { validationResult } = require("express-validator");
 const Review = require("../../models/review.model");
-const Product = require("../../models/product.model"); // Cần để kiểm tra
-const { analyzeSentiment } = require('../../services/ai/gemini.service'); // <-- THÊM IMPORT
+const Product = require("../../models/product.model"); 
+const { analyzeSentiment } = require('../../services/ai/gemini.service');
 
 // GET /api/reviews/:productId
 const getReviews = async (req, res) => {
@@ -12,27 +12,25 @@ const getReviews = async (req, res) => {
         const limit = 5; 
         const skip = (page - 1) * limit;
 
-        // === BỔ SUNG LOGIC SORT ===
         const sortQuery = req.query.sort || 'newest';
         let sort = {};
         switch (sortQuery) {
             case 'oldest':
                 sort = { createdAt: 1 };
                 break;
-            case 'highest': // Nhiều sao nhất
+            case 'highest':
                 sort = { rating: -1, createdAt: -1 };
                 break;
-            case 'lowest': // Ít sao nhất
+            case 'lowest':
                 sort = { rating: 1, createdAt: 1 };
                 break;
-            default: // 'newest'
+            default:
                 sort = { createdAt: -1 };
         }
-        // === KẾT THÚC BỔ SUNG ===
 
         const [reviews, totalReviews] = await Promise.all([
             Review.find({ productId })
-                .sort(sort) // <-- ÁP DỤNG SORT VÀO ĐÂY
+                .sort(sort)
                 .skip(skip)
                 .limit(limit)
                 .populate("userId", "fullName")
@@ -46,7 +44,7 @@ const getReviews = async (req, res) => {
             ok: true,
             reviews,
             pagination: { page, totalPages, totalReviews },
-            sort: sortQuery // Trả về sort đang áp dụng
+            sort: sortQuery
         });
 
     } catch (err) {
@@ -63,7 +61,7 @@ const postComment = async (req, res) => {
 
     try {
         const { productId } = req.params;
-        const { fullName, comment } = req.body; // Chỉ lấy tên và comment
+        const { fullName, comment } = req.body;
 
         if (!comment || !fullName) {
              return res.status(400).json({ ok: false, message: "Tên và bình luận là bắt buộc." });
@@ -73,19 +71,17 @@ const postComment = async (req, res) => {
 
         const newReview = new Review({
             productId,
-            userId: null, // Khách
+            userId: null,
             fullName: fullName,
             comment: comment,
-            rating: null, // Khách không thể rating
+            rating: null,
             sentiment: sentiment
         });
 
         await newReview.save(); 
 
-        // === BỔ SUNG: Phát WebSocket ===
-        const io = req.app.get('io'); // Lấy io từ app
-        io.to(productId).emit('new_review', newReview); // Gửi review
-        // === KẾT THÚC BỔ SUNG ===
+        const io = req.app.get('io'); 
+        io.to(productId).emit('new_review', newReview);
 
         res.status(201).json({ ok: true, message: "Đã gửi bình luận thành công", review: newReview });
 
@@ -111,8 +107,8 @@ const postRating = async (req, res) => {
 
         let newReview = new Review({
             productId,
-            userId: req.user.id, // Lấy từ requireLoginApi
-            fullName: req.user.fullName, // Lấy từ requireLoginApi
+            userId: req.user.id, 
+            fullName: req.user.fullName,
             rating: parseInt(rating, 10),
             comment: comment || "",
             sentiment: sentiment
@@ -120,14 +116,11 @@ const postRating = async (req, res) => {
 
         await newReview.save(); 
 
-        // === BỔ SUNG: Phát WebSocket ===
-        // Chúng ta cần 'populate' thủ công trước khi gửi đi
         newReview = newReview.toObject();
-        newReview.userId = { fullName: req.user.fullName }; // Thêm thông tin user
+        newReview.userId = { fullName: req.user.fullName };
         
-        const io = req.app.get('io'); // Lấy io từ app
-        io.to(productId).emit('new_review', newReview); // Gửi review
-        // === KẾT THÚC BỔ SUNG ===
+        const io = req.app.get('io');
+        io.to(productId).emit('new_review', newReview);
 
         res.status(201).json({ ok: true, message: "Đã gửi đánh giá thành công", review: newReview });
 

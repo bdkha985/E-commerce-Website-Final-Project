@@ -67,13 +67,11 @@ const toggleBanStatus = async (req, res) => {
             return res.redirect('/admin/users');
         }
 
-        // Admin không thể tự ban mình hoặc ban admin khác
         if (user.roles.includes('admin')) {
             req.flash('error', 'Không thể thay đổi trạng thái của Admin.');
             return res.redirect('/admin/users');
         }
 
-        // Lật ngược trạng thái
         user.isBanned = !user.isBanned;
         await user.save();
 
@@ -121,7 +119,6 @@ const saveUser = async (req, res, next) => {
         
         user.fullName = fullName;
         user.phone = phone;
-        // (Chúng ta có thể thêm logic đổi mật khẩu cho user tại đây nếu cần)
 
         await user.save();
         req.flash('success', 'Cập nhật thông tin người dùng thành công.');

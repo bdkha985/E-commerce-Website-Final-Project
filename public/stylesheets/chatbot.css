@@ -1,12 +1,11 @@
 /* public/stylesheets/chatbot.css */
 
 :root {
-    --chatbot-primary: #005461; /* Màu chính (từ header) */
+    --chatbot-primary: #005461;
     --chatbot-bg: #f8fafc;
     --chatbot-border: #e2e8f0;
 }
 
-/* 1. Nút Bong bóng Chat */
 .chatbot-bubble {
     position: fixed;
     bottom: 30px;
@@ -30,7 +29,6 @@
     box-shadow: 0 8px 20px rgba(0, 84, 97, 0.3);
 }
 
-/* 2. Cửa sổ Chat */
 .chatbot-window {
     position: fixed;
     bottom: 100px;
@@ -46,8 +44,6 @@
     flex-direction: column;
     overflow: hidden;
     z-index: 1049;
-
-    /* Ẩn mặc định */
     opacity: 0;
     visibility: hidden;
     transform: translateY(20px);
@@ -59,7 +55,6 @@
     transform: translateY(0);
 }
 
-/* 3. Header Cửa sổ Chat */
 .chatbot-header {
     padding: 16px;
     background: var(--chatbot-primary);
@@ -85,7 +80,6 @@
     opacity: 1;
 }
 
-/* 4. Khung tin nhắn */
 .chatbot-messages {
     flex-grow: 1;
     padding: 16px;
@@ -103,7 +97,6 @@
     line-height: 1.5;
     font-size: 1.4rem;
 }
-/* Tin nhắn của Bot (AI) */
 .chat-message.bot {
     justify-content: flex-start;
 }
@@ -113,7 +106,6 @@
     color: #334155;
     border-top-left-radius: 0;
 }
-/* Tin nhắn của Người dùng */
 .chat-message.user {
     justify-content: flex-end;
 }
@@ -123,7 +115,6 @@
     border-bottom-right-radius: 0;
 }
 
-/* Tin nhắn đang tải (loading) */
 .chat-message.bot.loading .bubble {
     padding: 12px 16px;
 }
@@ -136,14 +127,22 @@
     animation: typing 1s infinite;
     margin: 0 1px;
 }
-.typing-indicator span:nth-child(2) { animation-delay: 0.1s; }
-.typing-indicator span:nth-child(3) { animation-delay: 0.2s; }
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.1s;
+}
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.2s;
+}
 @keyframes typing {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 1; }
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 1;
+    }
 }
 
-/* 5. Khung nhập liệu */
 .chatbot-input {
     padding: 12px;
     border-top: 1px solid var(--chatbot-border);
@@ -181,7 +180,6 @@
     cursor: not-allowed;
 }
 
-/* Responsive */
 @media (max-width: 420px) {
     .chatbot-window {
         bottom: 0;

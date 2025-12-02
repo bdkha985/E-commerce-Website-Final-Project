@@ -6,7 +6,7 @@ const User = require("../../models/user.model");
 const {
     findUserByEmail,
     validatePassword,
-    createUserAndSendPassword
+    createUserAndSendPassword,
 } = require("../../services/auth/user.service");
 
 // ĐĂNG KÝ
@@ -28,7 +28,7 @@ const apiSignup = async (req, res) => {
         const user = await createUserAndSendPassword({
             email,
             fullName,
-            address
+            address,
         });
 
         // req.session.userId = user._id.toString();
@@ -38,7 +38,8 @@ const apiSignup = async (req, res) => {
         req.flash("success", "Đăng kí thành công");
         return res.status(201).json({
             ok: true,
-            message: "Đăng ký thành công, Vui lòng kiểm tra email để nhận mật khẩu tạm thời.",
+            message:
+                "Đăng ký thành công, Vui lòng kiểm tra email để nhận mật khẩu tạm thời.",
             user: {
                 id: user._id,
                 email: user.email,
@@ -83,10 +84,10 @@ const apiSignin = async (req, res) => {
 
     if (user.isBanned) {
         return res
-            .status(403) // 403 Forbidden
+            .status(403)
             .json({ ok: false, message: "Tài khoản của bạn đã bị khóa." });
     }
-    
+
     if (user.mustChangePassword) {
         req.session.tempUserId = user._id.toString();
         req.session.tempUserEmail = user.email;
@@ -98,25 +99,22 @@ const apiSignin = async (req, res) => {
         });
     }
 
-// LOGIN USER 
-req.login(user, (err) => {
-        // Xử lý lỗi khi đăng nhập
+    // LOGIN USER
+    req.login(user, (err) => {
         if (err) {
             console.error("Lỗi req.login:", err);
-            return res.status(500).json({ ok: false, message: "Lỗi khi tạo phiên đăng nhập." });
+            return res
+                .status(500)
+                .json({ ok: false, message: "Lỗi khi tạo phiên đăng nhập." });
         }
 
-        // Sau khi login thành công, req.user đã được thiết lập
-        
-        // (Chúng ta vẫn gán session phụ cho middleware app.js)
         req.session.fullName = user.fullName;
         const role = (user.roles || []).includes("admin")
             ? "admin"
             : "customer";
         req.session.role = role;
-        
-        // Quyết định URL chuyển hướng
-        const redirectUrl = (role === 'admin') ? '/admin' : '/homepage';
+
+        const redirectUrl = role === "admin" ? "/admin" : "/homepage";
         req.session.avatarUrl = user.avatarUrl || "";
 
         req.flash("success", "Đăng nhập thành công");

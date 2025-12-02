@@ -41,7 +41,6 @@ const PasswordResetSchema = new Schema({
     },
 });
 
-// Index hỗ trợ TTL cleanup
 PasswordResetSchema.index({ createdAt: 1 }, { expireAfterSeconds: 1800 });
 
 module.exports = model("PasswordReset", PasswordResetSchema);

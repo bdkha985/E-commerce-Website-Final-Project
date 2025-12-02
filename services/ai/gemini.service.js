@@ -6,7 +6,6 @@ const User = require('../../models/user.model');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// 1. Định nghĩa các "công cụ" (functions)
 const tools = [
     {
         functionDeclarations: [
@@ -17,7 +16,6 @@ const tools = [
             },
             {
                 name: "getOrderStatus",
-                // === SỬA LỖI 1: Sửa ví dụ ===
                 description: "Lấy thông tin và trạng thái của một đơn hàng cụ thể. Dùng khi khách hỏi 'đơn hàng của tôi đâu?', 'check đơn KSHOP-123456'.",
                 parameters: {
                     type: "OBJECT",
@@ -37,7 +35,6 @@ const model = genAI.getGenerativeModel({
     tools: tools
 });
 
-// 2. System Prompt (Linh hồn của Chatbot)
 const systemPrompt = `
     Bạn là "K Shopping Assistant", một trợ lý AI bán hàng thân thiện, thông minh và chuyên nghiệp của shop thời trang K Shopping.
     Nhiệm vụ của bạn là trả lời câu hỏi của khách hàng.
@@ -93,14 +90,13 @@ async function runConversation(message, history, userId) {
                            break;
                         }
                         
-                        // (Logic tìm kiếm đơn hàng của bạn đã chính xác, giữ nguyên)
                         const user = await User.findById(userId).select('email').lean();
                         if (!user) {
                             functionResponse = { error: "Lỗi: Không tìm thấy người dùng." };
                             break;
                         }
                         const order = await Order.findOne({ 
-                                code: args.orderCode, // Code này phải là 'KSHOP-...'
+                                code: args.orderCode,
                                 $or: [ { userId: userId }, { email: user.email } ]
                             })
                             .select('status code total paymentStatus createdAt')
@@ -119,27 +115,19 @@ async function runConversation(message, history, userId) {
             result = await chat.sendMessage(JSON.stringify(functionResponse));
 
         } else {
-            // AI trả về text
             const finalReply = responsePart.text;
             return finalReply;
         }
     }
 }
 
-/**
- * Phân tích cảm xúc (Bản Nâng Cấp)
- * @param {string} text - Nội dung bình luận
- * @param {number} rating - Số sao đánh giá (để fallback)
- */
 async function analyzeSentiment(text, rating) {
-    // 1. Nếu không có text, dùng rating để phán đoán
     if (!text || text.length < 2) {
         if (rating >= 4) return 'Positive';
         if (rating <= 2) return 'Negative';
         return 'Neutral';
     }
 
-    // 2. Prompt chặt chẽ hơn
     const prompt = `
         Phân tích cảm xúc của bình luận sản phẩm sau.
         Chỉ trả về ĐÚNG 1 từ duy nhất: "Positive" (khen/hài lòng), "Negative" (chê/thất vọng), hoặc "Neutral" (hỏi/trung tính).
@@ -154,37 +142,27 @@ async function analyzeSentiment(text, rating) {
         const response = await result.response;
         const rawText = response.text().trim().toLowerCase();
         
-        console.log(`[AI Sentiment] Input: "${text}" | Output: "${rawText}"`); // Log để debug
+        console.log(`[AI Sentiment] Input: "${text}" | Output: "${rawText}"`);
 
-        // 3. Phân loại dựa trên AI
         if (rawText.includes('positive') || rawText.includes('tích cực')) return 'Positive';
         if (rawText.includes('negative') || rawText.includes('tiêu cực')) return 'Negative';
         
-        // 4. Nếu AI bảo Neutral (hoặc trả lời lung tung), hãy nhìn vào Rating để sửa sai!
-        // (Đây là bước tối ưu quan trọng)
         if (rating) {
-            if (rating <= 2) return 'Negative'; // Chửi nhẹ mà 1 sao thì là Negative
-            if (rating >= 5) return 'Positive'; // Khen nhẹ mà 5 sao thì là Positive
+            if (rating <= 2) return 'Negative';
+            if (rating >= 5) return 'Positive';
         }
 
         return 'Neutral';
 
     } catch (err) {
         console.error("Lỗi Sentiment Analysis:", err);
-        // Fallback khi lỗi mạng
         if (rating >= 4) return 'Positive';
         if (rating <= 2) return 'Negative';
         return 'Neutral';
     }
 }
 
-/**
- * Tạo từ khóa tìm kiếm từ hình ảnh (Dùng Gemini Vision)
- * @param {Buffer} imageBuffer - Buffer của file ảnh
- * @param {string} mimeType - Loại file (image/jpeg, image/png...)
- */
 async function generateKeywordsFromImage(imageBuffer, mimeType) {
-    // Model flash hỗ trợ cả text và image
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const prompt = `

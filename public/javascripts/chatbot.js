@@ -19,20 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
         chatBubble.style.display = 'flex';
     });
 
-    // --- 2. NÂNG CẤP: Logic Gửi Tin nhắn (Gọi API AI) ---
-    const handleSend = async () => { // Thêm async
+    // --- 2. Logic Gửi Tin nhắn (Gọi API AI) ---
+    const handleSend = async () => { 
         const message = textInput.value.trim();
         if (message === '') return;
 
         // 1. Hiển thị tin nhắn của User
         appendMessage('user', message);
         textInput.value = '';
-        sendBtn.disabled = true; // Khóa nút gửi
+        sendBtn.disabled = true;
 
-        // 2. Thêm bong bóng loading
-        const loadingBubble = appendMessage('bot', null); // Giữ tham chiếu đến bubble loading
+        const loadingBubble = appendMessage('bot', null); 
 
-        // 3. GỌI API BACKEND
         try {
             const res = await fetch('/api/chatbot/query', {
                 method: 'POST',
@@ -41,16 +39,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await res.json();
             
-            // 4. Xóa loading và hiển thị trả lời
             loadingBubble.remove();
             appendMessage('bot', data.reply || "Xin lỗi, có lỗi xảy ra.");
 
         } catch (err) {
-            // 5. Xử lý lỗi mạng
             loadingBubble.remove();
             appendMessage('bot', "Không thể kết nối đến trợ lý. Vui lòng thử lại.");
         } finally {
-            sendBtn.disabled = false; // Mở lại nút gửi
+            sendBtn.disabled = false;
             textInput.focus();
         }
     };
@@ -69,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (text === null) {
             bubbleHtml = `<div class="bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div>`;
         } else {
-            // Đơn giản hóa: Chuyển đổi markdown cơ bản (như *bold*) sang HTML
             text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             bubbleHtml = `<div class="bubble">${text}</div>`;
         }
@@ -81,6 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesContainer.appendChild(messageDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
         
-        return messageDiv; // Trả về element
+        return messageDiv;
     }
 });

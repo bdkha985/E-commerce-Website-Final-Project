@@ -6,7 +6,6 @@
     background: #fff;
 }
 
-/* ===== Header Section ===== */
 .blog-header {
     text-align: center;
     max-width: 800px;
@@ -43,7 +42,6 @@
     line-height: 1.6;
 }
 
-/* ===== Categories Filter ===== */
 .blog-categories {
     display: flex;
     justify-content: center;
@@ -89,7 +87,6 @@
     box-shadow: 0 4px 12px rgba(0, 84, 97, 0.3);
 }
 
-/* ===== Featured Post ===== */
 .featured-post {
     background: #fff;
     border: 1px solid #e2e8f0;
@@ -246,7 +243,6 @@
     font-size: 1.6rem;
 }
 
-/* ===== Blog Grid ===== */
 .blog-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -265,12 +261,24 @@
     animation: fadeInUp 0.6s ease both;
 }
 
-.post-card:nth-child(1) { animation-delay: 0.1s; }
-.post-card:nth-child(2) { animation-delay: 0.2s; }
-.post-card:nth-child(3) { animation-delay: 0.3s; }
-.post-card:nth-child(4) { animation-delay: 0.4s; }
-.post-card:nth-child(5) { animation-delay: 0.5s; }
-.post-card:nth-child(6) { animation-delay: 0.6s; }
+.post-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+.post-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+.post-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+.post-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+.post-card:nth-child(5) {
+    animation-delay: 0.5s;
+}
+.post-card:nth-child(6) {
+    animation-delay: 0.6s;
+}
 
 @keyframes fadeInUp {
     from {
@@ -284,7 +292,7 @@
 }
 
 .post-card::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -324,7 +332,6 @@
     transform: scale(1.1);
 }
 
-/* Post category badge */
 .post-category {
     position: absolute;
     top: 16px;
@@ -341,7 +348,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Post content */
 .post-content {
     padding: 24px;
 }
@@ -449,7 +455,6 @@
     transform: scale(1.1);
 }
 
-/* ===== Sidebar (if needed) ===== */
 .blog-layout {
     display: grid;
     grid-template-columns: 1fr 340px;
@@ -583,7 +588,6 @@
     color: #94a3b8;
 }
 
-/* Tags */
 .tags-list {
     display: flex;
     flex-wrap: wrap;
@@ -609,7 +613,6 @@
     transform: translateY(-2px);
 }
 
-/* ===== Load More Section ===== */
 .blog-more {
     text-align: center;
     margin-top: 60px;
@@ -634,7 +637,7 @@
 }
 
 .blog-load::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -660,7 +663,6 @@
     font-size: 1.8rem;
 }
 
-/* ===== Newsletter Section ===== */
 .blog-newsletter {
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     border-radius: 24px;
@@ -672,19 +674,30 @@
 }
 
 .blog-newsletter::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -50%;
     right: -50%;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
+    background: radial-gradient(
+        circle,
+        rgba(14, 165, 233, 0.1) 0%,
+        transparent 70%
+    );
     animation: pulse 4s ease-in-out infinite;
 }
 
 @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.1); opacity: 0.8; }
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
 }
 
 .blog-newsletter h3 {
@@ -753,7 +766,6 @@
     box-shadow: 0 8px 20px rgba(14, 165, 233, 0.5);
 }
 
-/* ===== Responsive Design ===== */
 @media (max-width: 1200px) {
     .blog-layout {
         grid-template-columns: 1fr 300px;
@@ -765,11 +777,11 @@
         grid-template-columns: repeat(2, 1fr);
         gap: 24px;
     }
-    
+
     .featured-content {
         grid-template-columns: 1fr;
     }
-    
+
     .featured-text {
         padding: 36px;
     }
@@ -779,7 +791,7 @@
     .blog-layout {
         grid-template-columns: 1fr;
     }
-    
+
     .blog-sidebar {
         position: relative;
         top: 0;
@@ -790,27 +802,27 @@
     .blog-page {
         padding: 40px 0 60px;
     }
-    
+
     .blog-header h1 {
         font-size: 3.2rem;
     }
-    
+
     .featured-image img {
         min-height: 280px;
     }
-    
+
     .featured-text {
         padding: 28px;
     }
-    
+
     .featured-text h2 {
         font-size: 2.4rem;
     }
-    
+
     .blog-newsletter {
         padding: 48px 24px;
     }
-    
+
     .newsletter-form {
         flex-direction: column;
     }
@@ -821,15 +833,15 @@
         grid-template-columns: 1fr;
         gap: 20px;
     }
-    
+
     .post-thumb img {
         height: 200px;
     }
-    
+
     .blog-categories {
         gap: 8px;
     }
-    
+
     .category-chip {
         font-size: 1.3rem;
         padding: 8px 18px;

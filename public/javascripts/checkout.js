@@ -1,60 +1,59 @@
 // public/javascripts/checkout.js
-document.addEventListener('DOMContentLoaded', () => {
-    
+document.addEventListener("DOMContentLoaded", () => {
     // === DOM Elements ===
-    const addressSelector = document.getElementById('addressSelector');
-    const loyaltyCheckbox = document.getElementById('use-loyalty');
-    const checkoutForm = document.getElementById('checkout-form');
-    const placeOrderBtn = document.querySelector('.btn-place-order');
+    const addressSelector = document.getElementById("addressSelector");
+    const loyaltyCheckbox = document.getElementById("use-loyalty");
+    const checkoutForm = document.getElementById("checkout-form");
+    const placeOrderBtn = document.querySelector(".btn-place-order");
 
-    const errorBox = document.getElementById('checkoutError');
+    const errorBox = document.getElementById("checkoutError");
 
     // === DOM Elements (Summary Box) ===
-    const summaryBox = document.getElementById('checkout-summary-box');
-    const loyaltyRow = document.getElementById('loyalty-row');
-    const loyaltyValueEl = document.getElementById('summary-loyalty');
-    const totalValueEl = document.getElementById('summary-total');
+    const summaryBox = document.getElementById("checkout-summary-box");
+    const loyaltyRow = document.getElementById("loyalty-row");
+    const loyaltyValueEl = document.getElementById("summary-loyalty");
+    const totalValueEl = document.getElementById("summary-total");
 
-    // === State (Đọc từ EJS) ===
     let baseTotal = 0;
     let pointsAvailable = 0;
-    
+
     if (summaryBox) {
         baseTotal = parseFloat(summaryBox.dataset.total) || 0;
         pointsAvailable = parseFloat(summaryBox.dataset.pointsAvailable) || 0;
     }
 
     // === Helper ===
-    const formatCurrency = (amount) => (amount || 0).toLocaleString('vi-VN') + 'đ';
+    const formatCurrency = (amount) =>
+        (amount || 0).toLocaleString("vi-VN") + "đ";
 
-    // Hàm hiển thị lỗi (Thay thế alert)
     function showError(msg) {
         if (errorBox) {
             errorBox.textContent = msg;
-            errorBox.classList.remove('d-none');
-            // Cuộn lên để user thấy lỗi
-            errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            errorBox.classList.remove("d-none");
+            errorBox.scrollIntoView({ behavior: "smooth", block: "center" });
         } else {
-            // Fallback nếu không tìm thấy box
             alert(msg);
         }
     }
 
-    // === 1. LOGIC DROPDOWN ĐỊA CHỈ ===
     if (addressSelector) {
-        const streetInput = document.getElementById('street');
-        const wardInput = document.getElementById('ward');
-        const cityInput = document.getElementById('city');
-        addressSelector.addEventListener('change', (e) => {
+        const streetInput = document.getElementById("street");
+        const wardInput = document.getElementById("ward");
+        const cityInput = document.getElementById("city");
+        addressSelector.addEventListener("change", (e) => {
             const selectedOption = e.target.options[e.target.selectedIndex];
-            if (selectedOption.value === "") { streetInput.value = ""; wardInput.value = ""; cityInput.value = ""; return; }
+            if (selectedOption.value === "") {
+                streetInput.value = "";
+                wardInput.value = "";
+                cityInput.value = "";
+                return;
+            }
             streetInput.value = selectedOption.dataset.street;
             wardInput.value = selectedOption.dataset.ward;
             cityInput.value = selectedOption.dataset.city;
         });
     }
 
-    // === 2. (MỚI) LOGIC CHECKBOX ĐIỂM THƯỞNG ===
     function handleLoyaltyCheck() {
         if (!loyaltyCheckbox || !summaryBox) return;
 
@@ -63,74 +62,68 @@ document.addEventListener('DOMContentLoaded', () => {
         let finalTotal = baseTotal;
 
         if (usePoints) {
-            // Tính số điểm/tiền sẽ dùng (không vượt quá tổng tiền)
             pointsToUse = Math.min(pointsAvailable, baseTotal);
             finalTotal = baseTotal - pointsToUse;
-            
-            // Hiển thị
+
             loyaltyValueEl.textContent = `-${formatCurrency(pointsToUse)}`;
-            loyaltyRow.style.display = 'flex';
+            loyaltyRow.style.display = "flex";
         } else {
-            // Ẩn
-            loyaltyRow.style.display = 'none';
+            loyaltyRow.style.display = "none";
         }
 
-        // Cập nhật lại tổng tiền cuối cùng
         totalValueEl.textContent = formatCurrency(finalTotal);
     }
 
     if (loyaltyCheckbox) {
-        loyaltyCheckbox.addEventListener('change', handleLoyaltyCheck);
+        loyaltyCheckbox.addEventListener("change", handleLoyaltyCheck);
     }
-    
-    // === 3. LOGIC SUBMIT FORM CHECKOUT ===
-    if (checkoutForm && placeOrderBtn) {
-        checkoutForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); 
 
-            if (errorBox) errorBox.classList.add('d-none');
+    if (checkoutForm && placeOrderBtn) {
+        checkoutForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            if (errorBox) errorBox.classList.add("d-none");
             placeOrderBtn.disabled = true;
-            placeOrderBtn.textContent = 'ĐANG XỬ LÝ...';
+            placeOrderBtn.textContent = "ĐANG XỬ LÝ...";
 
             const formData = new FormData(checkoutForm);
             const payload = Object.fromEntries(formData.entries());
-            
-            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
-            payload.paymentMethod = paymentMethod ? paymentMethod.value : 'COD';
 
-            // Đọc trạng thái checkbox (ĐÃ ĐÚNG)
-            const cb = document.getElementById('use-loyalty');
+            const paymentMethod = document.querySelector(
+                'input[name="paymentMethod"]:checked'
+            );
+            payload.paymentMethod = paymentMethod ? paymentMethod.value : "COD";
+
+            const cb = document.getElementById("use-loyalty");
             payload.useLoyalty = !!(cb && cb.checked);
 
             try {
-                const response = await fetch('/api/checkout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                const response = await fetch("/api/checkout", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
                 });
                 const data = await response.json();
                 if (!response.ok) {
-                    throw new Error(data.message || 'Lỗi không xác định');
+                    throw new Error(data.message || "Lỗi không xác định");
                 }
 
-                if (data.type === 'VNPAY' && data.paymentUrl) {
+                if (data.type === "VNPAY" && data.paymentUrl) {
                     window.location.href = data.paymentUrl;
-                
-                } else if (data.type === 'COD') {
-                    const event = new CustomEvent('cart:updated', {
-                        detail: { cart: [], totalItems: 0 }
+                } else if (data.type === "COD") {
+                    const event = new CustomEvent("cart:updated", {
+                        detail: { cart: [], totalItems: 0 },
                     });
                     document.dispatchEvent(event);
-                    window.location.href = `/order/result/${data.orderCode}`; 
+                    window.location.href = `/order/result/${data.orderCode}`;
                 } else {
                     throw new Error("Phản hồi từ server không hợp lệ");
                 }
-
             } catch (err) {
-                console.error('Lỗi khi đặt hàng:', err);
+                console.error("Lỗi khi đặt hàng:", err);
                 showError(err.message);
                 placeOrderBtn.disabled = false;
-                placeOrderBtn.textContent = 'ĐẶT HÀNG';
+                placeOrderBtn.textContent = "ĐẶT HÀNG";
             }
         });
     }

@@ -4,20 +4,16 @@ const qs = require("qs");
 
 function normalizeValue(v) {
     if (v === null || v === undefined) return "";
-    // ensure string, trim, no thousands separators
     let s = String(v).trim();
-    // remove comma separators if any (e.g. "1,000")
     s = s.replace(/,/g, "");
     return s;
 }
 
 function buildSignString(params) {
-    // Build exactly: key1=value1&key2=value2 ... with values encoded by encodeURIComponent then %20 -> +
     const pairs = [];
     const keys = Object.keys(params).sort();
     for (const k of keys) {
         const v = normalizeValue(params[k]);
-        // encode value the same way VNPAY expects
         const ev = encodeURIComponent(v).replace(/%20/g, "+");
         pairs.push(`${k}=${ev}`);
     }
@@ -33,7 +29,6 @@ function createPaymentUrl(req, order) {
     const createDate = moment().format("YYYYMMDDHHmmss");
     const orderId = String(order.code);
 
-    // Ensure total is a Number and round to integer of VND*100
     const totalNumber = Number(order.total);
     if (Number.isNaN(totalNumber)) {
         throw new Error("order.total is not a number");
@@ -57,19 +52,13 @@ function createPaymentUrl(req, order) {
         vnp_CreateDate: createDate,
     };
 
-    // Build sign string using deterministic encoding
     const signData = buildSignString(vnp_Params);
-
-    // Logging for debug (remove/comment in production)
-    // console.log("VNPAY signData:", signData);
-    // console.log("VNPAY amount (vnp_Amount):", vnp_Params.vnp_Amount);
 
     const hmac = crypto.createHmac("sha512", secretKey);
     const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
 
     vnp_Params["vnp_SecureHash"] = signed;
 
-    // Build URL: use same encoding for query string as in sign (encodeURIComponent with %20->+)
     const qsPairs = [];
     Object.keys(vnp_Params)
         .sort()
@@ -83,38 +72,23 @@ function createPaymentUrl(req, order) {
     const queryString = qsPairs.join("&");
 
     const finalUrl = `${vnpUrl}?${queryString}`;
-    // console.log(
-    //     "VNPAY finalUrl (first 200 chars):",
-    //     finalUrl.substring(0, 200)
-    // );
     return finalUrl;
 }
 
 function verifyReturnUrl(vnp_ParamsIn) {
     const secretKey = process.env.VNP_HASHSECRET;
-    // Make a shallow copy so we don't mutate original
     const vnp_Params = Object.assign({}, vnp_ParamsIn);
 
     const secureHash =
         vnp_Params["vnp_SecureHash"] ||
         vnp_Params["vnp_SecureHash".toLowerCase()];
-    // delete hash fields
     delete vnp_Params["vnp_SecureHash"];
     delete vnp_Params["vnp_SecureHashType"];
 
-    // Build signData in same deterministic way
     const signData = buildSignString(vnp_Params);
-
-    // Logging for debug
-    // console.log("VNPAY verify signData:", signData);
-    // console.log("VNPAY incoming secureHash:", secureHash);
-
     const hmac = crypto.createHmac("sha512", secretKey);
     const signed = hmac.update(Buffer.from(signData, "utf-8")).digest("hex");
 
-    // console.log("VNPAY computed signed:", signed);
-
-    // compare ignoring case
     return (secureHash || "").toLowerCase() === (signed || "").toLowerCase();
 }
 
