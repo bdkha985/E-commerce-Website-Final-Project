@@ -16,6 +16,7 @@
 
 Dự án đã được deploy công khai trên nền tảng Cloud để phục vụ việc chấm điểm nhanh (nhưng cũng có 1 số hạn chế)
 
+  * Khi truy cập hãy đợi từ 3-5 phút để server khởi động (do hạn chế từ free hosting) 
   * **Public URL:** [https://kshop-live-website.onrender.com](https://kshop-live-website.onrender.com)
   * **Hạ tầng:** Render.com (Web Service) + MongoDB Atlas (Database) + Redis Cloud (Cache/Queue).
 
